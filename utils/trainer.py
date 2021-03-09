@@ -1,14 +1,22 @@
-from numpy.core.fromnumeric import argmax
-import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 from utils.evaluate import calc_acc_n_loss
 
 def train_engine(args, train_dataset, val_dataset, model, optimizer, scheduler=None):
-    criterion = nn.CrossEntropyLoss()
+    """ Generic Train function for training
 
+    Args:
+        args (TrainOptions): TrainOptions class (refer options/train_options.py)
+        train_dataset (Dataset): Train Dataset class object
+        val_dataset ([type]): Valid Dataset class object
+        model (Torch Model): Model for training
+        optimizer (Optimizer): Optimizer
+        scheduler (LR Schedular, optional): Changing learning rate according to a function. Defaults to None.
+    """
     device = args.device
+
+    criterion = nn.CrossEntropyLoss()
 
     params = {
         'batch_size': args.batch_size,
@@ -37,9 +45,11 @@ def train_engine(args, train_dataset, val_dataset, model, optimizer, scheduler=N
         if scheduler is not None:
             scheduler.step()
             curr_lr = scheduler.get_last_lr()
+            print('Current Learning Rate =', curr_lr)
         
-        print('\nValidating ...')
-        val_acc, val_loss = calc_acc_n_loss(args, model, valloader)
-        print(f'Valid Accuracy = {val_acc} %')
-        print('Valid loss =', val_loss)
-        print('-'*50)
+        if (i+1)%args.print_freq == 0:
+            print('\nValidating ...')
+            val_acc, val_loss = calc_acc_n_loss(args, model, valloader)
+            print(f'Valid Accuracy = {val_acc} %')
+            print('Valid loss =', val_loss)
+            print('-'*50)

@@ -2,7 +2,18 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 class MicroNet(nn.Module):
+    """ Model class for MicroNet
+    """
+
     def __init__(self, args):
+        """ Init function for defining layers and params
+
+        Args:
+            args (TrainOptions): TrainOptions class (refer options/train_options.py)
+            Required params from args:
+                num_classes (int): Final classes for last output layer
+        """
+    
         super(MicroNet, self).__init__()
         self.conv1 = nn.Conv2d(3, 1, kernel_size=1)
         self.conv2 = nn.Conv2d(1, 29, kernel_size=5)
@@ -21,7 +32,17 @@ class MicroNet(nn.Module):
         self.conv3_bn = nn.BatchNorm2d(59)
         self.conv4_bn = nn.BatchNorm2d(74)
         self.dense1_bn = nn.BatchNorm1d(300)
+    
     def forward(self, x):
+        """ Forward pass for the model
+
+        Args:
+            x (TorchTensor): TorchTensor of shape (N, 3, 48, 48)
+
+        Returns:
+            TorchTensor: TorchTensor of shape (N, args.num_classes)
+        """
+    
         x =  F.relu(self.conv1_bn(self.conv1(self.conv0_bn(x))))
         x = F.relu(self.conv2_bn(self.conv2(x)))
         x = F.relu(self.conv3_bn(self.conv3( self.maxpool2(x))))
