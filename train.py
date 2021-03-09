@@ -4,7 +4,7 @@ from data.gtsrb_loader import GTSRB
 from utils.trainer import train_engine
 from utils.evaluate import calc_acc_n_loss
 from torch.utils.data import DataLoader
-
+from utils.wandb_utils import init_wandb
 
 opt = TrainOptions()
 
@@ -18,13 +18,16 @@ test_dataset = GTSRB(args, setname='test')
 
 net, optimizer = model.CreateModel(args=args)
 
-train_engine(args=args, train_dataset=train_dataset, val_dataset=val_dataset, model=net, optimizer=optimizer)
+init_wandb(net, args)
+
+train_engine(args=args, train_dataset=train_dataset,
+             val_dataset=val_dataset, model=net, optimizer=optimizer)
 
 params = {
-        'batch_size': args.batch_size,
-        'num_workers': args.num_workers,
-        'shuffle': True
-    }
+    'batch_size': args.batch_size,
+    'num_workers': args.num_workers,
+    'shuffle': True
+}
 
 testloader = DataLoader(test_dataset, **params)
 
