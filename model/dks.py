@@ -2,8 +2,17 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 class DKS(nn.Module):
-    # define model elements
+    """ Model Class for DKS Net
+    """
     def __init__(self, args):
+        """ Init function for defining layers and params
+
+        Args:
+            args (TrainOptions): TrainOptions class (refer options/train_options.py)
+            Required params from args:
+                num_classes (int): Final classes for last output layer
+        """
+
         super(DKS, self).__init__()
         self.conv1 = nn.Conv2d(in_channels=3, out_channels=32, kernel_size=(3, 3))
         self.maxpool1 = nn.MaxPool2d(kernel_size=(2, 2))
@@ -19,8 +28,17 @@ class DKS(nn.Module):
         self.flat1 = nn.Linear(128, 512)
         self.flat2 = nn.Linear(512, args.num_classes)
 
-    # forward propagate input
     def forward(self, x):
+        """ Forward pass for the model
+
+        Args:
+            x (TorchTensor): TorchTensor of shape (N, 3, 48, 48)
+            N: Batchsize
+
+        Returns:
+            TorchTensor: TorchTensor of shape (N, args.num_classes)
+        """
+
         x = F.relu(self.maxpool1(self.conv1(x)))
         x = F.relu(self.maxpool2(self.conv2(x)))
         x = F.relu(self.maxpool3(self.conv3(x)))

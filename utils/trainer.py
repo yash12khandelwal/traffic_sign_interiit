@@ -1,6 +1,3 @@
-from numpy.core.fromnumeric import argmax
-import os
-import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
 from tqdm import tqdm
@@ -9,9 +6,19 @@ from utils.wandb_utils import wandb_log, save_model_wandb
 
 
 def train_engine(args, train_dataset, val_dataset, model, optimizer, scheduler=None):
-    criterion = nn.CrossEntropyLoss()
+    """ Generic Train function for training
 
+    Args:
+        args (TrainOptions): TrainOptions class (refer options/train_options.py)
+        train_dataset (Dataset): Train Dataset class object
+        val_dataset ([type]): Valid Dataset class object
+        model (Torch Model): Model for training
+        optimizer (Optimizer): Optimizer
+        scheduler (LR Schedular, optional): Changing learning rate according to a function. Defaults to None.
+    """
     device = args.device
+
+    criterion = nn.CrossEntropyLoss()
 
     params = {
         'batch_size': args.batch_size,
@@ -45,6 +52,7 @@ def train_engine(args, train_dataset, val_dataset, model, optimizer, scheduler=N
         if scheduler is not None:
             scheduler.step()
             curr_lr = scheduler.get_last_lr()
+            print('Current Learning Rate =', curr_lr)
 
         print('\nValidating ...')
         val_acc, val_loss = calc_acc_n_loss(args, model, valloader)
@@ -54,9 +62,9 @@ def train_engine(args, train_dataset, val_dataset, model, optimizer, scheduler=N
 
         if (i+1) % args.save_pred_every == 0:
             print('Taking snapshot ...')
-            if not os.path.exists(args.snapshotdir):
-                os.makedirs(args.snapshotdir)
-            save_path = os.path.join(args.snapshotdir, str(i+1) + '.pth')
+            if not os.path.exists(args.snapshot_dir):
+                os.makedirs(args.snapshot_dir)
+            save_path = os.path.join(args.snapshot_dir, str(i+1) + '.pth')
             torch.save(model.state_dict(), save_path)
 
         wandb_log(train_loss/len(trainloader), val_loss, val_acc, i)

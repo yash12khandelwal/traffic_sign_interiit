@@ -3,6 +3,21 @@ from model.micronet import MicroNet
 import torch.optim as optim
 
 def CreateModel(args):
+    """ Initialise model and optimiser
+
+    Note:
+    When adding a new file in models add a condition below with the params
+
+    Args:
+        args (TrainOptions): Training/Testing arguments (refer options/train_options.py)
+
+    Raises:
+        ValueError: If the model key provided in cmd arguments doesn't exist below
+
+    Returns:
+        tuple: Model and Optimiser
+    """
+
     device = args.device
 
     if args.model == 'dks':
