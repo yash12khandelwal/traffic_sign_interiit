@@ -54,8 +54,9 @@ def train_engine(args, train_dataset, val_dataset, model, optimizer, scheduler=N
 
         if (i+1) % args.save_pred_every == 0:
             print('Taking snapshot ...')
+            if not os.path.exists(args.snapshotdir):
+                os.makedirs(args.snapshotdir)
             save_path = os.path.join(args.snapshotdir, str(i+1) + '.pth')
             torch.save(model.state_dict(), save_path)
-            save_model_wandb(save_path)
 
         wandb_log(train_loss/len(trainloader), val_loss, val_acc, i)

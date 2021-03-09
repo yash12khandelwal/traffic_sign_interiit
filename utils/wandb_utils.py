@@ -19,13 +19,6 @@ def init_wandb(model, args=None) -> None:
     wandb.watch(model, log="all")
 
 
-def save_model_wandb(save_path: str):
-    """
-    Save model weights to wandb
-    """
-    wandb.save(os.path.abspath(save_path))
-
-
 def wandb_log(train_loss: float, val_loss: float, val_acc: float, epoch: int):
     """
     Logs the accuracy and loss to wandb
