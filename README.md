@@ -16,11 +16,11 @@ Baselines
 - MicroNet
 ```
 Validation Accuracy = 98.57
-Test Accuracy = 98.39
+Test Accuracy = 98.59
 ```
 
 - DKS
 ```
-Validation Accuracy = 97.52
-Test Accuracy = 97.44
+Validation Accuracy = 96.475
+Test Accuracy = 96.53
 ```
