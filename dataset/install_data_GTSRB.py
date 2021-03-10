@@ -39,7 +39,7 @@ def make_dir(path):
     """
 
     if not os.path.exists(path):
-        os.mkdir(path)
+        os.makedirs(path)
 
 Annotation = namedtuple('Annotation', ['filename', 'label'])
 def read_annotations(filename):
@@ -115,14 +115,11 @@ def split_train_validation_sets(source_path, train_path, validation_path, all_pa
         validation_fraction (float, optional): Split fraction . Defaults to 0.2.
     """
     
-    if not os.path.exists(train_path):
-        os.makedirs(train_path)
+    make_dir(train_path)
         
-    if not os.path.exists(validation_path):
-        os.makedirs(validation_path)
+    make_dir(validation_path)
         
-    if not os.path.exists(all_path):
-        os.makedirs(all_path)
+    make_dir(all_path)
     
     annotations = load_training_annotations(source_path)
     filenames = defaultdict(list)
