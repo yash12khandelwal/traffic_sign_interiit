@@ -11,7 +11,7 @@ def init_wandb(model, args=None) -> None:
         name=args.wandb_name,
         project="traffic-sign",
         id=args.wandb_id,
-        dir="~/",
+        dir="./",
     )
     if args:
         wandb.config.update(args)
@@ -28,3 +28,19 @@ def wandb_log(train_loss: float, val_loss: float, val_acc: float, epoch: int):
         'Validation loss': val_loss,
         'Validation Accuracy': val_acc
     })
+
+def wandb_save_summary(test_acc: float):
+    """ 
+    Saves Test accuracy in wandb
+    """
+
+    wandb.run.summary["test_accuracy"] = test_acc
+
+def save_model_wandb(save_path):
+    """ Saves model to wandb
+
+    Args:
+        save_path (str): Path to save the wandb model
+    """
+
+    wandb.save(os.path.abspath(save_path))

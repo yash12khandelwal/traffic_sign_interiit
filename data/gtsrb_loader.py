@@ -4,8 +4,28 @@ from PIL import Image
 import numpy as np
 from collections import namedtuple
 import csv
-from torch.utils.data import Dataset
+from torch.utils.data import Dataset, DataLoader
 from torchvision import transforms
+
+
+def get_loader(args, dataset):
+    """ Function that returns dataloader
+
+    Args:
+        args (TrainOptions): TrainOptions class (refer options/train_options.py)
+        dataset (Dataset): Custom Dataset class
+
+    Returns:
+        DataLoader: Dataloader for training or testing
+    """
+    params = {
+        'batch_size': args.batch_size,
+        'num_workers': args.num_workers,
+        'shuffle': True
+    }
+
+    trainloader = DataLoader(dataset, **params)
+    return trainloader
 
 def get_train_tuple(train_path):
     """ Generates a list of images and ground truths for Train DataLoader

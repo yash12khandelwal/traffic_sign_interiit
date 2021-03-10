@@ -135,3 +135,4 @@ dataset/GTSRB
 **/checkpoints
 **/.vscode
 **/__pycache__
+**/wandb
