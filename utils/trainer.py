@@ -56,7 +56,7 @@ def train_engine(args, trainloader, valloader, model, optimizer, scheduler=None)
         if scheduler is not None:
             scheduler.step()
             curr_lr = scheduler.get_last_lr()
-            print('Current Learning Rate =', curr_lr)
+            print('\nCurrent Learning Rate =', curr_lr)
 
         print('\nValidating ...')
         val_acc, val_loss = calc_acc_n_loss(args, model, valloader)

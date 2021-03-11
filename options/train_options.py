@@ -85,6 +85,8 @@ class TrainOptions():
         
         parser.add_argument("--class-weights",type=str,default=None,help="Class weights (numpy file)")
 
+        parser.add_argument('--lr-decay-step', type=int, default=5, help="Step size for Learning rate decay")
+
         return parser.parse_args()
 
     def print_options(self, args):

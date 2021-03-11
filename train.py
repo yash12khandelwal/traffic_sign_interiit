@@ -18,12 +18,12 @@ trainloader = get_loader(args, train_dataset)
 valloader = get_loader(args, val_dataset)
 testloader = get_loader(args, test_dataset)
 
-net, optimizer = model.CreateModel(args=args)
+net, optimizer, schedular = model.CreateModel(args=args)
 
 init_wandb(net, args)
 
 train_engine(args=args, trainloader=trainloader,
-             valloader=valloader, model=net, optimizer=optimizer)
+             valloader=valloader, model=net, optimizer=optimizer, scheduler=schedular)
 
 test_acc, test_loss = calc_acc_n_loss(args, net, testloader)
 
