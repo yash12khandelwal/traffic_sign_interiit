@@ -34,6 +34,7 @@ class TrainOptions():
             --print-freq [int]: Printing loss and valid accuracy after every such epochs, Defaults to 5
             --wandb-api-key [key]: Wandb api-key, Defaults to None 
             --wandb_id [id]: Wandb id, Defaults to None
+            --class_weights [numpy file]: Class weights (numpy file)
         """
 
         parser = argparse.ArgumentParser( description="training script for InterIIT Trafic Sign Recognition" )
@@ -81,6 +82,8 @@ class TrainOptions():
                             help="Wandb run resume id (valid only if restore-from != None")
         parser.add_argument("--wandb-name", type=str,
                             default='', help="Name of the wandb run")
+        
+        parser.add_argument("--class-weights",type=str,default=None,help="Class weights (numpy file)")
 
         return parser.parse_args()
 
