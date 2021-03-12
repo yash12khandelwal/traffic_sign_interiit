@@ -6,6 +6,7 @@ from collections import namedtuple
 import csv
 from torch.utils.data import Dataset, DataLoader
 from torchvision import transforms
+from augments.augs import load_augments
 
 
 def get_loader(args, dataset):
@@ -27,6 +28,7 @@ def get_loader(args, dataset):
     trainloader = DataLoader(dataset, **params)
     return trainloader
 
+
 def get_train_tuple(train_path):
     """ Generates a list of images and ground truths for Train DataLoader
 
@@ -46,15 +48,16 @@ def get_train_tuple(train_path):
     for root, dirs, files in os.walk(train_path):
         for class_dir in dirs:
             # print(class_dir, (os.listdir(osp.join(root, class_dir))))
-            mapper = lambda x: osp.join(root, class_dir, x)
+            def mapper(x): return osp.join(root, class_dir, x)
             img_loc = list(map(mapper, os.listdir(osp.join(root, class_dir))))
-            img_loc = [ f for f in img_loc if not f.endswith('.csv') ]
+            img_loc = [f for f in img_loc if not f.endswith('.csv')]
             class_id = [int(class_dir)]*len(img_loc)
             # print(int(class_dir))
             train_list.extend(img_loc)
             traingt_list.extend(class_id)
 
     return (train_list, traingt_list)
+
 
 def get_test_tuple(test_path):
     """ Generates a list of images and ground truths for Test DataLoader
@@ -73,17 +76,18 @@ def get_test_tuple(test_path):
     test_ids = []
 
     test_csv = osp.join(test_path, 'GT-final_test.csv')
-    
+
     with open(test_csv) as f:
         reader = csv.reader(f, delimiter=';')
         next(reader)
         for row in reader:
-            filename = row[0] # filename is in the 0th column
-            label = int(row[7]) # label is in the 7th column
+            filename = row[0]  # filename is in the 0th column
+            label = int(row[7])  # label is in the 7th column
             test_list.append(osp.join(test_path, filename))
             test_ids.append(label)
 
     return test_list, test_ids
+
 
 class GTSRB(Dataset):
     """ 
@@ -115,7 +119,7 @@ class GTSRB(Dataset):
         """
 
         return len(self.imgs)
-    
+
     def transform(self, image):
         """ Function to apply tranformations
 
@@ -129,11 +133,12 @@ class GTSRB(Dataset):
             TorchTensor: Transformed Tensor
         """
 
-        tran = transforms.Compose([
-                transforms.Resize(self.size),
-                transforms.ToTensor(),
-                transforms.Normalize((0.3337, 0.3064, 0.3171), ( 0.2672, 0.2564, 0.2629))
-            ])
+        tran = transforms.Compose([**load_augments(args.config_path),
+                                   transforms.Resize(self.size),
+                                   transforms.ToTensor(),
+                                   transforms.Normalize((0.3337, 0.3064, 0.3171),
+                                                        (0.2672, 0.2564, 0.2629))
+                                   ])
 
         return tran(image)
 

@@ -7,6 +7,7 @@ import datetime
 class TrainOptions():
     """ Training options for cmdline
     """
+
     def initialize(self):
         """ Parameter definitions
 
@@ -37,9 +38,12 @@ class TrainOptions():
             --class_weights [numpy file]: Class weights (numpy file)
         """
 
-        parser = argparse.ArgumentParser( description="training script for InterIIT Trafic Sign Recognition" )
-        parser.add_argument("--model", type=str, default='micronet', help="available options : dks/micronet")
-        parser.add_argument("--device", type=str, default='cpu', help="which GPU to use")
+        parser = argparse.ArgumentParser(
+            description="training script for InterIIT Trafic Sign Recognition")
+        parser.add_argument("--model", type=str, default='micronet',
+                            help="available options : dks/micronet")
+        parser.add_argument("--device", type=str,
+                            default='cpu', help="which GPU to use")
 
         parser.add_argument("--snapshot-dir", type=str, default='checkpoints/logs',
                             help="Where to save snapshots of the model.")
@@ -73,8 +77,10 @@ class TrainOptions():
         parser.add_argument("--restore-from", type=str, default=None,
                             help="Where restore model parameters from.")
 
-        parser.add_argument("--save-pred-every", type=int, default=5, help="Save summaries and checkpoint every often.")
-        parser.add_argument("--print-freq", type=int, default=5, help="print loss and time fequency.")
+        parser.add_argument("--save-pred-every", type=int, default=5,
+                            help="Save summaries and checkpoint every often.")
+        parser.add_argument("--print-freq", type=int, default=5,
+                            help="print loss and time fequency.")
 
         parser.add_argument("--wandb-api-key", type=str,
                             default=None, help="Wandb API Key")
@@ -82,10 +88,14 @@ class TrainOptions():
                             help="Wandb run resume id (valid only if restore-from != None")
         parser.add_argument("--wandb-name", type=str,
                             default='', help="Name of the wandb run")
-        
-        parser.add_argument("--class-weights",type=str,default=None,help="Class weights (numpy file)")
 
-        parser.add_argument('--lr-decay-step', type=int, default=5, help="Step size for Learning rate decay")
+        parser.add_argument("--class-weights", type=str,
+                            default=None, help="Class weights (numpy file)")
+        parser.add_argument("--config-path", type=str,
+                            default=None, help="Path to config file")
+
+        parser.add_argument('--lr-decay-step', type=int,
+                            default=5, help="Step size for Learning rate decay")
 
         return parser.parse_args()
 
@@ -103,7 +113,7 @@ class TrainOptions():
         # save to the disk
         if not os.path.exists(args.snapshot_dir):
             os.makedirs(args.snapshot_dir)
-        
+
         t = datetime.datetime.now()
         name = f'opt_{args.model}_{t.year}-{t.month}-{t.day}_{t.hour}-{t.minute}.txt'
         file_name = osp.join(args.snapshot_dir, name)
