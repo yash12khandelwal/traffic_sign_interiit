@@ -77,7 +77,7 @@ def load_training_annotations(source_path, num_class):
     """
 
     annotations = []
-    for c in range(0,43):
+    for c in range(0, num_class):
         filename = os.path.join(source_path, format(c, '05d'), 'GT-' + format(c, '05d') + '.csv')
         annotations.extend(read_annotations(filename))
     return annotations
