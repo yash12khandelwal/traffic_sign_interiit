@@ -22,7 +22,5 @@ def load_augments(config_path='../config/configs.yaml'):
         if val[0] == True:
             transforms.append(augments[key](**hyperparams[key]))
 
-    return transforms
-
-
-load_augments()
+    seq = iaa.Sequential(transforms)#.augment_image
+    return seq

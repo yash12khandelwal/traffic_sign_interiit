@@ -7,6 +7,7 @@ import csv
 from torch.utils.data import Dataset, DataLoader
 from torchvision import transforms
 from augments.augs import load_augments
+import cv2
 
 
 def get_loader(args, dataset):
@@ -62,7 +63,7 @@ def get_train_tuple(train_path):
 def get_test_tuple(test_path):
     """ Generates a list of images and ground truths for Test DataLoader
 
-    Reads a csv file provided with GTSRB Dataset and returns the above
+ data/gtsrb_loader.py   Reads a csv file provided with GTSRB Dataset and returns the above
 
     Args:
         test_path (str): Path of the tes Dataset
@@ -90,7 +91,7 @@ def get_test_tuple(test_path):
 
 
 class GTSRB(Dataset):
-    """ 
+    """
     Dataset class for GTSRB
     """
 
@@ -102,6 +103,7 @@ class GTSRB(Dataset):
             setname (str, optional): Possible values train, val, test for Dataset. Defaults to 'train'.
         """
 
+        self.args = args
         self.classes = args.num_classes
         self.setname = setname
         self.path = osp.join(args.data_dir, self.setname)
@@ -133,14 +135,27 @@ class GTSRB(Dataset):
             TorchTensor: Transformed Tensor
         """
 
-        tran = transforms.Compose([**load_augments(args.config_path),
-                                   transforms.Resize(self.size),
-                                   transforms.ToTensor(),
-                                   transforms.Normalize((0.3337, 0.3064, 0.3171),
+
+        res = transforms.Resize(self.size)
+        image = cv2.resize(image, self.size)
+        # image = load_augments(config_path=self.args.config_path)(image=image),
+        tran_train = transforms.Compose([
+                                    # load_augments(config_path=self.args.config_path).augment_image,
+                                    transforms.ToTensor(),
+                                    transforms.Normalize((0.3337, 0.3064, 0.3171),
                                                         (0.2672, 0.2564, 0.2629))
                                    ])
+        tran_test = transforms.Compose([
+                # transforms.Resize(self.size),
+                transforms.ToTensor(),
+                transforms.Normalize((0.3337, 0.3064, 0.3171),
+                                    (0.2672, 0.2564, 0.2629))
+                ])
 
-        return tran(image)
+        if self.setname == 'train':
+            return tran_train(image)
+        else:
+            return tran_test(image)
 
     def __getitem__(self, idx):
         """ Dataset Method for returning image and class at idx in list
@@ -152,7 +167,7 @@ class GTSRB(Dataset):
             tuple: (Image, Ground Truth) for a setname
         """
 
-        img = Image.open(self.imgs[idx])
+        img = cv2.imread(self.imgs[idx], 1)
         gt = self.ids[idx]
 
         img = self.transform(img)
