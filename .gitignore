@@ -127,3 +127,12 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Repo specific ignores
+snapshot
+dataset/zips
+dataset/GTSRB
+**/checkpoints
+**/.vscode
+**/__pycache__
+**/wandb
