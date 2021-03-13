@@ -19,15 +19,16 @@ def init_wandb(model, args=None) -> None:
     wandb.watch(model, log="all")
 
 
-def wandb_log(train_loss: float, val_loss: float, val_acc: float, epoch: int):
+def wandb_log(train_loss: float, val_loss: float, train_acc: float, val_acc: float, epoch: int):
     """
     Logs the accuracy and loss to wandb
     """
     wandb.log({
         'Training loss': train_loss,
         'Validation loss': val_loss,
+        'Training Accuracy': train_acc,
         'Validation Accuracy': val_acc
-    })
+    }, step=epoch)
 
 def wandb_save_summary(test_acc: float):
     """ 
