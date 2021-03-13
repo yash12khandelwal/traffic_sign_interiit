@@ -79,15 +79,18 @@ def train_engine(args, trainloader, valloader, model, optimizer, scheduler=None)
                 os.makedirs(args.snapshot_dir)
             save_path = os.path.join(args.snapshot_dir, f'{args.model}_{i+1}.pth')
             torch.save(model.state_dict(), save_path)
-            save_model_wandb(save_path)
+            if args.wandb:
+                save_model_wandb(save_path)
 
-        wandb_log(train_loss, val_loss, train_acc, val_acc, i)
+        if args.wandb:
+            wandb_log(train_loss, val_loss, train_acc, val_acc, i)
 
     t = datetime.datetime.now()
     name = f'opt_{args.model}_{t.year}-{t.month}-{t.day}_{t.hour}-{t.minute}.pth'
 
     save_path = os.path.join(args.snapshot_dir, name)
     torch.save(model.state_dict(), save_path)
-    save_model_wandb(save_path)
+    if args.wandb:
+        save_model_wandb(save_path)
 
     return model

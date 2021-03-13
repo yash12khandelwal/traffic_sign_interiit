@@ -26,7 +26,8 @@ if __name__ == "__main__":
 
     net, optimizer, schedular = model.CreateModel(args=args)
 
-    init_wandb(net, args)
+    if args.wandb:
+        init_wandb(net, args)
 
     train_engine(args=args, trainloader=trainloader,
                 valloader=valloader, model=net, optimizer=optimizer, scheduler=schedular)
@@ -36,4 +37,5 @@ if __name__ == "__main__":
     print(f'Test Accuracy = {test_acc}')
     print(f'Test Loss = {test_loss}')
 
-    wandb_save_summary(test_acc=test_acc)
+    if args.wandb:
+        wandb_save_summary(test_acc=test_acc)
