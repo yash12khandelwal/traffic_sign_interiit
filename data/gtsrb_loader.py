@@ -24,8 +24,8 @@ def get_loader(args, dataset):
         'shuffle': True
     }
 
-    trainloader = DataLoader(dataset, **params)
-    return trainloader
+    dataloader = DataLoader(dataset, **params)
+    return dataloader
 
 def get_train_tuple(train_path):
     """ Generates a list of images and ground truths for Train DataLoader
