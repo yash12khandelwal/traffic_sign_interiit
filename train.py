@@ -3,6 +3,7 @@ from options.train_options import *
 from data.gtsrb_loader import GTSRB, get_loader
 from utils.trainer import train_engine
 from utils.evaluate import calc_acc_n_loss
+from utils.utils import set_seed
 from utils.wandb_utils import init_wandb, wandb_save_summary
 
 if __name__ == "__main__":
@@ -14,7 +15,7 @@ if __name__ == "__main__":
     opt.print_options(args)
 
     # setting seed system wide for proper reproducibility
-	set_seed(int(args.seed))
+    set_seed(int(args.seed))
 
     train_dataset = GTSRB(args, setname='train')
     val_dataset = GTSRB(args, setname='valid')

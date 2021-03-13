@@ -30,3 +30,4 @@ def cfg_parser(cfg_file: str) -> dict:
     exp_cfg = Config(cfg_file, cfg)
 
     return exp_cfg
+

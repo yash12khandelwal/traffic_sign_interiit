@@ -43,14 +43,14 @@ class TrainOptions():
             "-v",
             "--version",
             type=str,
-            default="default.json",
+            default="default_params.json",
             help="name of the config file to use.",
         )
         parser.add_argument(
             "-w", "--wandb", action="store_true", help="Log to wandb or not"
         )
-
-        cfg = cfg_parser(join("config", args.version))
+        args=parser.parse_args()
+        cfg = cfg_parser(osp.join("config", args.version))
         cfg.wandb = args.wandb
         cfg.version = args.version
         # parser.add_argument("--model", type=str, default='micronet', help="available options : dks/micronet")
