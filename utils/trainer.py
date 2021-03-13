@@ -38,7 +38,8 @@ def train_engine(args, trainloader, valloader, model, optimizer, scheduler=None)
         model.train()
 
         train_loss = 0.0
-
+        correct = 0
+        total = 0
         print('-'*50)
         print('\nEpoch =', i)
         for (img, gt) in tqdm(trainloader):
@@ -50,6 +51,9 @@ def train_engine(args, trainloader, valloader, model, optimizer, scheduler=None)
 
             train_loss += loss.item()
 
+            correct += (out == gt).sum()
+            total += len(gt)
+
             loss.backward()
             optimizer.step()
 
@@ -58,10 +62,15 @@ def train_engine(args, trainloader, valloader, model, optimizer, scheduler=None)
             curr_lr = scheduler.get_last_lr()
             print('\nCurrent Learning Rate =', curr_lr)
 
+        train_acc = (correct/total).item()*100
+        train_loss /= len(trainloader)
+        print(f'Train Accuracy = {train_acc} %')
+        print(f'Train loss = {train_loss}')
+
         print('\nValidating ...')
         val_acc, val_loss = calc_acc_n_loss(args, model, valloader)
         print(f'Valid Accuracy = {val_acc} %')
-        print('Valid loss =', val_loss)
+        print(f'Valid loss = {val_loss}')
         print('-'*50)
 
         if (i+1) % args.save_pred_every == 0:
@@ -72,7 +81,7 @@ def train_engine(args, trainloader, valloader, model, optimizer, scheduler=None)
             torch.save(model.state_dict(), save_path)
             save_model_wandb(save_path)
 
-        wandb_log(train_loss/len(trainloader), val_loss, val_acc, i)
+        wandb_log(train_loss, val_loss, train_acc, val_acc, i)
 
     t = datetime.datetime.now()
     name = f'opt_{args.model}_{t.year}-{t.month}-{t.day}_{t.hour}-{t.minute}.pth'
