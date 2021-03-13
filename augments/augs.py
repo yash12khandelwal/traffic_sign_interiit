@@ -4,6 +4,9 @@ import imgaug.augmenters as iaa
 import cv2
 import random
 
+"""
+Add the function call when adding new augmentations
+"""
 augments = {
         "Fog": iaa.weather.Fog,
         "Snowflakes": iaa.Snowflakes,
@@ -17,6 +20,15 @@ augments = {
 
 
 def load_augments(config_path='../config/default_augment_conf.json', rand=False):
+    """ Function that returns the augmentatons list from available ones
+
+    Args:
+        config_path (str, optional): path to augmentations configs. Defaults to '../config/default_augment_conf.json'.
+        rand (bool, optional): Flag to use a single random augmentations. Defaults to False.
+
+    Returns:
+        iaa.Sequential: Sequential of list of tranforms according to config file and rand
+    """
 
     with open(config_path, 'r') as f:
         augments_conf= json.load(f)

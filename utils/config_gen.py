@@ -9,6 +9,7 @@ args = parser.parse_args()
 
 contents = dict()
 
+# Dictionary to define which augmentation to execute
 contents["Augmentation"] = {
     "Fog": True,
     "Snowflakes": True,
@@ -20,6 +21,7 @@ contents["Augmentation"] = {
     "Invert": True
 }
 
+# Parameters related to augmentations
 contents["Fog"] = {}
 
 contents["Snowflakes"] = {
@@ -52,6 +54,7 @@ contents["Invert"] = {
     "per_channel": 0.5
 }
 
+# Probability for applying augmentations
 contents["probability"] = 0.3
 
 with open(args.save_path, "w") as file:
