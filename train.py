@@ -5,29 +5,35 @@ from utils.trainer import train_engine
 from utils.evaluate import calc_acc_n_loss
 from utils.wandb_utils import init_wandb, wandb_save_summary
 
-opt = TrainOptions()
+if __name__ == "__main__":
 
-args = opt.initialize()
-opt.print_options(args)
+    #TODO Instead of using so many arguments, use a config file for each run. Just change the relevant parameters in the config file.
+    
+    opt = TrainOptions()
+    args = opt.initialize()
+    opt.print_options(args)
 
-train_dataset = GTSRB(args, setname='train')
-val_dataset = GTSRB(args, setname='valid')
-test_dataset = GTSRB(args, setname='test')
+    # setting seed system wide for proper reproducibility
+	set_seed(int(args.seed))
 
-trainloader = get_loader(args, train_dataset)
-valloader = get_loader(args, val_dataset)
-testloader = get_loader(args, test_dataset)
+    train_dataset = GTSRB(args, setname='train')
+    val_dataset = GTSRB(args, setname='valid')
+    test_dataset = GTSRB(args, setname='test')
 
-net, optimizer, schedular = model.CreateModel(args=args)
+    trainloader = get_loader(args, train_dataset)
+    valloader = get_loader(args, val_dataset)
+    testloader = get_loader(args, test_dataset)
 
-init_wandb(net, args)
+    net, optimizer, schedular = model.CreateModel(args=args)
 
-train_engine(args=args, trainloader=trainloader,
-             valloader=valloader, model=net, optimizer=optimizer, scheduler=schedular)
+    init_wandb(net, args)
 
-test_acc, test_loss = calc_acc_n_loss(args, net, testloader)
+    train_engine(args=args, trainloader=trainloader,
+                valloader=valloader, model=net, optimizer=optimizer, scheduler=schedular)
 
-print('Test Accuracy =', test_acc)
-print('Test Loss =', test_loss)
+    test_acc, test_loss = calc_acc_n_loss(args, net, testloader)
 
-wandb_save_summary(test_acc=test_acc)
+    print(f'Test Accuracy = {test_acc}')
+    print(f'Test Loss = {test_loss}')
+
+    wandb_save_summary(test_acc=test_acc)
