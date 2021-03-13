@@ -67,7 +67,7 @@ class TrainOptions():
                             help="Decay parameter to compute the learning rate (only for deeplab).")
 
         parser.add_argument("--num-classes", type=int, default=43,
-                            help="Number of classes for cityscapes.")
+                            help="Number of classes for GTSRB.")
         parser.add_argument("--init-weights", type=str,
                             default=None, help="initial model.")
         parser.add_argument("--restore-from", type=str, default=None,
@@ -86,6 +86,8 @@ class TrainOptions():
         parser.add_argument("--class-weights",type=str,default=None,help="Class weights (numpy file)")
 
         parser.add_argument('--lr-decay-step', type=int, default=5, help="Step size for Learning rate decay")
+
+        parser.add_argument("-s", "--seed", default=42, help="Random seed")
 
         return parser.parse_args()
 
