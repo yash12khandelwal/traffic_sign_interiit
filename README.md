@@ -6,9 +6,14 @@ cd dataset
 python install_data_GTSRB.py
 ```
 
-To train the model
+To train the model without logging on wandb
 ```
-python train.py --model micronet --size 48 48 --batch-size 50 --epochs 85 --learning-rate 0.007 --weight-decay 0.00001  --device cuda
+python train.py -v default_params.json
+```
+
+To train the model while logging on wandb
+```
+python train.py -v default_params.json -w
 ```
 
 Baselines
