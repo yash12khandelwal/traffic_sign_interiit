@@ -58,6 +58,14 @@ def write_annotations(annotations, filepath):
     df.to_csv(filepath, sep=';', index=False)
 
 def split_train_val_test_sets(path, annotations, validation_fraction, test_fraction):
+    """ Function to split the new classes in train, val and test
+
+    Args:
+        path (str): Path to save the new extended dataset
+        annotations (list): List of Annotations along with file image locations and labels
+        validation_fraction (float): Fraction for validation
+        test_fraction (float): Fraction for test
+    """
 
     train_path = osp.join(path, 'train')
     validation_path = osp.join(path, 'valid')
@@ -88,19 +96,20 @@ def split_train_val_test_sets(path, annotations, validation_fraction, test_fract
 
     write_annotations(test_annotation, osp.join(test_path, 'GT-Test.csv'))
 
-def prepare_train_val_n_test(source_path, validation_fraction=0.2, test_fraction=0.2):
+def prepare_train_val_n_test(source_path, save_classpath, validation_fraction=0.2, test_fraction=0.2):
     """ Prepare Train/Valid from raw dataset
 
     Args:
         validation_fraction (float, optional): valid/val split. Defaults to 0.2.
     """
 
-    path = 'EXTRA'
+    path = save_classpath
 
     annotations = make_annotations(source_path)
     split_train_val_test_sets(path, annotations, validation_fraction, test_fraction)
 
 if __name__ == '__main__':
     extra_classpath = sys.argv[1]
+    save_classpath = sys.argv[2]
 
-    prepare_train_val_n_test(extra_classpath, validation_fraction=0.2, test_fraction=0.2)
+    prepare_train_val_n_test(extra_classpath, save_classpath, validation_fraction=0.2, test_fraction=0.2)
