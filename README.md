@@ -8,12 +8,12 @@ python install_data_GTSRB.py
 
 To train the model without logging on wandb
 ```
-python train.py -v default_params.json
+python train.py -v default_params
 ```
 
 To train the model while logging on wandb
 ```
-python train.py -v default_params.json -w
+python train.py -v default_params -w
 ```
 
 Baselines

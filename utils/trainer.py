@@ -92,7 +92,7 @@ def train_engine(args, trainloader, valloader, model, optimizer, scheduler=None)
             wandb_log(train_loss, val_loss, train_acc, val_acc, i)
 
     t = datetime.datetime.now()
-    name = f'opt_{args.model}_{t.year}-{t.month}-{t.day}_{t.hour}-{t.minute}.pt'
+    name = f'final_{args.model}_{t.year}-{t.month}-{t.day}_{t.hour}-{t.minute}.pt'
 
     save_path = os.path.join(args.snapshot_dir, name)
     torch.save({
