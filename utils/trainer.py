@@ -51,7 +51,7 @@ def train_engine(args, trainloader, valloader, model, optimizer, scheduler=None)
 
             train_loss += loss.item()
 
-            correct += (out == gt).sum()
+            correct += (torch.argmax(out, dim=-1) == gt).sum()
             total += len(gt)
 
             loss.backward()

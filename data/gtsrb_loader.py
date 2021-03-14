@@ -30,8 +30,7 @@ def get_loader(args, dataset):
     dataloader = DataLoader(dataset, **params)
     return dataloader
 
-
-def get_train_tuple(train_path):
+def get_train_tuple(train_path, extra_train_path=None):
     """ Generates a list of images and ground truths for Train DataLoader
 
     Recursive folder traversal to return the above
@@ -47,24 +46,35 @@ def get_train_tuple(train_path):
     train_list = []
     traingt_list = []
 
-    for root, dirs, files in os.walk(train_path):
-        for class_dir in dirs:
-            # print(class_dir, (os.listdir(osp.join(root, class_dir))))
-            def mapper(x): return osp.join(root, class_dir, x)
-            img_loc = list(map(mapper, os.listdir(osp.join(root, class_dir))))
-            img_loc = [f for f in img_loc if not f.endswith('.csv')]
-            class_id = [int(class_dir)]*len(img_loc)
-            # print(int(class_dir))
-            train_list.extend(img_loc)
-            traingt_list.extend(class_id)
+    for classid in os.listdir(train_path):
+        class_csv = osp.join(train_path, classid, f'GT-{classid}.csv')
 
-    return (train_list, traingt_list)
+        reader = csv.reader(open(class_csv, 'r'), delimiter=';')
+        # print(list(reader))
+        next(reader)
 
+        # print(class_csv)
+        for row in reader:
+            train_list.append(row[0])
+            traingt_list.append(int(row[1]))
 
-def get_test_tuple(test_path):
+    if extra_train_path is not None:
+        for classid in os.listdir(extra_train_path):
+            class_csv = open(osp.join(extra_train_path, classid, f'GT-{classid}.csv'))
+
+            reader = csv.reader(class_csv, delimiter=';')
+            next(reader)
+
+            for row in reader:
+                train_list.append(row[0])
+                traingt_list.append(int(row[1]))
+
+    return train_list, traingt_list
+
+def get_test_tuple(test_path, extra_test_path=None):
     """ Generates a list of images and ground truths for Test DataLoader
 
- data/gtsrb_loader.py   Reads a csv file provided with GTSRB Dataset and returns the above
+    Reads a csv file provided with GTSRB Dataset and returns the above
 
     Args:
         test_path (str): Path of the tes Dataset
@@ -77,19 +87,26 @@ def get_test_tuple(test_path):
     test_list = []
     test_ids = []
 
-    test_csv = osp.join(test_path, 'GT-final_test.csv')
+    test_csv = osp.join(test_path, 'GT-Test.csv')
 
     with open(test_csv) as f:
         reader = csv.reader(f, delimiter=';')
         next(reader)
         for row in reader:
-            filename = row[0]  # filename is in the 0th column
-            label = int(row[7])  # label is in the 7th column
-            test_list.append(osp.join(test_path, filename))
-            test_ids.append(label)
+            test_list.append(row[0])
+            test_ids.append(int(row[1]))
 
-    return test_list, test_ids
+    if extra_test_path is not None:
+        extra_test_csv = osp.join(extra_test_path, 'GT-Test.csv')
 
+        with open(extra_test_csv) as f:
+            reader = csv.reader(f, delimiter=';')
+            next(reader)
+            for row in reader:
+                test_list.append(row[0])
+                test_ids.append(int(row[1]))
+
+    return (test_list, test_ids)
 
 class GTSRB(Dataset):
     """
@@ -110,9 +127,9 @@ class GTSRB(Dataset):
         self.path = osp.join(args.data_dir, self.setname)
         self.size = tuple(args.size)
         if self.setname == 'train' or self.setname == 'valid':
-            self.imgs, self.ids = get_train_tuple(self.path)
+            self.imgs, self.ids = get_train_tuple(self.path, osp.join(self.args.extra_path, self.setname))
         elif self.setname == 'test':
-            self.imgs, self.ids = get_test_tuple(self.path)
+            self.imgs, self.ids = get_test_tuple(self.path, osp.join(self.args.extra_path, self.setname))
 
     def __len__(self):
         """ Gives the length of Dataset

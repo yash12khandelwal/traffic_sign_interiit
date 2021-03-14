@@ -26,7 +26,7 @@ def CreateModel(args):
         scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=args.lr_decay_step, gamma=0.9)
 
     elif args.model == 'micronet':
-        model = MicroNet(args).cuda()
+        model = MicroNet(args).to(device)
         optimizer = optim.SGD(model.parameters(), lr=args.learning_rate, momentum=args.momentum, weight_decay=args.weight_decay, nesterov=True)
         scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=args.lr_decay_step, gamma=0.9)
     
