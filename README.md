@@ -25,6 +25,7 @@ All images of class_id 43 must be in folder 43, class_id must be integers
 To train the model
 ```
 python train.py -v [config_file_name] [-w|--wandb]
+Use --wandb option to enable logging in wandb
 ```
 
 Default Config Files
