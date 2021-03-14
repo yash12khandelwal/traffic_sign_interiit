@@ -8,7 +8,6 @@ from torch.utils.data import Dataset, DataLoader
 from torchvision import transforms
 from augments.augs import load_augments
 import cv2
-import matplotlib.pyplot as plt
 
 
 def get_loader(args, dataset):
@@ -29,6 +28,7 @@ def get_loader(args, dataset):
 
     dataloader = DataLoader(dataset, **params)
     return dataloader
+
 
 
 def get_train_tuple(train_path):

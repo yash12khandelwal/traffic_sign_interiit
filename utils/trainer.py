@@ -9,6 +9,7 @@ import numpy as np
 import os
 import datetime
 
+
 def train_engine(args, trainloader, valloader, model, optimizer, scheduler=None):
     """ Generic Train function for training
 
@@ -29,7 +30,6 @@ def train_engine(args, trainloader, valloader, model, optimizer, scheduler=None)
             weight = weight.type(torch.FloatTensor).to(device)
         else:
             raise ValueError('Class weights file not found')
-
 
     criterion = nn.CrossEntropyLoss(weight=weight)
 
@@ -69,7 +69,7 @@ def train_engine(args, trainloader, valloader, model, optimizer, scheduler=None)
         print(f'Train loss = {train_loss}')
 
         print('\nValidating ...')
-        val_acc, val_loss = calc_acc_n_loss(args, model, valloader)
+        val_acc, val_loss = calc_acc_n_loss(args, model, valloader, False)
         print(f'Valid Accuracy = {val_acc} %')
         print(f'Valid loss = {val_loss}')
         print('-'*50)
@@ -78,7 +78,8 @@ def train_engine(args, trainloader, valloader, model, optimizer, scheduler=None)
             print('Taking snapshot ...')
             if not os.path.exists(args.snapshot_dir):
                 os.makedirs(args.snapshot_dir)
-            save_path = os.path.join(args.snapshot_dir, f'{args.model}_{i+1}.pth')
+            save_path = os.path.join(
+                args.snapshot_dir, f'{args.model}_{i+1}.pth')
             torch.save(model.state_dict(), save_path)
             if args.wandb:
                 save_model_wandb(save_path)

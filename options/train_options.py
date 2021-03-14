@@ -19,6 +19,7 @@ class TrainOptions():
             --version [str]: name of the config file to use
             --wandb [bool]: Log to wandb or not
         """
+
         parser = argparse.ArgumentParser( description="training script for InterIIT Trafic Sign Recognition" )
         parser.add_argument(
             "-v",

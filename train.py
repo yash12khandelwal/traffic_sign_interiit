@@ -33,7 +33,7 @@ if __name__ == "__main__":
     train_engine(args=args, trainloader=trainloader,
                 valloader=valloader, model=net, optimizer=optimizer, scheduler=schedular)
 
-    test_acc, test_loss = calc_acc_n_loss(args, net, testloader)
+    test_acc, test_loss = calc_acc_n_loss(args, net, testloader, True)
 
     print(f'Test Accuracy = {test_acc}')
     print(f'Test Loss = {test_loss}')
