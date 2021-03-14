@@ -21,9 +21,9 @@ from PIL import Image
 import matplotlib as mpl
 
 def rise_eval(model, device, dataloader, num_classes):
-        explainer = RISEBatch(model, (32, 32), gpu_batch=20, device = device)
+        explainer = RISEBatch(model, (48, 48), gpu_batch=4)
         # explainer.load_masks('masks.npy')
-        explainer.generate_masks(N = 4000, s= 10, p1 = 0.1, savepath = 'masks.npy')
+        explainer.generate_masks(N = 4000, s= 8, p1 = 0.1, savepath = 'masks.npy')
 
         klen = 11
         ksig = 5
@@ -31,11 +31,14 @@ def rise_eval(model, device, dataloader, num_classes):
 
         blur = lambda x: torch.nn.functional.conv2d(x, kern, padding=klen//2)
 
-        insertion = CausalMetric(model, 'ins', 32*8, substrate_fn=blur, n_classes=num_classes, device=device)
-        deletion = CausalMetric(model, 'del', 32*8, substrate_fn=torch.zeros_like, n_classes=num_classes, device=device)
+        insertion = CausalMetric(model, 'ins', 48*8, substrate_fn=blur, n_classes=num_classes, device=device)
+        deletion = CausalMetric(model, 'del', 48*8, substrate_fn=torch.zeros_like, n_classes=num_classes, device=device)
 
         for i, data in tqdm(enumerate(dataloader, 0), desc="Images" ):
+                if i > 5:
+                        break
                 img = data[0]
+                print(img.shape)
                 img = img.float().to(device)
                 cl = data[1]
                 sal = explainer(img.to(device)).cpu().numpy()
@@ -74,7 +77,7 @@ def rise_eval(model, device, dataloader, num_classes):
                 final_img = final_img.astype(np.uint8)
                 final_img = Image.fromarray(final_img)
 
-                final_img.save('~/rise_temp' + '/rise_' + str(i) + '.jpg')
+                final_img.save('/root/traffic_sign_interiit' + '/rise_' + str(i) + '.jpg')
                 # plt.imshow(img_cpu.astype(np.uint8))
                 # plt.imshow(sal_batch[0], alpha=0.5, cmap='jet')
                 # plt.axis('off')
@@ -86,9 +89,9 @@ def rise_eval(model, device, dataloader, num_classes):
                 # del_auc = 0
                 # print("------------Summary (so far)----------------------------", flush=True)
                 print("image: {}".format(i), flush = True)
-                print("insertion score : ",ins_auc, flush = True)
-                print("deletion score", del_auc, flush = True)
-                print("--------------------------------------------------------", flush = True)
+                # print("insertion score : ",ins_auc, flush = True)
+                # print("deletion score", del_auc, flush = True)
+                # print("--------------------------------------------------------", flush = True)
         del explainer
         explainer = None
         # torch.cuda.empty_cache()
@@ -101,9 +104,15 @@ train_dataset = GTSRB(args, setname='train')
 
 trainloader = get_loader(args, train_dataset)
 net, optimizer, schedular = model.CreateModel(args=args)
-net.load_state_dict(torch.load("~/opt_micronet_2021-3-11_11-30.pth"))
+net.load_state_dict(torch.load("/root/traffic_sign_interiit/opt_micronet_2021-3-11_11-30.pth"))
+net.eval()
 
 print("---")
 print(net)
 print(args)
 print("---")
+
+# x = torch.ones((4, 3, 48, 48))
+# x = x.float().cuda()
+# net(x)
+rise_eval(net, torch.device("cuda:0"), trainloader, 43)
