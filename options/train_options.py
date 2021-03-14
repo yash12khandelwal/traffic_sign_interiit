@@ -8,6 +8,7 @@ from config.cfg_parser import cfg_parser
 class TrainOptions():
     """ Training options for cmdline
     """
+
     def initialize(self):
         """ Parameter definitions
 
@@ -18,7 +19,6 @@ class TrainOptions():
             --version [str]: name of the config file to use
             --wandb [bool]: Log to wandb or not
         """
-
         parser = argparse.ArgumentParser( description="training script for InterIIT Trafic Sign Recognition" )
         parser.add_argument(
             "-v",
@@ -52,7 +52,7 @@ class TrainOptions():
         # save to the disk
         if not os.path.exists(args.snapshot_dir):
             os.makedirs(args.snapshot_dir)
-        
+
         t = datetime.datetime.now()
         name = f'opt_{args.model}_{t.year}-{t.month}-{t.day}_{t.hour}-{t.minute}.txt'
         file_name = osp.join(args.snapshot_dir, name)

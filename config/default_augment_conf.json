@@ -1,0 +1,60 @@
+{
+    "Augmentation": {
+        "Fog": true,
+        "Snowflakes": true,
+        "GaussianNoise": true,
+        "Rain": true,
+        "FastSnowyLandscape": true,
+        "JpegCompression": true,
+        "CoarsePepper": true,
+        "Invert": true
+    },
+    "Fog": {},
+    "Snowflakes": {
+        "flake_size": [
+            0.1,
+            0.4
+        ],
+        "speed": [
+            0.01,
+            0.05
+        ]
+    },
+    "GaussianNoise": {
+        "severity": 2
+    },
+    "Rain": {
+        "speed": [
+            0.1,
+            0.3
+        ]
+    },
+    "FastSnowyLandscape": {
+        "lightness_threshold": [
+            100,
+            255
+        ],
+        "lightness_multiplier": [
+            1.0,
+            4.0
+        ]
+    },
+    "JpegCompression": {
+        "compression": [
+            70,
+            99
+        ]
+    },
+    "CoarsePepper": {
+        "p": 0.25,
+        "size_percent": [
+            0.01,
+            0.1
+        ]
+    },
+    "Invert": {
+        "p": 0.25,
+        "per_channel": 0.5
+    },
+    "probability": 0.3
+}
