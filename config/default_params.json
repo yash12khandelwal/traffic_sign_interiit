@@ -3,7 +3,7 @@
 	"device": "cpu",
 	"snapshot_dir": "checkpoints/logs",
 	"data_dir": "dataset/GTSRB",
-	"size": [32,32],
+	"size": [48, 48],
 	"batch_size": 1,
 	"epochs": 100,
 	"epochs_stop": 100,
