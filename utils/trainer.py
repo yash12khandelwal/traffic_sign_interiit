@@ -9,6 +9,7 @@ import numpy as np
 import os
 import datetime
 
+
 def train_engine(args, trainloader, valloader, model, optimizer, scheduler=None):
     """ Generic Train function for training
 
@@ -20,6 +21,9 @@ def train_engine(args, trainloader, valloader, model, optimizer, scheduler=None)
         optimizer (Optimizer): Optimizer
         scheduler (LR Schedular, optional): Changing learning rate according to a function. Defaults to None.
     """
+
+    args = args['experiment']
+
     device = args.device
     if args.class_weights is None:
         weight = None
@@ -29,7 +33,6 @@ def train_engine(args, trainloader, valloader, model, optimizer, scheduler=None)
             weight = weight.type(torch.FloatTensor).to(device)
         else:
             raise ValueError('Class weights file not found')
-
 
     criterion = nn.CrossEntropyLoss(weight=weight)
 
@@ -69,7 +72,7 @@ def train_engine(args, trainloader, valloader, model, optimizer, scheduler=None)
         print(f'Train loss = {train_loss}')
 
         print('\nValidating ...')
-        val_acc, val_loss = calc_acc_n_loss(args, model, valloader)
+        val_acc, val_loss = calc_acc_n_loss(args, model, valloader, False)
         print(f'Valid Accuracy = {val_acc} %')
         print(f'Valid loss = {val_loss}')
         print('-'*50)

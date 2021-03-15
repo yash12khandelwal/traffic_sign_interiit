@@ -1,0 +1,10 @@
+Augmentation:
+  Fog: [false]
+  GaussianNoise: [true]
+  Snowflakes: [false]
+Fog: {}
+GaussianNoise:
+  severity: [2]
+Snowflakes:
+  flake_size: [0.1, 0.4]
+  speed: [0.01, 0.05]

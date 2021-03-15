@@ -19,7 +19,7 @@ augments = {
         }
 
 
-def load_augments(config_path='../config/default_augment_conf.json', rand=False):
+def load_augments(augments_conf, top=1):
     """ Function that returns the augmentatons list from available ones
 
     Args:
@@ -30,24 +30,15 @@ def load_augments(config_path='../config/default_augment_conf.json', rand=False)
         iaa.Sequential: Sequential of list of tranforms according to config file and rand
     """
 
-    with open(config_path, 'r') as f:
-        augments_conf= json.load(f)
-
     transforms = []
 
-    total_augments = []
-    for (k, v) in augments_conf['Augmentation'].items():
-        if v:
-            total_augments.append(k)
+    total_augments = [ k for (k, v) in augments_conf.Use.items() if v ]
 
-    if rand:
-        choice = random.choice(total_augments)
-        aug = iaa.Sometimes(augments_conf['probability'], augments[choice](**augments_conf[choice]))
+    apply_augments = random.choices(total_augments, k=top)
+
+    for k in apply_augments:
+        aug = iaa.Sometimes(augments_conf.probability, augments[k](**augments_conf[k]))
         transforms.append(aug)
-    else:
-        for k in total_augments:
-            aug = iaa.Sometimes(augments_conf['probability'], augments[k](**augments_conf[k]))
-            transforms.append(aug)
 
     seq = iaa.Sequential(transforms)
     return seq

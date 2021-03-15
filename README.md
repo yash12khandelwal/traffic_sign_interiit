@@ -7,7 +7,7 @@ cd dataset
 python install_data_GTSRB.py
 ```
 
-Adding new classes 
+Adding new classes
 ```
 cd dataset
 python prepare_new_classes.py [new_class_path] [write_path]
@@ -29,11 +29,7 @@ Use --wandb option to enable logging in wandb
 ```
 
 Default Config Files
-
-- Augmentations
-  - default_augment_conf.json
-- Model Parameters
-  - default_params.json
+- config/params.json
 
 Baselines
 
