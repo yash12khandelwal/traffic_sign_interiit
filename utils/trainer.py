@@ -21,6 +21,9 @@ def train_engine(args, trainloader, valloader, model, optimizer, scheduler=None)
         optimizer (Optimizer): Optimizer
         scheduler (LR Schedular, optional): Changing learning rate according to a function. Defaults to None.
     """
+
+    args = args['experiment']
+
     device = args.device
     if args.class_weights is None:
         weight = None

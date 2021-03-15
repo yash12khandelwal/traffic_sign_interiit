@@ -1,4 +1,5 @@
 import os
+
 import os.path as osp
 from PIL import Image
 import numpy as np
@@ -20,6 +21,8 @@ def get_loader(args, dataset):
     Returns:
         DataLoader: Dataloader for training or testing
     """
+
+    args = args['experiment']
     params = {
         'batch_size': args.batch_size,
         'num_workers': args.num_workers,
@@ -120,15 +123,19 @@ class GTSRB(Dataset):
             setname (str, optional): Possible values train, val, test for Dataset. Defaults to 'train'.
         """
 
-        self.args = args
-        self.classes = args.num_classes
+        self.args = args['experiment']
+        self.augment_args = args['augmentations']
+        self.classes = self.args.num_classes
         self.setname = setname
-        self.path = osp.join(args.data_dir, self.setname)
-        self.size = tuple(args.size)
+        self.path = osp.join(self.args.data_dir, self.setname)
+        self.size = tuple(self.args.size)
+
+        extra_class_path = None if self.args.extra_path is None else \
+                            osp.join(self.args.extra_path, self.setname)
         if self.setname == 'train' or self.setname == 'valid':
-            self.imgs, self.ids = get_train_tuple(self.path, osp.join(self.args.extra_path, self.setname))
+            self.imgs, self.ids = get_train_tuple(self.path, extra_class_path)
         elif self.setname == 'test':
-            self.imgs, self.ids = get_test_tuple(self.path, osp.join(self.args.extra_path, self.setname))
+            self.imgs, self.ids = get_test_tuple(self.path, extra_class_path)
 
     def __len__(self):
         """ Gives the length of Dataset
@@ -154,7 +161,7 @@ class GTSRB(Dataset):
 
 
         image = cv2.resize(image, self.size)
-        image = load_augments(config_path=self.args.config_path, rand=True)(image=image)
+        image = load_augments(self.augment_args, top=1)(image=image)
         tran_train = transforms.Compose([
                                     transforms.ToTensor(),
                                     transforms.Normalize((0.3337, 0.3064, 0.3171),

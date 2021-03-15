@@ -8,6 +8,8 @@ def init_wandb(model, args=None) -> None:
     """
     Initialize project on Weights & Biases
     """
+
+    args = args['experiment']
     wandb.login(key=args.wandb_api_key)
     wandb.init(
         name=args.wandb_name,

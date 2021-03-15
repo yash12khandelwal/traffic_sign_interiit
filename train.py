@@ -8,14 +8,12 @@ from utils.wandb_utils import init_wandb, wandb_save_summary
 
 if __name__ == "__main__":
 
-    #TODO Instead of using so many arguments, use a config file for each run. Just change the relevant parameters in the config file.
-    
     opt = TrainOptions()
     args = opt.initialize()
     opt.print_options(args)
 
     # setting seed system wide for proper reproducibility
-    set_seed(int(args.seed))
+    set_seed(int(args['experiment'].seed))
 
     train_dataset = GTSRB(args, setname='train')
     val_dataset = GTSRB(args, setname='valid')
@@ -27,16 +25,17 @@ if __name__ == "__main__":
 
     net, optimizer, schedular = model.CreateModel(args=args)
 
-    if args.wandb:
+    if args['experiment'].wandb:
         init_wandb(net, args)
 
     train_engine(args=args, trainloader=trainloader,
                 valloader=valloader, model=net, optimizer=optimizer, scheduler=schedular)
 
-    test_acc, test_loss = calc_acc_n_loss(args, net, testloader, True)
+    log_confusion = True if args['experiment'].wandb else False
+    test_acc, test_loss = calc_acc_n_loss(args['experiment'], net, testloader, log_confusion)
 
     print(f'Test Accuracy = {test_acc}')
     print(f'Test Loss = {test_loss}')
 
-    if args.wandb:
+    if args['experiment'].wandb:
         wandb_save_summary(test_acc=test_acc)

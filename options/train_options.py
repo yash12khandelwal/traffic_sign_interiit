@@ -31,32 +31,33 @@ class TrainOptions():
         parser.add_argument(
             "-w", "--wandb", action="store_true", help="Log to wandb or not"
         )
-        args=parser.parse_args()
+        args = parser.parse_args()
         cfg = cfg_parser(osp.join("config", args.version + '.json'))
-        cfg.wandb = args.wandb
-        cfg.version = args.version
-        cfg.snapshot_dir = os.path.join(cfg.snapshot_dir, args.version)
-        
+        cfg['experiment'].wandb = args.wandb
+        cfg['experiment'].version = args.version
+        cfg['experiment'].snapshot_dir = os.path.join(cfg['experiment'].snapshot_dir, args.version)
+
         return cfg
 
     def print_options(self, args):
         """ Function that prints and saves the output
         """
+
         message = ''
-        message += '----------------- Options ---------------\n'
-        for k, v in sorted(vars(args).items()):
+        message += f'----------------- Options ----------------\n'
+        for k, v in sorted(vars(args['experiment']).items()):
             comment = ''
             message += '{:>25}: {:<30}{}\n'.format(str(k), str(v), comment)
         message += '----------------- End -------------------\n'
         print(message)
 
         # save to the disk
-        if not os.path.exists(args.snapshot_dir):
-            os.makedirs(args.snapshot_dir)
+        if not os.path.exists(args['experiment'].snapshot_dir):
+            os.makedirs(args['experiment'].snapshot_dir)
 
         t = datetime.datetime.now()
-        name = f'opt_{args.model}_{t.year}-{t.month}-{t.day}_{t.hour}-{t.minute}.txt'
-        file_name = osp.join(args.snapshot_dir, name)
+        name = f'opt_{args["experiment"].model}_{t.year}-{t.month}-{t.day}_{t.hour}-{t.minute}.txt'
+        file_name = osp.join(args['experiment'].snapshot_dir, name)
         with open(file_name, 'wt') as args_file:
             args_file.write(message)
             args_file.write('\n')
