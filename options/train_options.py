@@ -25,16 +25,17 @@ class TrainOptions():
             "-v",
             "--version",
             type=str,
-            default="default_params.json",
+            default="default_params",
             help="name of the config file to use.",
         )
         parser.add_argument(
             "-w", "--wandb", action="store_true", help="Log to wandb or not"
         )
         args=parser.parse_args()
-        cfg = cfg_parser(osp.join("config", args.version))
+        cfg = cfg_parser(osp.join("config", args.version + '.json'))
         cfg.wandb = args.wandb
         cfg.version = args.version
+        cfg.snapshot_dir = os.path.join(cfg.snapshot_dir, args.version)
         
         return cfg
 
