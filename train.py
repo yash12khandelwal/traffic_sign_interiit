@@ -40,3 +40,6 @@ if __name__ == "__main__":
 
     if args.wandb:
         wandb_save_summary(test_acc=test_acc)
+
+    if args.saliency:
+    	rise(net, testloader, 43, (48,48), args.saliency_imgfolder, torch.device("cuda:0"))
