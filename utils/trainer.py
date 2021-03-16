@@ -5,6 +5,7 @@ from torch.utils.data import DataLoader
 from tqdm import tqdm
 from utils.evaluate import calc_acc_n_loss
 from utils.wandb_utils import wandb_log, save_model_wandb
+from utils.utils import convert_onnx
 import numpy as np
 import os
 import datetime
@@ -81,13 +82,14 @@ def train_engine(args, trainloader, valloader, model, optimizer, scheduler=None)
             print('Taking snapshot ...')
             if not os.path.exists(args.snapshot_dir):
                 os.makedirs(args.snapshot_dir)
-            save_path = os.path.join(args.snapshot_dir, f'{args.model}_{i+1}.pt')
+            save_path = os.path.join(
+                args.snapshot_dir, f'{args.model}_{i+1}.pt')
             torch.save({
                 'epoch': i,
                 'model_state_dict': model.state_dict(),
                 'optimizer_state_dict': optimizer.state_dict(),
                 'loss': loss,
-                }, save_path)
+            }, save_path)
             if args.wandb:
                 save_model_wandb(save_path)
 
@@ -105,7 +107,10 @@ def train_engine(args, trainloader, valloader, model, optimizer, scheduler=None)
         'loss': train_loss,
     }, save_path)
 
+    onnx_save_path = convert_onnx(model, args)
+
     if args.wandb:
         save_model_wandb(save_path)
+        save_model_wandb(onnx_save_path)
 
     return model
