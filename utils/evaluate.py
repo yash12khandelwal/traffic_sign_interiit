@@ -50,9 +50,5 @@ def calc_acc_n_loss(args, model, loader, log_matrix=False):
         wandb_log_conf_matrix(y_true, y_pred)
 
     acc = sum(1 for x, y in zip(y_true, y_pred) if x == y) * 100 / len(y_true)
-    dictionary ={"f1_score" : f1,"confusion_matrix":cm,"accuracy":acc,"precision":precision,"recall":recall,"loss":loss/len(loader)}  
-    json_object = json.dumps(dictionary, indent = 4)       
-    with open("metrics.json", "w") as outfile: 
-        outfile.write(json_object)
 
-    return acc, (loss/len(loader))
+    return acc, (loss/len(loader)), f1, cm, precision, recall
