@@ -5,6 +5,7 @@ from torch.utils.data import DataLoader
 from tqdm import tqdm
 from utils.evaluate import calc_acc_n_loss
 from utils.wandb_utils import wandb_log, save_model_wandb
+from utils.utils import convert_onnx
 import numpy as np
 import os
 import datetime
@@ -72,22 +73,27 @@ def train_engine(args, trainloader, valloader, model, optimizer, scheduler=None)
         print(f'Train loss = {train_loss}')
 
         print('\nValidating ...')
-        val_acc, val_loss = calc_acc_n_loss(args, model, valloader, False)
+        val_acc, val_loss, val_f1, val_cm, val_precision, val_recall = calc_acc_n_loss(args, model, valloader, False)
         print(f'Valid Accuracy = {val_acc} %')
-        print(f'Valid loss = {val_loss}')
+        print(f'Valid loss = {val_loss} %')
+        print(f'Valid f1 = {val_f1} %')
+        print(f'Valid ConfusionMatrix = {val_cm} %')
+        print(f'Valid precision = {val_precision} %')
+        print(f'Valid recall = {val_recall}')
         print('-'*50)
 
         if (i+1) % args.save_pred_every == 0:
             print('Taking snapshot ...')
             if not os.path.exists(args.snapshot_dir):
                 os.makedirs(args.snapshot_dir)
-            save_path = os.path.join(args.snapshot_dir, f'{args.model}_{i+1}.pt')
+            save_path = os.path.join(
+                args.snapshot_dir, f'{args.model}_{i+1}.pt')
             torch.save({
                 'epoch': i,
                 'model_state_dict': model.state_dict(),
                 'optimizer_state_dict': optimizer.state_dict(),
                 'loss': loss,
-                }, save_path)
+            }, save_path)
             if args.wandb:
                 save_model_wandb(save_path)
 
@@ -95,7 +101,7 @@ def train_engine(args, trainloader, valloader, model, optimizer, scheduler=None)
             wandb_log(train_loss, val_loss, train_acc, val_acc, i)
 
     t = datetime.datetime.now()
-    name = f'final_{args.model}_{t.year}-{t.month}-{t.day}_{t.hour}-{t.minute}.pt'
+    name = f'final_{args.model}{t.year}-{t.month}-{t.day}{t.hour}-{t.minute}.pt'
 
     save_path = os.path.join(args.snapshot_dir, name)
     torch.save({
@@ -105,7 +111,10 @@ def train_engine(args, trainloader, valloader, model, optimizer, scheduler=None)
         'loss': train_loss,
     }, save_path)
 
+    onnx_save_path = convert_onnx(model, args)
+
     if args.wandb:
         save_model_wandb(save_path)
+        save_model_wandb(onnx_save_path)
 
     return model
