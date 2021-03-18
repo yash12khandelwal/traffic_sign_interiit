@@ -32,10 +32,13 @@ if __name__ == "__main__":
                 valloader=valloader, model=net, optimizer=optimizer, scheduler=schedular)
 
     log_confusion = True if args['experiment'].wandb else False
-    test_acc, test_loss = calc_acc_n_loss(args['experiment'], net, testloader, log_confusion)
+    test_acc, test_loss,test_f1,cm,test_precision,test_recall = calc_acc_n_loss(args['experiment'], net, testloader, log_confusion)
 
     print(f'Test Accuracy = {test_acc}')
     print(f'Test Loss = {test_loss}')
+    print(f'F1 Score = {test_f1}')
+    print(f'Test Precision = {test_precision}')
+    print(f'Test Recall = {test_recall}')
 
     if args['experiment'].wandb:
-        wandb_save_summary(test_acc=test_acc)
+        wandb_save_summary(test_acc=test_acc,test_f1=test_f1,test_precision=test_precision,test_recall=test_recall)
