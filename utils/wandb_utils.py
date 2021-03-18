@@ -35,12 +35,15 @@ def wandb_log(train_loss: float, val_loss: float, train_acc: float, val_acc: flo
     }, step=epoch)
 
 
-def wandb_save_summary(test_acc: float):
+def wandb_save_summary(test_acc: float,test_f1:float,test_precision:float,test_recall:float):
     """
     Saves Test accuracy in wandb
     """
 
     wandb.run.summary["test_accuracy"] = test_acc
+    wandb.run.summary["test_f1_score"] = test_f1
+    wandb.run.summary["test_precision"] = test_precision
+    wandb.run.summary["test_recall"] = test_recall
 
 
 def wandb_log_conf_matrix(y_true: list, y_pred: list):
