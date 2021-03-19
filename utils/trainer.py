@@ -73,9 +73,13 @@ def train_engine(args, trainloader, valloader, model, optimizer, scheduler=None)
         print(f'Train loss = {train_loss}')
 
         print('\nValidating ...')
-        val_acc, val_loss = calc_acc_n_loss(args, model, valloader, False)
+        val_acc, val_loss, val_f1, val_cm, val_precision, val_recall = calc_acc_n_loss(args, model, valloader, False)
         print(f'Valid Accuracy = {val_acc} %')
-        print(f'Valid loss = {val_loss}')
+        print(f'Valid loss = {val_loss} %')
+        print(f'Valid f1 = {val_f1} %')
+        print(f'Valid ConfusionMatrix = {val_cm} %')
+        print(f'Valid precision = {val_precision} %')
+        print(f'Valid recall = {val_recall}')
         print('-'*50)
 
         if (i+1) % args.save_pred_every == 0:
@@ -97,7 +101,7 @@ def train_engine(args, trainloader, valloader, model, optimizer, scheduler=None)
             wandb_log(train_loss, val_loss, train_acc, val_acc, i)
 
     t = datetime.datetime.now()
-    name = f'final_{args.model}_{t.year}-{t.month}-{t.day}_{t.hour}-{t.minute}.pt'
+    name = f'final_{args.model}{t.year}-{t.month}-{t.day}{t.hour}-{t.minute}.pt'
 
     save_path = os.path.join(args.snapshot_dir, name)
     torch.save({
