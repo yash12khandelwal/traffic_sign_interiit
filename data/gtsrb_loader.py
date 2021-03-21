@@ -161,7 +161,6 @@ class GTSRB(Dataset):
 
 
         image = cv2.resize(image, self.size)
-        image = load_augments(self.augment_args, top=1)(image=image)
         tran_train = transforms.Compose([
                                     transforms.ToTensor(),
                                     transforms.Normalize((0.3337, 0.3064, 0.3171),
@@ -174,6 +173,7 @@ class GTSRB(Dataset):
                 ])
 
         if self.setname == 'train':
+            image = load_augments(self.augment_args, top=1)(image=image)
             return tran_train(image)
         else:
             return tran_test(image)
