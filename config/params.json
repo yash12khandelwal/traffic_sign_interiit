@@ -1,7 +1,7 @@
 {
     "experiment": {
 	    "model": "micronet",
-	    "device": "gpu",
+	    "device": "cuda",
 	    "snapshot_dir": "checkpoints/logs",
 	    "data_dir": "dataset/GTSRB",
         "extra_path": null,
