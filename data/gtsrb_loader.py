@@ -1,9 +1,6 @@
 import os
-
 import os.path as osp
-from PIL import Image
 import numpy as np
-from collections import namedtuple
 import csv
 from torch.utils.data import Dataset, DataLoader
 from torchvision import transforms
@@ -12,7 +9,8 @@ import cv2
 
 
 def get_loader(args, dataset):
-    """ Function that returns dataloader
+    """ 
+    Function that returns dataloader
 
     Args:
         args (TrainOptions): TrainOptions class (refer options/train_options.py)
@@ -32,14 +30,15 @@ def get_loader(args, dataset):
     dataloader = DataLoader(dataset, **params)
     return dataloader
 
-def get_train_tuple(train_path, extra_train_path=None):
-    """ Generates a list of images and ground truths for Train DataLoader
 
+def get_train_tuple(train_path, extra_train_path=None):
+    """
+    Generates a list of images and ground truths for Train DataLoader
     Recursive folder traversal to return the above
 
     Args:
         train_path (str): Path of the Train or Valid Dataset
-        Ex. dataset/GTSRB/train
+        extra_train_path (str, optional): Path of the Extra Classes Train or Valid Dataset. Defaults to None.
 
     Returns:
         tuple: (List of train/val images, List of ground truths)
@@ -52,17 +51,16 @@ def get_train_tuple(train_path, extra_train_path=None):
         class_csv = osp.join(train_path, classid, f'GT-{classid}.csv')
 
         reader = csv.reader(open(class_csv, 'r'), delimiter=';')
-        # print(list(reader))
         next(reader)
 
-        # print(class_csv)
         for row in reader:
             train_list.append(row[0])
             traingt_list.append(int(row[1]))
 
     if extra_train_path is not None:
         for classid in os.listdir(extra_train_path):
-            class_csv = open(osp.join(extra_train_path, classid, f'GT-{classid}.csv'))
+            class_csv = open(
+                osp.join(extra_train_path, classid, f'GT-{classid}.csv'))
 
             reader = csv.reader(class_csv, delimiter=';')
             next(reader)
@@ -73,14 +71,15 @@ def get_train_tuple(train_path, extra_train_path=None):
 
     return train_list, traingt_list
 
-def get_test_tuple(test_path, extra_test_path=None):
-    """ Generates a list of images and ground truths for Test DataLoader
 
+def get_test_tuple(test_path, extra_test_path=None):
+    """ 
+    Generates a list of images and ground truths for Test DataLoader
     Reads a csv file provided with GTSRB Dataset and returns the above
 
     Args:
-        test_path (str): Path of the tes Dataset
-        Ex. dataset/GTSRB/test
+        test_path (str): Path of the Test Dataset
+        extra_train_path (str, optional): Path of the Extra Classes Test Dataset. Defaults to None.
 
     Returns:
         tuple: (List of test images, List of ground truths)
@@ -110,13 +109,15 @@ def get_test_tuple(test_path, extra_test_path=None):
 
     return (test_list, test_ids)
 
+
 class GTSRB(Dataset):
     """
     Dataset class for GTSRB
     """
 
     def __init__(self, args, setname='train'):
-        """ Init functions calls get_train_sanple or get_test_sample
+        """ 
+        Constructor calls get_train_sanple or get_test_sample, based on setname
 
         Args:
             args (TrainOptions): TrainOptions class (refer options/train_options.py)
@@ -131,14 +132,16 @@ class GTSRB(Dataset):
         self.size = tuple(self.args.size)
 
         extra_class_path = None if self.args.extra_path is None else \
-                            osp.join(self.args.extra_path, self.setname)
+            osp.join(self.args.extra_path, self.setname)
+
         if self.setname == 'train' or self.setname == 'valid':
             self.imgs, self.ids = get_train_tuple(self.path, extra_class_path)
         elif self.setname == 'test':
             self.imgs, self.ids = get_test_tuple(self.path, extra_class_path)
 
     def __len__(self):
-        """ Gives the length of Dataset
+        """
+        Gives the length of Dataset
 
         Returns:
             int: Length of Dataset
@@ -147,39 +150,36 @@ class GTSRB(Dataset):
         return len(self.imgs)
 
     def transform(self, image):
-        """ Function to apply tranformations
+        """ 
+        Function to apply tranformations
 
         TODO
         Proper api for working with augmentations
 
         Args:
-            image (PIL Image): PIL Image for applying tranforms
+            image (np.array): OpenCV Image (np.array) for applying tranforms
 
         Returns:
             TorchTensor: Transformed Tensor
         """
 
-
         image = cv2.resize(image, self.size)
-        tran_train = transforms.Compose([
-                                    transforms.ToTensor(),
-                                    transforms.Normalize((0.3337, 0.3064, 0.3171),
-                                                        (0.2672, 0.2564, 0.2629))
-                                   ])
-        tran_test = transforms.Compose([
-                transforms.ToTensor(),
-                transforms.Normalize((0.3337, 0.3064, 0.3171),
-                                    (0.2672, 0.2564, 0.2629))
-                ])
+        trans = transforms.Compose([
+            transforms.ToTensor(),
+            transforms.Normalize((0.3337, 0.3064, 0.3171),
+                                 (0.2672, 0.2564, 0.2629))
+        ])
 
         if self.setname == 'train':
+            # Applying augmentations to the image
             image = load_augments(self.augment_args, top=1)(image=image)
-            return tran_train(image)
+            return trans(image)
         else:
-            return tran_test(image)
+            return trans(image)
 
     def __getitem__(self, idx):
-        """ Dataset Method for returning image and class at idx in list
+        """ 
+        Dataset Method for returning image and class at idx in list
 
         Args:
             idx (int): DataLoader provides this
