@@ -18,7 +18,16 @@ def set_seed(seed):
 
 
 def convert_onnx(model, args):
-    """Converts the model to .onnx format and saves it"""
+    """
+    Converts the model to .onnx format and saves it
+
+    Args:
+        model (Torch Model): Trained Model
+        args (TrainOptions): TrainOptions class (refer options/train_options.py)
+
+    Returns:
+        str: path to converted .onnx file
+    """
 
     batch_size = 1
     inputs = torch.randn(
