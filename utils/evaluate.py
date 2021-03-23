@@ -6,7 +6,7 @@ import torch
 import torch.nn as nn
 import json
 from utils.wandb_utils import wandb_log_conf_matrix
-from sklearn.metrics import f1_score, multilabel_confusion_matrix, recall_score, precision_score
+from sklearn.metrics import f1_score, multilabel_confusion_matrix, recall_score, precision_score, classification_report
 
 
 def calc_acc_n_loss(args, model, loader, log_matrix=False):
@@ -52,6 +52,8 @@ def calc_acc_n_loss(args, model, loader, log_matrix=False):
 
     if log_matrix == True:
         wandb_log_conf_matrix(y_true, y_pred)
+
+    print(classification_report(y_true, y_pred))
 
     # Calculating accuracy: Number of correct predictions / Number of samples
     acc = sum(1 for x, y in zip(y_true, y_pred) if x == y) * 100 / len(y_true)
