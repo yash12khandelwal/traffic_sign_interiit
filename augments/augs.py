@@ -5,39 +5,45 @@ import cv2
 import random
 
 """
-Add the function call when adding new augmentations
+Maps the given string to the corresponding imgaug function.
+
+Note: Add the function call when adding new augmentations
 """
 augments = {
-        "Fog": iaa.weather.Fog,
-        "Snowflakes": iaa.Snowflakes,
-        "GaussianNoise": iaa.imgcorruptlike.GaussianNoise,
-        "Rain": iaa.Rain,
-        "FastSnowyLandscape": iaa.FastSnowyLandscape,
-        "JpegCompression": iaa.JpegCompression,
-        "CoarsePepper": iaa.CoarsePepper,
-        "Invert": iaa.Invert
-        }
+    "Fog": iaa.weather.Fog,
+    "Snowflakes": iaa.Snowflakes,
+    "GaussianNoise": iaa.imgcorruptlike.GaussianNoise,
+    "Rain": iaa.Rain,
+    "FastSnowyLandscape": iaa.FastSnowyLandscape,
+    "JpegCompression": iaa.JpegCompression,
+    "CoarsePepper": iaa.CoarsePepper,
+    "Invert": iaa.Invert
+}
 
 
-def load_augments(augments_conf, top=1):
-    """ Function that returns the augmentatons list from available ones
+def load_augments(augments_conf: dict, top=1):
+    """
+    Function that returns the augmentatons list from available ones
 
     Args:
-        config_path (str, optional): path to augmentations configs. Defaults to '../config/default_augment_conf.json'.
-        rand (bool, optional): Flag to use a single random augmentations. Defaults to False.
+        augments_conf (dict): Augmentations dictionary of the config file.
+        top (int, optional): Number of augmentations to apply on a single image. Defaults to 1.
 
     Returns:
-        iaa.Sequential: Sequential of list of tranforms according to config file and rand
+        iaa.Sequential: Sequential of list of transforms according to augments_conf and top
     """
 
     transforms = []
 
-    total_augments = [ k for (k, v) in augments_conf.Use.items() if v ]
+    total_augments = [k for (k, v) in augments_conf.Use.items() if v]
 
+    # Randomly chooses 'top' augmentations from the list of avialable augmentations
     apply_augments = random.choices(total_augments, k=top)
 
     for k in apply_augments:
-        aug = iaa.Sometimes(augments_conf.probability, augments[k](**augments_conf[k]))
+        # Applies the randomly chosen augmentations with given probability
+        aug = iaa.Sometimes(augments_conf.probability,
+                            augments[k](**augments_conf[k]))
         transforms.append(aug)
 
     seq = iaa.Sequential(transforms)
