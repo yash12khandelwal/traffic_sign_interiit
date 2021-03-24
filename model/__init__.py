@@ -5,7 +5,7 @@ import torch.optim as optim
 
 def CreateModel(args):
     """ 
-    Initialise model and optimiser and schedular
+    Initialize model and optimizer and schedular
     Note: When adding a new file in models add a condition below with the params
 
     Args:
