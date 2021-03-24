@@ -1,5 +1,6 @@
 import json
 
+
 class Config(object):
     """
     Class for all attributes and functionalities related to a particular training run.
@@ -7,7 +8,8 @@ class Config(object):
 
     def __init__(self, cfg_file: str, params: dict):
         """
-        Constructir for Config class
+        Constructor for Config class
+
         Args:
             cfg_file (str): config file path
             params (dict): parameters
@@ -21,12 +23,12 @@ class Config(object):
 
 def cfg_parser(cfg_file: str) -> dict:
     """
-    This functions reads an input config file and instantiates objects of
-    Config types.
-    args:
-        cfg_file (string): path to cfg file
-    returns:
-        exp_cfg (Config)
+    This functions reads an input config file and instantiates objects of Config type.
+
+    Args:
+        cfg_file (string): path to config file
+    Returns:
+        exp_cfg (dict) : dictionary of config file
     """
     cfg = json.load(open(cfg_file))
 
