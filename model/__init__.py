@@ -15,7 +15,7 @@ def CreateModel(args):
         ValueError: If the model key provided in cmd arguments doesn't exist below
 
     Returns:
-        tuple: (Model, Optimiser, Schedular)
+        tuple: (Model, Optimizer, Schedular)
     """
 
     args = args['experiment']
