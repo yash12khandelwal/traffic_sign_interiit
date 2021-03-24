@@ -117,7 +117,7 @@ class GTSRB(Dataset):
 
     def __init__(self, args, setname='train'):
         """ 
-        Constructor calls get_train_sanple or get_test_sample, based on setname
+        Constructor calls get_train_sample or get_test_sample, based on setname
 
         Args:
             args (TrainOptions): TrainOptions class (refer options/train_options.py)
