@@ -1,4 +1,7 @@
 import json
+import os
+
+root_dir = "data/traffic_sign_interiit/"
 
 class Config(object):
     """
@@ -28,7 +31,10 @@ def cfg_parser(cfg_file: str) -> dict:
     returns:
         exp_cfg (Config)
     """
-    cfg = json.load(open(cfg_file))
+    cfg = json.load(open(os.path.join(root_dir, cfg_file)))
+    
+    # cfg = json.load(open(os.path.join(app.config["DATA_PATH"], cfg_file)))
+    # cfg = json.load(open(cfg_file))
 
     exp_cfg = {
         "experiment": Config(cfg_file, cfg['experiment']),

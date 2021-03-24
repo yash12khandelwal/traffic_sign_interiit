@@ -5,6 +5,8 @@ import sys
 from collections import defaultdict, namedtuple
 import csv
 
+root_dir = "data/traffic_sign_interiit/"
+
 def make_dir(path):
     """ Utility function to make directories
 
@@ -19,11 +21,18 @@ def get_classes(path):
     """
     Get New class ids
     """
-
-    return list(map(int, os.listdir(path)))
+    dirs = os.listdir(path)
+    int_dirs = []
+    for folder in dirs:
+        try:
+            int_dirs.append(int(folder))
+        except:
+            continue
+    return int_dirs
+    # return list(map(int, os.listdir(path)))
 
 Annotation = namedtuple('Annotation', ['filename', 'label'])
-def make_annotations(datapath):
+def make_annotations(datapath, all_classes):
     """ Making annotations for dataset class
 
     Args:
@@ -33,7 +42,12 @@ def make_annotations(datapath):
         list: List of Annotations
     """
 
-    classes = get_classes(datapath)
+    classes = []
+    if all_classes==False:
+        file = json.load(root_dir + "config/temp_config.json")
+        classes = file["experiment"]["class_ids"]
+    else:
+        classes = get_classes(datapath)
     annotations = []
     for classid in classes:
         path = osp.join(datapath, f'{classid}')
@@ -96,7 +110,7 @@ def split_train_val_test_sets(path, annotations, validation_fraction, test_fract
 
     write_annotations(test_annotation, osp.join(test_path, 'GT-Test.csv'))
 
-def prepare_train_val_n_test(source_path, save_classpath, validation_fraction=0.2, test_fraction=0.2):
+def prepare_train_val_n_test(source_path, save_classpath, validation_fraction=0.2, test_fraction=0.2, all_classes=True):
     """ Prepare Train/Valid from raw dataset
 
     Args:
@@ -105,7 +119,7 @@ def prepare_train_val_n_test(source_path, save_classpath, validation_fraction=0.
 
     path = save_classpath
 
-    annotations = make_annotations(source_path)
+    annotations = make_annotations(source_path, all_classes)
     split_train_val_test_sets(path, annotations, validation_fraction, test_fraction)
 
 if __name__ == '__main__':

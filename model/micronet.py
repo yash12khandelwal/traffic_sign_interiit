@@ -7,6 +7,7 @@ class MicroNet(nn.Module):
 
     def __init__(self, args):
         """ Init function for defining layers and params
+
         Args:
             args (TrainOptions): TrainOptions class (refer options/train_options.py)
             Required params from args:
@@ -34,8 +35,10 @@ class MicroNet(nn.Module):
     
     def forward(self, x):
         """ Forward pass for the model
+
         Args:
             x (TorchTensor): TorchTensor of shape (N, 3, 48, 48)
+
         Returns:
             TorchTensor: TorchTensor of shape (N, args.num_classes)
         """
@@ -50,4 +53,5 @@ class MicroNet(nn.Module):
         x = self.dense1_bn(x)
         x = F.dropout(x, training=self.training)
         x = self.fc2(x)
+        x = F.dropout(x, training=self.training)
         return F.log_softmax(x)

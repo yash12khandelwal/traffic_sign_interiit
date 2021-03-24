@@ -10,6 +10,7 @@ from torchvision import transforms
 from augments.augs import load_augments
 import cv2
 
+root_dir = "data/traffic_sign_interiit/"
 
 def get_loader(args, dataset):
     """ Function that returns dataloader
@@ -48,8 +49,8 @@ def get_train_tuple(train_path, extra_train_path=None):
     train_list = []
     traingt_list = []
 
-    for classid in os.listdir(train_path):
-        class_csv = osp.join(train_path, classid, f'GT-{classid}.csv')
+    for classid in os.listdir(root_dir + train_path):
+        class_csv = osp.join(root_dir + train_path, classid, f'GT-{classid}.csv')
 
         reader = csv.reader(open(class_csv, 'r'), delimiter=';')
         # print(list(reader))
@@ -91,7 +92,7 @@ def get_test_tuple(test_path, extra_test_path=None):
 
     test_csv = osp.join(test_path, 'GT-Test.csv')
 
-    with open(test_csv) as f:
+    with open(root_dir + test_csv) as f:
         reader = csv.reader(f, delimiter=';')
         next(reader)
         for row in reader:
@@ -161,6 +162,7 @@ class GTSRB(Dataset):
 
 
         image = cv2.resize(image, self.size)
+        image = load_augments(self.augment_args, top=1)(image=image)
         tran_train = transforms.Compose([
                                     transforms.ToTensor(),
                                     transforms.Normalize((0.3337, 0.3064, 0.3171),
@@ -173,7 +175,6 @@ class GTSRB(Dataset):
                 ])
 
         if self.setname == 'train':
-            image = load_augments(self.augment_args, top=1)(image=image)
             return tran_train(image)
         else:
             return tran_test(image)
@@ -187,10 +188,14 @@ class GTSRB(Dataset):
         Returns:
             tuple: (Image, Ground Truth) for a setname
         """
-
-        img = cv2.imread(self.imgs[idx], 1)
+        # import ipdb; ipdb.set_trace()
+        img = cv2.imread(root_dir + self.imgs[idx], 1)
         gt = self.ids[idx]
+        try:
+            img = self.transform(img)
+        except:
+            print("***************************************************************************************************************************")
+            print(self.imgs[idx])
 
-        img = self.transform(img)
 
         return img, gt

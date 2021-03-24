@@ -131,7 +131,9 @@ dmypy.json
 # Repo specific ignores
 snapshot
 dataset/zips
-dataset/GTSRB
+dataset/GTSRB/Final_Training/*
+dataset/GTSRB/Final_Test/*
+dataset/GTSRB/all/*
 **/checkpoints
 **/.vscode
 **/__pycache__
