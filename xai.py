@@ -4,6 +4,7 @@ import os
 import matplotlib.pyplot as plt 
 import torch 
 import numpy as np
+import tqdm.notebook as tq
 from skimage.transform import resize
 import model
 from options.train_options import *
@@ -19,8 +20,12 @@ from tqdm import tqdm
 import csv
 from PIL import Image 
 import matplotlib as mpl
+import csv
 
-def rise(model, dataloader, num_classes, image_size, save_path, device=torch.device("cuda:0")):
+data_wrong = []
+data_right = []
+
+def rise(model1, dataloader, num_classes, image_size, save_path, device=torch.device("cuda:0")):
         """
         A function to create the saliency maps for all the images in the dataloader
 
@@ -33,22 +38,33 @@ def rise(model, dataloader, num_classes, image_size, save_path, device=torch.dev
         """
 
         #Create the explainer
-        explainer = RISEBatch(model, image_size, gpu_batch=20)
+        explainer = RISEBatch(model1, image_size, gpu_batch=20)
 
         #Create the masks once, and save them. For later use, simply load the masks.
         explainer.generate_masks(N = 4000, s= 8, p1 = 0.1, savepath = 'masks.npy')
-        # explainer.load_masks('masks.npy')
-
-        #Iterate over the dataloader
-        for i, data in tqdm(enumerate(dataloader, 0), desc="Images" ):
-                #Currently stopping after 5 images
-                if i > 5:
-                        break
-
-                #Extract the image and class from the data element
+        explainer.load_masks('masks.npy')
+        c_cnt = np.zeros((48))
+        i=0
+        j = 0
+        for data in tq.tqdm(dataloader):
+            flag = 0
+            img = data[0]
+            cl = data[1]
+            name = str(data[2][0])
+            out = model1(img.to(device)).cpu().detach().numpy()[0]
+            # print(cl.cpu().detach().numpy(), np.argmax(out))
+            if cl[0].cpu().detach().numpy() == np.argmax(out) and c_cnt[cl.cpu().detach().numpy()]<2:
+                c_cnt[cl.cpu().detach().numpy()] += 1
+                flag = 1
+                # print(str(cl[0].cpu().detach().numpy()), out[np.argmax(out)])
+                data_right.append((name[:-4], str(cl[0].cpu().detach().numpy()), out[np.argmax(out)]))
+            elif cl != np.argmax(out):
+                flag = 2
+                data_wrong.append((name[:-4], str(cl[0].cpu().detach().numpy()), np.argmax(out), out[np.argmax(out)]))
+            if (flag!=0):
                 img = data[0]
                 img = img.float().to(device)
-                cl = data[1]
+                name = data[2]
 
                 #Generate the saliency map
                 sal = explainer(img.to(device)).cpu().numpy()
@@ -60,7 +76,7 @@ def rise(model, dataloader, num_classes, image_size, save_path, device=torch.dev
                 std =  [0.2672, 0.2564, 0.2629]
 
                 for channel in range(3):
-                        img_cpu[channel] = img_cpu[channel]*std[channel] + mean[channel]
+                    img_cpu[channel] = img_cpu[channel]*std[channel] + mean[channel]
 
                 img_cpu = img_cpu*255
 
@@ -74,21 +90,41 @@ def rise(model, dataloader, num_classes, image_size, save_path, device=torch.dev
                 explanation = cm(explanation)
                 explanation = explanation[:, :, :3]
                 explanation *=255
-                # explanation = explanation.astype(np.uint8)
 
                 final_img = explanation * 0.5 + img_cpu * 0.5
                 final_img = final_img.astype(np.uint8)
                 final_img = Image.fromarray(final_img)
-
-                final_img.save(save_path + '/rise_' + str(i) + '.jpg')
-                print("image: {}".format(i), flush = True)
+                if flag==1:
+                    final_img.save(save_path + '/C_Classifications/rise_' + str(name[0])[:-4] + '_' + str(cl[0].cpu().detach().numpy()) + '.jpg')
+                else:
+                    final_img.save(save_path + '/Misclassifications/rise_' + str(name[0])[:-4] + '_' + str(cl[0].cpu().detach().numpy()) + '.jpg')
+        filename = save_path + '/c_predictions.csv'
+        with open(filename, 'w') as csvfile:  
+            # creating a csv writer object  
+            csvwriter = csv.writer(csvfile)  
+                
+            # writing the fields  
+            csvwriter.writerow(['Image', 'Real Class', 'Probability'])  
+                
+            # writing the data rows  
+            csvwriter.writerows(data_right)
+        filename = save_path + '/mispredictions.csv'
+        with open(filename, 'w') as csvfile:  
+            # creating a csv writer object  
+            csvwriter = csv.writer(csvfile)  
+                
+            # writing the fields  
+            csvwriter.writerow(['Image', 'Real Class', 'Predicted Class', 'Probability'])  
+                
+            # writing the data rows  
+            csvwriter.writerows(data_wrong)
                 
 opt = TrainOptions()
 args = opt.initialize()
-train_dataset = GTSRB(args, setname='train')
+test_dataset = GTSRB(args, setname='test')
 
-trainloader = get_loader(args, train_dataset)
+testloader = get_loader(args, test_dataset)
 net, optimizer, schedular = model.CreateModel(args=args)
 net.load_state_dict(torch.load("/root/traffic_sign_interiit/opt_micronet_2021-3-11_11-30.pth"))
 net.eval()
-rise(net, trainloader, 43, (48, 48), "/root/traffic_sign_interiit/sample_outputs", torch.device("cuda:0"), )
+rise(net, testloader, 43, (48, 48), "/root/traffic_sign_interiit/sample_outputs", torch.device("cuda:0"), )

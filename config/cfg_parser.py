@@ -15,6 +15,9 @@ class Config(object):
         self.cfg_file = cfg_file
         self.__dict__.update(params)
 
+    def __getitem__(self, key):
+        return self.__dict__[key]
+
 
 def cfg_parser(cfg_file: str) -> dict:
     """
@@ -27,7 +30,9 @@ def cfg_parser(cfg_file: str) -> dict:
     """
     cfg = json.load(open(cfg_file))
 
-    exp_cfg = Config(cfg_file, cfg)
+    exp_cfg = {
+        "experiment": Config(cfg_file, cfg['experiment']),
+        "augmentations": Config(cfg_file, cfg['augmentations'])
+    }
 
     return exp_cfg
-

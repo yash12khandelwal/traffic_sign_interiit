@@ -2,8 +2,9 @@ import numpy as np
 import math
 import argparse
 import os
+import pandas as pd
 
-def get_class_dist(path):
+def get_class_dist(path, extra_path):
     """ Generates a dictionary that contains classes and number of images per class
 
     Args:
@@ -19,9 +20,17 @@ def get_class_dist(path):
 
     for dir in dirs:
         _, _, files = next(os.walk(os.path.join(path,dir)))
-        class_dist[dir] = len(files)
+        class_dist[int(dir)] = len(pd.read_csv(os.path.join(path,dir,files[0])))
+
+    path = os.path.join(extra_path,'train')
+    _, dirs, _ = next(os.walk(path))
+
+    for dir in dirs:
+        _, _, files = next(os.walk(os.path.join(path,dir)))
+        class_dist[int(dir)] = len(pd.read_csv(os.path.join(path,dir,files[0])))
 
     return class_dist
+
 
 def create_class_weight_log(labels_dict,mu=0.15):
     """ Class log weights 
@@ -35,7 +44,7 @@ def create_class_weight_log(labels_dict,mu=0.15):
     """
 
     total = np.sum(list(labels_dict.values()))
-    keys = labels_dict.keys()
+    keys = sorted(labels_dict.keys())
     class_weight = []
 
     for key in keys:
@@ -56,7 +65,7 @@ def create_class_weight_average(labels_dict):
     """
 
     total = np.sum(list(labels_dict.values()))
-    keys = labels_dict.keys()
+    keys = sorted(labels_dict.keys())
     class_weight = []
 
     for key in keys:
@@ -68,16 +77,20 @@ def create_class_weight_average(labels_dict):
 
 parser = argparse.ArgumentParser( description="training script for InterIIT Trafic Sign Recognition" )
 parser.add_argument("--data-dir", type=str, default='../dataset/GTSRB', help="path to the dataset directory")
-parser.add_argument("--weights", type=str, default='average', help="options available: average/log")
+parser.add_argument("--weights", type=str, default='log', help="options available: average/log")
 parser.add_argument("--save-dir",type=str, default='../config/', help="path to save class weights")
 
 args = parser.parse_args()
 
-labels_dict = get_class_dist(args.data_dir)
+labels_dict = get_class_dist(args.data_dir,'../dataset/EXTRA')
+
+print(labels_dict)
 
 if args.weights == 'average':
     class_weight = create_class_weight_average(labels_dict)
 elif args.weights == 'log' :
     class_weight = create_class_weight_log(labels_dict)
+
+print(class_weight)
 
 np.save(os.path.join(args.save_dir, f'class_weights_{args.weights}.npy'),np.array(class_weight))
