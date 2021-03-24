@@ -102,9 +102,3 @@ Use --wandb option to enable logging in wandb
 Validation Accuracy = 98.57
 Test Accuracy = 98.59
 ```
-
-- ### DKS
-```
-Validation Accuracy = 96.475
-Test Accuracy = 96.53
-```
