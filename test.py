@@ -37,6 +37,7 @@ if __name__ == "__main__":
     print(f'Recall Score: {recall}')
 
     if args['experiment'].wandb:
+        wandb.run.summary['test_accuracy'] = acc
         wandb.run.summary["test_f1"] = f1*100
         wandb.run.summary["test_precision"] = precision*100
         wandb.run.summary["test_recall"] = recall*100

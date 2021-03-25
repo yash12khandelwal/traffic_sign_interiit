@@ -1,3 +1,4 @@
+import torch
 import model
 from options.train_options import *
 from data.gtsrb_loader import GTSRB, get_loader
@@ -24,6 +25,14 @@ if __name__ == "__main__":
     testloader = get_loader(args, test_dataset)
 
     net, optimizer, schedular = model.CreateModel(args=args)
+
+    if args['experiment'].restore_from:
+        device = torch.device(args['experiment'].device)
+        PATH = args['experiment'].restore_from
+        checkpoints = torch.load(PATH, map_location=device)
+
+        net.load_state_dict(checkpoints['model_state_dict'])
+        optimizer.load_state_dict(checkpoints['optimizer_state_dict'])
 
     if args['experiment'].wandb:
         init_wandb(net, args)

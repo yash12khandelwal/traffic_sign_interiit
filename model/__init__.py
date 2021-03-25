@@ -30,6 +30,7 @@ def CreateModel(args):
 
     elif args.model == 'micronet':
         model = MicroNet(args).to(device)
+
         optimizer = optim.SGD(model.parameters(), lr=args.learning_rate,
                               momentum=args.momentum, weight_decay=args.weight_decay, nesterov=True)
         scheduler = optim.lr_scheduler.StepLR(

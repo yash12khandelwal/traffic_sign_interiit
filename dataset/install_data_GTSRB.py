@@ -7,7 +7,6 @@ import sys
 import pandas as pd
 import glob
 
-
 def download_gtsrb():
     """ 
     Function to download raw dataset if not downloaded before
@@ -47,7 +46,6 @@ def make_dir(path):
 
     if not os.path.exists(path):
         os.makedirs(path)
-
 
 def read_annotations(filename, path):
     """ 
@@ -185,6 +183,7 @@ def prepare_test(source_test, target_test):
     make_dir('GTSRB/test')
 
     test_csv = glob.glob(f'{source_test}/*.csv')[0]
+
     annotations = read_annotations(
         test_csv, os.path.join(source_test, 'Images'))
 
@@ -209,6 +208,7 @@ def prepare_train_val_n_test(validation_fraction=0.2, num_class=43):
     all_path = os.path.join(path, 'all')
 
     prepare_test(source_test, target_test)
+
     split_train_validation_sets(
         source_path, train_path, validation_path, all_path, num_class, validation_fraction)
 

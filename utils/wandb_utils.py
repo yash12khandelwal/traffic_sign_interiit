@@ -19,6 +19,7 @@ def init_wandb(model, args=None) -> None:
         name=args.wandb_name,
         project="traffic-sign",
         id=args.wandb_id,
+        resume=True,
         dir="./",
     )
     if args:
@@ -46,6 +47,7 @@ def wandb_log(train_loss: float, val_loss: float, train_acc: float, val_acc: flo
     }, step=epoch)
 
 
+
 def wandb_save_summary(test_acc: float, test_f1: float, test_precision: float, test_recall: float):
     """[summary]
 
@@ -71,6 +73,7 @@ def wandb_log_conf_matrix(y_true: list, y_pred: list):
         y_pred (list): predicted labels
     """
     num_classes = len(set(y_true))
+
     wandb.log({'confusion_matrix': wandb.plots.HeatMap(list(np.arange(0, num_classes)), list(
         np.arange(0, num_classes)), confusion_matrix(y_true, y_pred, normalize="true"), show_text=True)})
 

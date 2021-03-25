@@ -1,4 +1,5 @@
 import os
+
 import os.path as osp
 import numpy as np
 import csv
@@ -108,7 +109,6 @@ def get_test_tuple(test_path, extra_test_path=None):
                 test_ids.append(int(row[1]))
 
     return (test_list, test_ids)
-
 
 class GTSRB(Dataset):
     """
