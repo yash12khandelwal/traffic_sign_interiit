@@ -211,10 +211,11 @@ def datasetStatistics():
 @app.route("/training", methods=["GET", "POST"])
 def trainModel():
     pretrained_models = []
-    for file in os.listdir(app.config["DATA_PATH"] + "checkpoints/logs/micronet_params"):
-        print(file)
-        if file.endswith(".pt"):
-            pretrained_models.append(file)
+    models = os.listdir(app.config["DATA_PATH"] + "checkpoints/logs/")
+    for model in models:
+        for file in os.listdir(app.config["DATA_PATH"] + "checkpoints/logs/" + model):
+            if model in file:
+                pretrained_models.append(file)
     print(pretrained_models)
     return render_template("training.html", self_classes=self_classes, pretrained_models=pretrained_models)
 
@@ -237,19 +238,28 @@ def ModelTraindata():
         range(0, 43)) + (np.array(data["class_ids"]) + 43).tolist()
     default_configs["experiment"]["num_classes"] = int(
         data["num_classes"]) + 43
-    with open(app.config["DATA_PATH"] + "config/temp_config.json", "w") as outfile:
+
+    max_train = -1
+    for file in os.listdir(app.config["DATA_PATH"] + "checkpoints/logs/"):
+        if file.startswith("temp"):
+            number = int(file.split("_")[-1])
+            max_train = max(max_train, number)
+
+    max_train+=1
+    next_config = "temp_config_"+ str(max_train)
+    with open(app.config["DATA_PATH"] + "config/" + next_config + ".json", "w") as outfile:
         json.dump(default_configs, outfile)
 
     try:
         shutil.move(os.path.join(app.config["DATA_PATH"], "dataset/EXTRA"),
                     os.path.join(app.config["DATA_PATH"], "dataset/EXTRA_copy"))
         remake_EXTRA_folder(
-            0, 0, new_classes=default_configs["experiment"]["class_ids"])
+            0, 0, new_classes=default_configs["experiment"]["class_ids"], next_config = max_train)
         remake_EXTRA_folder(
-            0, 1, new_classes=default_configs["experiment"]["class_ids"])
+            0, 1, new_classes=default_configs["experiment"]["class_ids"], next_config = max_train)
         remake_EXTRA_folder(
-            1, 0, new_classes=default_configs["experiment"]["class_ids"])
-        train.train("temp_config")
+            1, 0, new_classes=default_configs["experiment"]["class_ids"], next_config = max_train)
+        train.train(next_config, next_config=next_config)
     except KeyboardInterrupt:
         "Stopped Abruptly"
     finally:
@@ -426,7 +436,7 @@ def get_index(class_list, class_name):
     return -1
 
 
-def remake_EXTRA_folder(val_fraction, test_fraction, new_classes=[]):
+def remake_EXTRA_folder(val_fraction, test_fraction, new_classes=[], next_config = -1):
     """
     Prepares the the .csv files in EXTRA/train, EXTRA/test and(or) EXTRA/valid
     folders according to the input validation fraction, test fraction, 
@@ -439,6 +449,8 @@ def remake_EXTRA_folder(val_fraction, test_fraction, new_classes=[]):
             Setting  it to 1 prepares Test folder
         new_classes (list)[string]:
             Contains the classes which need to be prepared.
+        next_config (int):
+            index of next confog file name
     Outputs:
        None
     """
@@ -451,7 +463,7 @@ def remake_EXTRA_folder(val_fraction, test_fraction, new_classes=[]):
     else:
         new_path += "Train/"
     prepare_new_classes.prepare_train_val_n_test(
-        new_path, extra_path, validation_fraction=val_fraction, test_fraction=test_fraction, new_classes=new_classes)
+        new_path, extra_path, validation_fraction=val_fraction, test_fraction=test_fraction, new_classes=new_classes, next_config = next_config)
     return
 
 

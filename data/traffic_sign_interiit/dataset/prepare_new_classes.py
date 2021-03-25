@@ -31,11 +31,13 @@ def get_classes(path):
     return int_dirs
 
 Annotation = namedtuple('Annotation', ['filename', 'label'])
-def make_annotations(datapath, new_classes):
+def make_annotations(datapath, new_classes, next_config):
     """ Making annotations for dataset class
 
     Args:
         filepath (str): Folder location for class
+        new_classes (list): List of classes to prepare
+        next_config (int): index of next config file name
 
     Returns:
         list: List of Annotations
@@ -43,8 +45,9 @@ def make_annotations(datapath, new_classes):
 
     classes = get_classes(datapath)
     if len(new_classes)!=0:
-        print(os.path.join(source_dir, "config/temp_config.json"))
-        with open(os.path.join(source_dir, "config/temp_config.json")) as json_file:
+        print(os.path.join(source_dir, "config/temp_config_" + str(next_config) + ".json"))
+        with open(os.path.join(source_dir, "config/temp_config_" + str(next_config) + ".json")) as json_file:
+            print("config/temp_config" + str(next_config) + ".json")
             config = json.load(json_file)
             classes_to_train = config["experiment"]["class_ids"]
             classes = list(set(classes_to_train) & set(classes))
@@ -117,7 +120,7 @@ def split_train_val_test_sets(path, annotations, validation_fraction, test_fract
     if test_fraction > 0.0:
         write_annotations(test_annotation, osp.join(test_path, 'GT-Test.csv'))
 
-def prepare_train_val_n_test(source_path, save_classpath, validation_fraction=0.2, test_fraction=0.2, new_classes=[]):
+def prepare_train_val_n_test(source_path, save_classpath, validation_fraction=0.2, test_fraction=0.2, new_classes=[], next_config = -1):
     """ Prepare Train/Valid from raw dataset
 
     Args:
@@ -126,7 +129,7 @@ def prepare_train_val_n_test(source_path, save_classpath, validation_fraction=0.
 
     path = save_classpath
 
-    annotations = make_annotations(source_path, new_classes)
+    annotations = make_annotations(source_path, new_classes, next_config)
     split_train_val_test_sets(path, annotations, validation_fraction, test_fraction)
 
 if __name__ == '__main__':

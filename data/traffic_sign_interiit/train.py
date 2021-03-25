@@ -7,7 +7,7 @@ from utils.evaluate import calc_acc_n_loss
 from utils.utils import set_seed
 from utils.wandb_utils import init_wandb, wandb_save_summary
 
-def train(config_file=""):
+def train(config_file="", next_config=""):
 
     opt = TrainOptions()
     args = opt.initialize(config_file=config_file)
@@ -38,7 +38,7 @@ def train(config_file=""):
         init_wandb(net, args)
 
     train_engine(args=args, trainloader=trainloader,
-                valloader=valloader, model=net, optimizer=optimizer, scheduler=schedular)
+                valloader=valloader, model=net, optimizer=optimizer, scheduler=schedular, next_config=next_config)
 
     log_confusion = True if args['experiment'].wandb else False
     test_acc, test_loss,test_f1,cm,test_precision,test_recall = calc_acc_n_loss(args['experiment'], net, testloader, log_confusion)

@@ -11,7 +11,7 @@ import os
 import datetime
 
 
-def train_engine(args, trainloader, valloader, model, optimizer, scheduler=None):
+def train_engine(args, trainloader, valloader, model, optimizer, scheduler=None, next_config=""):
     """
     Generic Train function for training
 
@@ -117,7 +117,8 @@ def train_engine(args, trainloader, valloader, model, optimizer, scheduler=None)
             wandb_log(train_loss, val_loss, train_acc, val_acc, i)
 
     t = datetime.datetime.now()
-    name = f'final_{args.model}{t.year}-{t.month}-{t.day}{t.hour}-{t.minute}.pt'
+    name = f'final_{next_config}.pt'
+    # name = f'final_{args.model}{t.year}-{t.month}-{t.day}{t.hour}-{t.minute}.pt'
 
     save_path = os.path.join(args.snapshot_dir, name)
     torch.save({
