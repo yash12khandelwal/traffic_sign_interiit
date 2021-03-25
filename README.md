@@ -1,5 +1,9 @@
 # DETEKTOR
 
+[Link](https://www.thedetektor.com/) to the project website.
+
+[Link](data/traffic_sign_interiit/README.md) to README of DL code.
+
 ## INSTRUCTIONS TO RUN THE UI
 
 Python version: 3.7.10
@@ -11,7 +15,6 @@ python app.py
 ```
 The UI can be accessed at `localhost:5000` on any commonly used browser.
 
-[Link](data/traffic_sign_interiit/README.md) to README of DL code.
 
 ## FEATURES
 
