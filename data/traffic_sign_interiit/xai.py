@@ -45,28 +45,26 @@ def rise(model1, dataloader, num_classes, image_size, save_path, device=torch.de
         explainer.load_masks('masks.npy')
         c_cnt = np.zeros((48))
         i=0
-        j=0
+        j = 0
         for data in tq.tqdm(dataloader):
-        	if (i>=5 and j>=5):
-        		break
             flag = 0
             img = data[0]
             cl = data[1]
+            name = str(data[2][0])
             out = model1(img.to(device)).cpu().detach().numpy()[0]
             # print(cl.cpu().detach().numpy(), np.argmax(out))
             if cl[0].cpu().detach().numpy() == np.argmax(out) and c_cnt[cl.cpu().detach().numpy()]<2:
-            	i+=1
                 c_cnt[cl.cpu().detach().numpy()] += 1
                 flag = 1
                 # print(str(cl[0].cpu().detach().numpy()), out[np.argmax(out)])
-                # data_right.append((name[:-4], str(cl[0].cpu().detach().numpy()), out[np.argmax(out)]))
+                data_right.append((name[:-4], str(cl[0].cpu().detach().numpy()), out[np.argmax(out)]))
             elif cl != np.argmax(out):
-            	j+=1
                 flag = 2
-                # data_wrong.append((name[:-4], str(cl[0].cpu().detach().numpy()), np.argmax(out), out[np.argmax(out)]))
+                data_wrong.append((name[:-4], str(cl[0].cpu().detach().numpy()), np.argmax(out), out[np.argmax(out)]))
             if (flag!=0):
                 img = data[0]
                 img = img.float().to(device)
+                name = data[2]
 
                 #Generate the saliency map
                 sal = explainer(img.to(device)).cpu().numpy()
@@ -97,29 +95,29 @@ def rise(model1, dataloader, num_classes, image_size, save_path, device=torch.de
                 final_img = final_img.astype(np.uint8)
                 final_img = Image.fromarray(final_img)
                 if flag==1:
-                    final_img.save(save_path + '/C_Classifications/rise_' + str(i) + '_' + str(cl[0].cpu().detach().numpy()) + '.jpg')
+                    final_img.save(save_path + '/C_Classifications/rise_' + str(name[0])[:-4] + '_' + str(cl[0].cpu().detach().numpy()) + '.jpg')
                 else:
-                    final_img.save(save_path + '/Misclassifications/rise_' + str(j) + '_' + str(cl[0].cpu().detach().numpy()) + '.jpg')
-        # filename = save_path + '/c_predictions.csv'
-        # with open(filename, 'w') as csvfile:  
-        #     # creating a csv writer object  
-        #     csvwriter = csv.writer(csvfile)  
+                    final_img.save(save_path + '/Misclassifications/rise_' + str(name[0])[:-4] + '_' + str(cl[0].cpu().detach().numpy()) + '.jpg')
+        filename = save_path + '/c_predictions.csv'
+        with open(filename, 'w') as csvfile:  
+            # creating a csv writer object  
+            csvwriter = csv.writer(csvfile)  
                 
-        #     # writing the fields  
-        #     csvwriter.writerow(['Image', 'Real Class', 'Probability'])  
+            # writing the fields  
+            csvwriter.writerow(['Image', 'Real Class', 'Probability'])  
                 
-        #     # writing the data rows  
-        #     csvwriter.writerows(data_right)
-        # filename = save_path + '/mispredictions.csv'
-        # with open(filename, 'w') as csvfile:  
-        #     # creating a csv writer object  
-        #     csvwriter = csv.writer(csvfile)  
+            # writing the data rows  
+            csvwriter.writerows(data_right)
+        filename = save_path + '/mispredictions.csv'
+        with open(filename, 'w') as csvfile:  
+            # creating a csv writer object  
+            csvwriter = csv.writer(csvfile)  
                 
-        #     # writing the fields  
-        #     csvwriter.writerow(['Image', 'Real Class', 'Predicted Class', 'Probability'])  
+            # writing the fields  
+            csvwriter.writerow(['Image', 'Real Class', 'Predicted Class', 'Probability'])  
                 
-        #     # writing the data rows  
-        #     csvwriter.writerows(data_wrong)
+            # writing the data rows  
+            csvwriter.writerows(data_wrong)
                 
 opt = TrainOptions()
 args = opt.initialize()
@@ -129,4 +127,4 @@ testloader = get_loader(args, test_dataset)
 net, optimizer, schedular = model.CreateModel(args=args)
 net.load_state_dict(torch.load("/root/traffic_sign_interiit/opt_micronet_2021-3-11_11-30.pth"))
 net.eval()
-rise(net, testloader, args['experiment'].num_classes, (48, 48), "/root/traffic_sign_interiit/sample_outputs", torch.device("cpu"))
+rise(net, testloader, 43, (48, 48), "/root/traffic_sign_interiit/sample_outputs", torch.device("cuda:0"), )

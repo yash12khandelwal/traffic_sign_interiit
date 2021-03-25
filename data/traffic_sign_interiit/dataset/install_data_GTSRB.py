@@ -8,7 +8,8 @@ import pandas as pd
 import glob
 
 def download_gtsrb():
-    """ Function to download raw dataset if not downloaded before
+    """ 
+    Function to download raw dataset if not downloaded before
     """
 
     TMP_DATA_DIR = "."
@@ -31,11 +32,13 @@ def download_gtsrb():
 
     for file, directory in to_unpack:
         print("Unzipping {} to {}...".format(file, directory))
-        with zipfile.ZipFile(file,"r") as zip_ref:
+        with zipfile.ZipFile(file, "r") as zip_ref:
             zip_ref.extractall(directory)
 
+
 def make_dir(path):
-    """ Utility function to make directories
+    """ 
+    Utility function to make directories
 
     Args:
         path (str): Folder to make
@@ -44,64 +47,77 @@ def make_dir(path):
     if not os.path.exists(path):
         os.makedirs(path)
 
-Annotation = namedtuple('Annotation', ['filename', 'label'])
 def read_annotations(filename, path):
-    """ Reading annotations from test csv file
+    """ 
+    Reading annotations from csv file
 
     Args:
-        filename (str): File location for test csv file
+        filename (str): File location for csv file
+
+    Returns:
+        list: List of Annotations
+    """
+
+    Annotation = namedtuple('Annotation', ['filename', 'label'])
+
+    annotations = []
+
+    with open(filename) as f:
+        reader = csv.reader(f, delimiter=';')
+        next(reader)  # skip header
+
+        # loop over all images in current annotations file
+        for row in reader:
+            filename = row[0]  # filename is in the 0th column
+            label = int(row[7])  # label is in the 7th column
+            annotations.append(Annotation(
+                os.path.join('dataset', path, filename), label))
+
+    return annotations
+
+
+def load_training_annotations(source_path, num_class):
+    """ 
+    Reading train annotations for each class
+
+    Args:
+        source_path (str): Path of training data
 
     Returns:
         list: List of Annotations
     """
 
     annotations = []
-
-    with open(filename) as f:
-        reader = csv.reader(f, delimiter=';')
-        next(reader) # skip header
-
-        # loop over all images in current annotations file
-        for row in reader:
-            filename = row[0] # filename is in the 0th column
-            label = int(row[7]) # label is in the 7th column
-            annotations.append(Annotation(os.path.join('dataset', path, filename), label))
-
-    return annotations
-
-def load_training_annotations(source_path, num_class):
-    """ Reading train annotations for each class
-
-    Args:
-        source_path (str): Path of training data
-
-    Returns:
-        [type]: List of Annotations
-    """
-
-    annotations = []
     for c in range(0, num_class):
-        filename = os.path.join(source_path, format(c, '05d'), 'GT-' + format(c, '05d') + '.csv')
-        annotations.append(read_annotations(filename, os.path.join(source_path, format(c, '05d'))))
+        filename = os.path.join(source_path, format(
+            c, '05d'), 'GT-' + format(c, '05d') + '.csv')
+        annotations.append(read_annotations(
+            filename, os.path.join(source_path, format(c, '05d'))))
     return annotations
+
 
 def write_annotations(annotations, filepath):
     """
     Function that writes the annotations to file
+
+    Args:
+        annotations (list): list of namedtuple('Annotation', ['filename', 'label'])
+        filepath (str): path to save annotations to csv file
     """
 
     data = dict()
     data['Filename'] = []
     data['ClassId'] = []
     for filename, label in annotations:
-        # print(filename, label)
         data['Filename'].append(filename)
         data['ClassId'].append(label)
     df = pd.DataFrame(data=data)
     df.to_csv(filepath, sep=';', index=False)
 
+
 def copy_files(label, filenames, source, destination, move=False):
-    """ Copy files from source to destination
+    """ 
+    Copy files from source to destination
 
     Args:
         label (str): Path for labels
@@ -119,10 +135,13 @@ def copy_files(label, filenames, source, destination, move=False):
     for filename in filenames:
         destination_path = os.path.join(label_path, filename)
         if not os.path.exists(destination_path):
-            func(os.path.join(source, format(label, '05d'), filename), destination_path)
+            func(os.path.join(source, format(
+                label, '05d'), filename), destination_path)
+
 
 def split_train_validation_sets(source_path, train_path, validation_path, all_path, num_class, validation_fraction=0.2):
-    """ Spliting the Train folder into train and valid
+    """ 
+    Spliting the Train folder into train and valid
 
     Args:
         source_path (str): Source destination of Train
@@ -144,26 +163,40 @@ def split_train_validation_sets(source_path, train_path, validation_path, all_pa
 
         validation_size = int(len(annotation) // 30 * validation_fraction) * 30
 
-        write_annotations(annotation, os.path.join(all_path, f'{i:04}', f'GT-{i:04}.csv'))
-        write_annotations(annotation[validation_size:], os.path.join(train_path, f'{i:04}', f'GT-{i:04}.csv'))
-        write_annotations(annotation[:validation_size], os.path.join(validation_path, f'{i:04}', f'GT-{i:04}.csv'))
+        write_annotations(annotation, os.path.join(
+            all_path, f'{i:04}', f'GT-{i:04}.csv'))
+        write_annotations(annotation[validation_size:], os.path.join(
+            train_path, f'{i:04}', f'GT-{i:04}.csv'))
+        write_annotations(annotation[:validation_size], os.path.join(
+            validation_path, f'{i:04}', f'GT-{i:04}.csv'))
+
 
 def prepare_test(source_test, target_test):
-    """ Function to prepare Test set from raw dataset
+    """
+    Function to prepare Test set from raw dataset
+
+    Args:
+        source_test (str): Path to raw test dataset
+        target_test (str): Path to save annotations for test dataset
     """
 
     make_dir('GTSRB/test')
 
     test_csv = glob.glob(f'{source_test}/*.csv')[0]
-    annotations = read_annotations(test_csv, os.path.join(source_test, 'Images'))
+
+    annotations = read_annotations(
+        test_csv, os.path.join(source_test, 'Images'))
 
     write_annotations(annotations, os.path.join(target_test, 'GT-Test.csv'))
 
+
 def prepare_train_val_n_test(validation_fraction=0.2, num_class=43):
-    """ Prepare Train/Valid from raw dataset
+    """ 
+    Prepare Train/Valid from raw dataset
 
     Args:
         validation_fraction (float, optional): valid/val split. Defaults to 0.2.
+        num_class (int, optional): number of classes. Defaults to 43.
     """
 
     path = 'GTSRB'
@@ -175,11 +208,13 @@ def prepare_train_val_n_test(validation_fraction=0.2, num_class=43):
     all_path = os.path.join(path, 'all')
 
     prepare_test(source_test, target_test)
-    split_train_validation_sets(source_path, train_path, validation_path, all_path, num_class, validation_fraction)
+
+    split_train_validation_sets(
+        source_path, train_path, validation_path, all_path, num_class, validation_fraction)
 
 
 if __name__ == "__main__":
-    num_class = 43#int(sys.argv[1])  # Change this if classes change
+    num_class = 43  # int(sys.argv[1])  # Change this if classes change
 
     download_gtsrb()
     prepare_train_val_n_test(validation_fraction=0.2, num_class=num_class)
