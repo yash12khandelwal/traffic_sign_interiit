@@ -32,7 +32,7 @@ def cfg_parser(cfg_file: str) -> dict:
     Returns:
         exp_cfg (dict) : dictionary of config file
     """
-    cfg = json.load(open(cfg_file))
+    cfg = json.load(open(root_dir + cfg_file))
 
     exp_cfg = {
         "experiment": Config(cfg_file, cfg['experiment']),

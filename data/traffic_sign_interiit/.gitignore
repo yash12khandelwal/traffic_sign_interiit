@@ -134,7 +134,6 @@ dataset/zips
 dataset/GTSRB/Final_Training/*
 dataset/GTSRB/Final_Test/*
 dataset/GTSRB/all/*
-**/checkpoints
 **/.vscode
 **/__pycache__
 **/wandb

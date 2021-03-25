@@ -1,0 +1,30 @@
+----------------- Options ---------------
+               batch_size: 50                            
+                 cfg_file: config\micronet_params.json   
+            class_weights: None                          
+              config_path: config/default_augment_conf.json
+                 data_dir: dataset/GTSRB                 
+                   device: cpu                           
+                   epochs: 100                           
+              epochs_stop: 100                           
+             init_weights: None                          
+            learning_rate: 0.00025                       
+            lr_decay_step: 5                             
+                    model: micronet                      
+                 momentum: 0.9                           
+              num_classes: 48                            
+              num_workers: 4                             
+                    power: 0.9                           
+               print_freq: 5                             
+             restore_from: None                          
+          save_pred_every: 5                             
+                     seed: 42                            
+                     size: [48, 48]                      
+             snapshot_dir: checkpoints/logs\micronet_params
+                  version: micronet_params               
+                    wandb: False                         
+            wandb_api_key: None                          
+               wandb_name: None                          
+             weight_decay: 0.0005                        
+----------------- End -------------------
+
