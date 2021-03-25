@@ -1,9 +1,45 @@
 {% extends "basetemplate.html" %}
 
-{% block title %}Dashboard{% endblock %}
+{% block title %}Home{% endblock %}
+
+{% block ptitle %}Home{% endblock %}
+
+{% block styles %}
+<link rel="preconnect" href="https://fonts.gstatic.com">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+    .c-body {
+        background-image: url('../static/images/back.jpg');
+        background-repeat: no-repeat;
+        background-size: cover;
+    }
+
+    .dheading {
+        font-size: 6rem;
+        margin-top: 150px;
+        font-family: 'Montserrat';
+        font-weight: 700;
+        -webkit-text-stroke-width: 2px;
+        -webkit-text-stroke-color: black;
+    }
+
+    .dtag {
+        font-size: 2.5rem;
+        margin-top: 50px;
+        font-weight: 700;
+        -webkit-text-stroke-width: 2px;
+        -webkit-text-stroke-color: black;
+    }
+</style>
+{% endblock %}
 
 {% block main %}
-
+<div class="row" style="color: white;">
+    <div class="col-xl-12 col-md-12 text-center">
+        <h1 class="dheading">THE DETEKTOR</h1>
+        <h2 class="dtag">TRAFFIC SIGN RECOGNITION: <br>A STEP TOWARDS LEVEL 5 AUTONOMY</h1>
+    </div>
+</div>
 
 {% endblock %}
 
