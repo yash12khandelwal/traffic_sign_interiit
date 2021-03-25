@@ -54,7 +54,8 @@ def addImages():
         if os.path.exists(path):
             #randomly choosing a img from a particular class folder
             random_file = random.choice(os.listdir(path))
-            temp = [f'{i}', random_file]
+            class_name = self_classes[i-43]
+            temp = [f'{i}', random_file, class_name]
             img_paths.append(temp)
 
     if request.method == 'POST':
