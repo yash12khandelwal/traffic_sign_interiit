@@ -176,7 +176,7 @@ def datasetStatistics():
     train_path_Extra = os.path.join(base_path_Extra, "Train/")
     train_class_dist_extra = []
     for i in range(0, len(orig_classes) + len(self_classes)):
-        folder = "{:04d}".format(i)
+        folder = f'{i}'
         path = train_path_Extra + folder
         if os.path.exists(path):
             train_class_dist_extra.insert(i, len(next(os.walk(path))[2]))
@@ -186,7 +186,7 @@ def datasetStatistics():
     val_path_Extra = os.path.join(base_path_Extra, "Valid/")
     val_class_dist_extra = []
     for i in range(0, len(orig_classes) + len(self_classes)):
-        folder = "{:04d}".format(i)
+        folder = f'{i}'
         path = val_path_Extra + folder
         if os.path.exists(path):
             val_class_dist_extra.insert(i, len(next(os.walk(path))[2]))
@@ -197,7 +197,7 @@ def datasetStatistics():
     test_path_Extra = os.path.join(base_path_Extra, "Test/")
     test_class_dist_extra = []
     for i in range(0, len(orig_classes) + len(self_classes)):
-        folder = "{:04d}".format(i)
+        folder = f'{i}'
         path = test_path_Extra + folder
         if os.path.exists(path):
             test_class_dist_extra.insert(i, len(next(os.walk(path))[2]))
