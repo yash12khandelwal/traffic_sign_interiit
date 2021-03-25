@@ -1,0 +1,11 @@
+torch
+imgaug==0.4.0
+imagecorruptions
+opencv-python
+numpy==1.19.2
+pandas
+Pillow
+scipy
+tqdm
+wandb
+ipdb

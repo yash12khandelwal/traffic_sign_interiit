@@ -1,0 +1,208 @@
+{% extends "basetemplate.html" %}
+
+{% block title %}Train and Test Model {% endblock %}
+
+{% block ptitle %}Train and Test Model{% endblock %}
+
+{% block main %}
+<div class="row">
+    <div class="col-xl-6 col-md-6 mb-4">
+        <h2>Train Model</h2>
+        <form id="form1">
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <label class="input-group-text bg-primary text-white" for="Model"> Model :</label>
+                </div>
+                <input  id="Model" value="MicronNet" class="form-control" required disabled>
+            </div>
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <label class="input-group-text bg-primary text-white" for="num_classes">Select Classes :</label>
+                </div>
+                <div class="col border rounded-right" id="classes">
+                    {% for class in self_classes %}
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="{{class}}" id="{{class}}" name="self-classes">
+                        <label class="form-check-label" for="{{class}}">
+                            {{ class }} 
+                        </label>
+                    </div>  
+                    {% endfor %}
+                 </div>      
+            </div>
+        </form>
+    </div>
+    <div class="col-xl-6 col-md-6 mb-4">
+        <br><br>
+        <form id="form2">
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <label class="input-group-text bg-primary text-white" for="batch_size">Batch Size :</label>
+                </div>
+                <select class="custom-select" required id="batch_size">
+                    <option value="" selected>Choose...</option>
+                    <option value="2">2</option>
+                    <option value="4">4</option>
+                    <option value="8">8</option>
+                    <option value="16">16</option>
+                    <option value="32">32</option>
+                    <option value="64">64</option>
+                    <option value="128">128</option>
+                </select>
+            </div>
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <label class="input-group-text bg-primary text-white" for="epochs">Epochs :</label>
+                </div>
+                <select class="custom-select" required id="epochs">
+                    <option value="" selected>Choose...</option>
+                    <option value="1">1</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                    <option value="200">200</option>
+                </select>
+            </div>
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <label class="input-group-text bg-primary text-white" for="lr">Learning Rate :</label>
+                </div>
+                <input type="number" name="lr" id="lr" placeholder=">0" class="form-control" min="0" value="0.01" step="0.01" required>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="text-center">
+    <input type="submit" value="Train Model" onclick="submitform()" class="btn btn-success">
+    <div id="msg" class="mt-4"></div>
+</div>
+
+<!-- <div class="row">
+    <h1><center>TRAINING....</center></h1>
+</div> -->
+
+<div class="row">
+    <h2>Test Model</h2>
+    <div class="input-group mb-3">
+        <div class="input-group-prepend">
+            <label class="input-group-text bg-primary text-white" for="test">Pre-Trained Model :</label>
+        </div>
+        <select class="custom-select" required id="test">
+            {% for model in pretrained_models %}
+                <option value="{{model}}">{{model}}</option>
+                <!-- <option value="50">50</option>
+                <option value="100">100</option>
+                <option value="200">200</option> -->
+            {% endfor %}
+        </select>
+        <div class="input-group-append">
+            <button class="btn btn-success" type="button">Test Model</button>
+        </div>
+    </div>
+    <!-- <div class="text-center">
+        <input type="submit" value="Train Model" onclick="submitform()" class="btn btn-success">
+        <div id="msg" class="mt-4"></div>
+    </div> -->
+</div>
+ 
+<div class="toast" data-delay="5000" style="position: absolute; bottom: 15px; right: 15px;">
+    <div class="toast-header">
+        <strong class="mr-auto text-danger">Form Submission Error</strong>
+        <button type="button" class="ml-2 mb-1 close" data-dismiss="toast">&times;</button>
+    </div>
+    <div class="toast-body">
+
+    </div>
+</div>
+
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    $("#training-sidebar").addClass('active');
+
+
+    function submitform()
+    {
+        var Obj = [];
+        Obj[0] = document.querySelector('#Model');
+        Obj[1] = document.querySelector('#batch_size');
+        Obj[2] = document.querySelector('#epochs');
+        Obj[3] = document.querySelector('#lr');
+
+        var elems = document.querySelectorAll('[name="self-classes"]');
+        var checked_classes = [];
+
+        for(var i=0; i<elems.length; i++)
+        {
+            if(elems[i].checked)
+            {
+                checked_classes.push(i);
+            }
+        }
+
+        for(var i=0; i<4; i++)
+        {
+            if(!Obj[i].checkValidity()) 
+            {   
+                for(var j=0; j<4; j++)
+                {
+                    document.querySelector(`#${Obj[j].id}`).classList.remove("border-danger");
+                }
+                document.querySelector(`#${Obj[i].id}`).classList.add("border-danger");
+                $('.toast').toast('show'); 
+                document.querySelector(".toast-body").innerHTML = Obj[i].validationMessage; 
+                return false;
+            } 
+        }
+        // if(checked_classes.length == 0 )
+        // {
+        //     document.querySelector("#classes").classList.add("border-danger");
+        //     $('.toast').toast('show'); 
+        //     document.querySelector(".toast-body").innerHTML = "Select atleast one custom added class!"; 
+        //     return false;
+        // }
+
+        for(var j=0; j<4; j++)
+        {
+            document.querySelector(`#${Obj[j].id}`).classList.remove("border-danger");
+        }
+        document.querySelector("#classes").classList.remove("border-danger");
+
+        fetch('/training/train', {
+            method: 'POST',
+            credentials: "include",
+            body: JSON.stringify({
+                model: "micronet",
+                num_classes: checked_classes.length,
+                class_ids: checked_classes,
+                batch_size: Obj[1].value,
+                epochs: Obj[2].value,
+                learning_rate: Obj[3].value
+            }),
+            cache: "no-cache",
+            headers: new Headers(
+            {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            })
+        })
+        .then(response => response.json().then(data => ({status: response.status, body: data})))
+        .then(result => {
+            console.log(result);
+            let msg = document.querySelector('#msg');
+            if(result.status != 200)
+            {
+                msg.innerHTML = result.body.error;
+                msg.style.color = "red";
+            }
+            else
+            {
+                msg.innerHTML = result.body.message;
+                msg.style.color = "green";
+            }
+        });
+    }
+</script>
+{% endblock %}

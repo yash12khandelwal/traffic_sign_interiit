@@ -1,0 +1,407 @@
+{% extends "basetemplate.html" %}
+
+{% block title %}Dataset Statistics{% endblock %}
+
+{% block ptitle %}Dataset Statistics{% endblock %}
+
+{% block main %}
+        <div class="row">
+            <div class="col-xl-12 col-md-12">
+                <div class="row">
+                    <div class="col-xl-6 col-md-6">
+                        <div class="card shadow">
+                            <div class="card-header py-3">
+                                <h6 class="m-0 font-weight-bold text-primary">Total Classes/Labels</h6>
+                            </div>
+                            <div class="card-body">
+                                <!-- <h5 class="card-title">Original : 43 <br> New : {{self_classes_count}} </h5>
+                                <h4 class="card-title">Total : {{43 + self_classes_count}}</h4> -->
+                                <h5 class="card-title">Original : 43 &nbsp; &mdash; &nbsp; New : {{self_classes_count}} &nbsp; &mdash; &nbsp; Total : {{43 + self_classes_count}}</h5>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-6 col-md-6">
+                        <div class="card shadow">
+                            <div class="card-header py-3">
+                                <h6 class="m-0 font-weight-bold text-primary">Total Images</h6>
+                            </div>
+                            <div class="card-body">
+                                <h5 class="card-title">Original : {{count_org}} &nbsp; &mdash; &nbsp; New : {{count_new}} &nbsp; &mdash; &nbsp; Total : {{count_org + count_new}}</h5>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Donut Chart -->
+                <div class="card shadow">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">Data Set Distribution</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-pie">
+                            <canvas id="myPieChart" style="min-height: 250px;"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xl-12 col-lg-12">
+                <!-- Bar Chart-train -->
+                <div class="card shadow">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">Training Set Class Distribution</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-bar">
+                            <canvas id="myBarChart" style="height: 300px;"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <!-- Bar Chart-val -->
+                <div class="card shadow">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">Validation Set Class Distribution</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-bar">
+                            <canvas id="myBarChart1" style="height: 300px;"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <!-- Bar Chart-test -->
+                <div class="card shadow">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">Test Set Class Distribution</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-bar">
+                            <canvas id="myBarChart2" style="height: 300px;"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/coreui-chartjs.bundle.js') }}"></script>
+<script src="{{ url_for('static', filename='vendor/chart.js/Chart.min.js') }}"></script>
+<script>
+    $("#dataset-sidebar").addClass('active');
+
+    var orig_classes = {{orig_classes_count}};
+    var new_classes = {{self_classes_count}};
+    var total_classes = orig_classes + new_classes;
+
+    var train_ImgsPerClass_gtsrb = {{train_class_dist_gtsrb}};
+    var val_ImgsPerClass_gtsrb = {{val_class_dist_gtsrb}};
+    var test_ImgsPerClass_gtsrb = {{test_class_dist_gtsrb}};
+    
+    var train_ImgsPerClass_extra = {{train_class_dist_extra}};
+    var val_ImgsPerClass_extra = {{val_class_dist_extra}};
+    var test_ImgsPerClass_extra = {{test_class_dist_extra}};
+
+    var train_IPC_extra_gtsrb = train_ImgsPerClass_extra.slice(0, orig_classes);
+    var train_IPC_extra_new = [];
+
+    var val_IPC_extra_gtsrb = val_ImgsPerClass_extra.slice(0, orig_classes);
+    var val_IPC_extra_new = [];
+
+    var test_IPC_extra_gtsrb = test_ImgsPerClass_extra.slice(0, orig_classes);
+    var test_IPC_extra_new = [];
+
+    var class_ids = [];
+    for (var i = 0; i < orig_classes; i++) {
+            class_ids.push(i);
+            train_IPC_extra_new.push(0);
+            val_IPC_extra_new.push(0);
+            test_IPC_extra_new.push(0);
+    }
+    for (var i = orig_classes; i < total_classes; i++) {
+        class_ids.push(i);
+        train_ImgsPerClass_gtsrb.push(0);
+        val_ImgsPerClass_gtsrb.push(0);
+        test_ImgsPerClass_gtsrb.push(0);
+
+        train_IPC_extra_gtsrb.push(0);
+        val_IPC_extra_gtsrb.push(0);
+        test_IPC_extra_gtsrb.push(0);
+    }
+    
+    train_IPC_extra_new = train_IPC_extra_new.concat(train_ImgsPerClass_extra.slice(orig_classes, total_classes));
+    val_IPC_extra_new = val_IPC_extra_new.concat(val_ImgsPerClass_extra.slice(orig_classes, total_classes));
+    test_IPC_extra_new = test_IPC_extra_new.concat(test_ImgsPerClass_extra.slice(orig_classes, total_classes));
+
+    // StackedBar Chart
+    var ctx = document.getElementById("myBarChart").getContext("2d");
+    var stackedBar = new Chart(ctx,{
+        type: 'bar',
+        data: {
+            labels: class_ids,
+            datasets: [{
+                label: "GTSRB Data",
+                backgroundColor: "#1d8cf8", // blue color
+                hoverBackgroundColor: "#2e59d9",
+                maxBarThickness: 10,
+                data: train_ImgsPerClass_gtsrb,
+            }, {
+                label: "Augmented Data",
+                backgroundColor: "#ffff00", // yellow color
+                hoverBackgroundColor: "#cccc00",
+                maxBarThickness: 10,
+                data: train_IPC_extra_gtsrb,
+            },{
+                label: 'New Classes Data',
+                backgroundColor: "#4edf61", //green color
+                hoverBackgroundColor: "#0acc24",
+                maxBarThickness: 10,
+                data : train_IPC_extra_new
+            }],
+        },
+        options: {
+            maintainAspectRatio: false,
+            layout: {
+                padding: {
+                    left: 10,
+                    right: 25,
+                    top: 25,
+                    bottom: 0
+                }
+            },
+            scales: {
+                xAxes: [{
+                    stacked : true,
+                    gridLines: {
+                        display: true,
+                        drawBorder: true
+                    },
+                    ticks: {
+                        maxTicksLimit: 55
+                    }
+                }],
+                yAxes: [{
+                    stacked : true,
+                    ticks: {
+                        min: 0,
+                        max: 2000,
+                        maxTicksLimit: 8,
+                        padding: 10,
+                    },
+                    gridLines: {
+                        color: "rgb(234, 236, 244)",
+                        zeroLineColor: "rgb(234, 236, 244)",
+                        drawBorder: true,
+                        borderDash: [2],
+                        zeroLineBorderDash: [2]
+                    }
+                }],
+            },
+            legend: {
+                display: true
+            },
+            tooltips: {
+                titleFontSize: 14,
+                xPadding: 15,
+                yPadding: 15,
+                displayColors: false,
+                caretPadding: 10,
+            },
+        }
+    });
+
+    function get_dataset_dist() {
+        var train_sum = train_ImgsPerClass_gtsrb.reduce((a, b) => a + b, 0) + train_IPC_extra_gtsrb.reduce((a, b) => a + b, 0) + train_IPC_extra_new.reduce((a, b) => a + b, 0)
+
+        var val_sum = val_ImgsPerClass_gtsrb.reduce((a, b) => a + b, 0) + val_IPC_extra_gtsrb.reduce((a, b) => a + b, 0) + val_IPC_extra_new.reduce((a, b) => a + b, 0)
+
+        var test_sum = test_ImgsPerClass_gtsrb.reduce((a, b) => a + b, 0) + test_IPC_extra_gtsrb.reduce((a, b) => a + b, 0) + test_IPC_extra_new.reduce((a, b) => a + b, 0)
+
+        var dataset = [train_sum, val_sum, test_sum]; //train,val,test
+        return dataset;
+    }
+    var dataset = get_dataset_dist();
+    var sum = (dataset[0] + dataset[1] + dataset[2]) / 100;
+    var percentage = [];
+    for (var i = 0; i < 3; i++) {
+        percentage[i] = Math.round((dataset[i] / sum) * 100) / 100;
+    }
+
+    // Pie Chart
+    var ctx = document.getElementById("myPieChart");
+    var myPieChart = new Chart(ctx,{
+        type: 'doughnut',
+        data: {
+            labels: ["Training Set (" + percentage[0] + "%)", "Validation Set (" + percentage[1] + "%)", "Test Set (" + percentage[2] + "%)"],
+            datasets: [{
+                data: dataset,
+                backgroundColor: ['#1d8cf8', '#1cc88a', '#36b9cc'],
+                hoverBackgroundColor: ['#2e59d9', '#17a673', '#2c9faf'],
+                hoverBorderColor: "rgba(234, 236, 244, 1)",
+            }],
+        },
+        options: {
+            maintainAspectRatio: false,
+            legend: {
+                display: true
+            },
+            cutoutPercentage: 40,
+        },
+    });
+
+
+
+    // Val Chart
+    var ctx = document.getElementById("myBarChart1").getContext("2d");
+    var stackedBar = new Chart(ctx,{
+        type: 'bar',
+        data: {
+            labels: class_ids,
+            datasets: [{
+                label: "GTSRB Data",
+                backgroundColor: "#1d8cf8", // blue color
+                hoverBackgroundColor: "#2e59d9",
+                maxBarThickness: 10,
+                data: val_ImgsPerClass_gtsrb,
+            }, {
+                label: "Augmented Data",
+                backgroundColor: "#ffff00", // yellow color
+                hoverBackgroundColor: "#cccc00",
+                maxBarThickness: 10,
+                data: val_IPC_extra_gtsrb,
+            },{
+                label: 'New Classes Data',
+                backgroundColor: "#4edf61", //green color
+                hoverBackgroundColor: "#0acc24",
+                maxBarThickness: 10,
+                data : val_IPC_extra_new
+            }],
+        },
+        options: {
+            maintainAspectRatio: false,
+            layout: {
+                padding: {
+                    left: 10,
+                    right: 25,
+                    top: 25,
+                    bottom: 0
+                }
+            },
+            scales: {
+                xAxes: [{
+                    stacked : true,
+                    gridLines: {
+                        display: true,
+                        drawBorder: true
+                    },
+                    ticks: {
+                        maxTicksLimit: 55
+                    }
+                }],
+                yAxes: [{
+                    stacked : true,
+                    ticks: {
+                        min: 0,
+                        max: 600,
+                        maxTicksLimit: 8,
+                        padding: 10,
+                    },
+                    gridLines: {
+                        color: "rgb(234, 236, 244)",
+                        zeroLineColor: "rgb(234, 236, 244)",
+                        drawBorder: true,
+                        borderDash: [2],
+                        zeroLineBorderDash: [2]
+                    }
+                }],
+            },
+            legend: {
+                display: true
+            },
+            tooltips: {
+                titleFontSize: 14,
+                xPadding: 15,
+                yPadding: 15,
+                displayColors: false,
+                caretPadding: 10,
+            },
+        }
+    });
+
+    // test Chart
+    var ctx = document.getElementById("myBarChart2").getContext("2d");
+    var stackedBar = new Chart(ctx,{
+        type: 'bar',
+        data: {
+            labels: class_ids,
+            datasets: [{
+                label: "GTSRB Data",
+                backgroundColor: "#1d8cf8", // blue color
+                hoverBackgroundColor: "#2e59d9",
+                maxBarThickness: 10,
+                data: test_ImgsPerClass_gtsrb,
+            }, {
+                label: "Augmented Data",
+                backgroundColor: "#ffff00", // yellow color
+                hoverBackgroundColor: "#cccc00",
+                maxBarThickness: 10,
+                data: test_IPC_extra_gtsrb,
+            },{
+                label: 'New Classes Data',
+                backgroundColor: "#4edf61", //green color
+                hoverBackgroundColor: "#0acc24",
+                maxBarThickness: 10,
+                data : test_IPC_extra_new
+            }],
+        },
+        options: {
+            maintainAspectRatio: false,
+            layout: {
+                padding: {
+                    left: 10,
+                    right: 25,
+                    top: 25,
+                    bottom: 0
+                }
+            },
+            scales: {
+                xAxes: [{
+                    stacked : true,
+                    gridLines: {
+                        display: true,
+                        drawBorder: true
+                    },
+                    ticks: {
+                        maxTicksLimit: 55
+                    }
+                }],
+                yAxes: [{
+                    stacked : true,
+                    ticks: {
+                        min: 0,
+                        max: 1000,
+                        maxTicksLimit: 8,
+                        padding: 10,
+                    },
+                    gridLines: {
+                        color: "rgb(234, 236, 244)",
+                        zeroLineColor: "rgb(234, 236, 244)",
+                        drawBorder: true,
+                        borderDash: [2],
+                        zeroLineBorderDash: [2]
+                    }
+                }],
+            },
+            legend: {
+                display: true
+            },
+            tooltips: {
+                titleFontSize: 14,
+                xPadding: 15,
+                yPadding: 15,
+                displayColors: false,
+                caretPadding: 10,
+            },
+        }
+    });
+</script>
+{% endblock %}

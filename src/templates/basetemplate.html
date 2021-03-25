@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+  <title>{% block title %}{% endblock %}</title>
+  <link rel="icon" type="image/png" href="assets/favicon/android-icon-192x192.png">
+  <script src="https://kit.fontawesome.com/1cc5ac35f0.js" crossorigin="anonymous"></script>
+  <!-- Main styles for this application-->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/coreui-chartjs.css') }}">
+  {% block styles %}{% endblock %}
+</head>
+
+<body class="c-app">
+  <div class="c-sidebar c-sidebar-dark c-sidebar-fixed c-sidebar-lg-show" id="sidebar">
+    <div class="c-sidebar-brand">
+      <h4 class="m-0">DETEKTOR</h4>
+    </div>
+    <ul class="c-sidebar-nav">
+      <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" id="dashboard-sidebar" href="/">
+          <i class="fas fa-fw fa-home mr-3"></i> Dashboard</a></li>
+      <li class="c-sidebar-nav-title">Options</li>
+      <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" id="addimages-sidebar" href="addimages">
+          <i class="fas fa-fw fa-image mr-3"></i> Add Images</a></li>
+      <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" id="augmentations-sidebar" href="augmentations">
+          <i class="fas fa-fw fa-eye mr-3"></i> Add Augmentations</a></li>
+      <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" id="validation-sidebar" href="validation">
+          <i class="fas fa-fw fa-check-double mr-3"></i> Create Validation Set</a></li>
+      <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" id="dataset-sidebar" href="dataset">
+          <i class="fas fa-fw fa-chart-line mr-3"></i> View Dataset Statistics</a></li>
+      <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" id="visualise-sidebar" href="visualise">
+        <i class="fas fa-fw fa-project-diagram mr-3"></i> Visualise Model</a></li>
+      <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" id="training-sidebar" href="training">
+        <i class="fab fa-fw fa-hive mr-3"></i> Train and Test Model</a></li>
+      <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" id="results-sidebar" href="results">
+          <i class="fas fa-fw fa-poll mr-3"></i> View Results</a></li>
+    </ul>
+  </div>
+  <div class="c-wrapper c-fixed-components">
+    <header class="c-header c-header-light c-header-fixed c-header-with-subheader">
+      <button class="c-header-toggler c-class-toggler mfs-3 d-md-down-none" type="button" data-target="#sidebar"
+        data-class="c-sidebar-lg-show" responsive="true">
+        <i class="fas fa-fw fa-bars mr-3"></i>
+      </button>
+      <div class="c-header-nav">
+        <h4 class="m-0 pl-2">{% block ptitle %}{% endblock %}</h4>
+      </div>
+    </header>
+    <div class="c-body">
+      <main class="c-main">
+        <div class="container-fluid">
+          {% block main %}{% endblock %}
+        </div>
+      </main>
+    </div>
+  </div>
+  <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
+  <!-- <script src="{{ url_for('static', filename='js/popper.min.js') }}"></script> -->
+  <!-- <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script> -->
+  <!-- CoreUI and necessary plugins-->
+  <script src="{{ url_for('static', filename='js/coreui.bundle.js') }}"></script>
+  {% block scripts %}{% endblock %}
+</body>
+
+</html>

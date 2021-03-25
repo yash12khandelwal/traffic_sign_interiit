@@ -1,0 +1,918 @@
+{% extends "basetemplate.html" %}
+
+{% block title %}Augmentations{% endblock %}
+
+{% block ptitle %}Add Augmentations{% endblock %}
+
+{% block main %}
+<div class="row">
+    <!-- Add augmentations start -->
+    <div class="col-5">
+        <div class="card" style="height: 470px;">
+            <div class="card-header py-2.5 bg-dark text-white">
+                <div class="form-inline justify-content-center">
+                    <!-- <h4 class="card-title float-left mb-0">Augmentation:</h4> -->
+                    <select class="custom-select custom-select-sm my-0 border-1 bg-light mt-1 mx-2"
+                        aria-label="Select augmentation class" id="selectAugmentationClass">
+                        <option value="0">Select augmentation class</option>
+                        <option value="1">Arithmetic</option>
+                        <option value="2">Weather</option>
+                        <option value="3">Geometric</option>
+                        <option value="4">Blur</option>
+                        <option value="5">Color</option>
+                        <option value="6">Other</option>
+                    </select>
+                    <select class="custom-select custom-select-sm my-0 border-1 bg-light mt-1 mx-2"
+                        aria-label="Select augmentation" id="selectAugmentation" disabled>
+                        <option value="0">Select augmentation</option>
+                        <option value="1" class="augmentationClass_1 augmentationClassGroup">Salt and Pepper</option>
+                        <option value="2" class="augmentationClass_1 augmentationClassGroup">Gaussian Noise</option>
+                        <option value="3" class="augmentationClass_2 augmentationClassGroup">Rain</option>
+                        <option value="4" class="augmentationClass_2 augmentationClassGroup">Fog</option>
+                        <option value="5" class="augmentationClass_2 augmentationClassGroup">Snow</option>
+                        <option value="6" class="augmentationClass_6 augmentationClassGroup">Spatter</option>
+                        <option value="7" class="augmentationClass_6 augmentationClassGroup">Smudge</option>
+                        <option value="8" class="augmentationClass_3 augmentationClassGroup">Rotate</option>
+                        <option value="9" class="augmentationClass_3 augmentationClassGroup">Affine</option>
+                        <option value="10" class="augmentationClass_4 augmentationClassGroup">Motion Blur</option>
+                        <option value="11" class="augmentationClass_4 augmentationClassGroup">Zoom Blur</option>
+                        <option value="12" class="augmentationClass_5 augmentationClassGroup">Brightness</option>
+                        <option value="13" class="augmentationClass_5 augmentationClassGroup">Color Temperature</option>
+                        <option value="14" class="augmentationClass_5 augmentationClassGroup">Contrast</option>
+                        <option value="15" class="augmentationClass_5 augmentationClassGroup">Cutout</option>
+                    </select>
+                </div>
+            </div>
+            <div class="card-body overflow-auto">
+                <!-- augmentation 0 (auxilliary empty augmentation) -->
+                <div id="augmentation_0" class="augmentationGroup">
+                    <span>No augmentation selected. Please select an augmentation from the dropdown list above.</span>
+                </div>
+                <!-- augmentation 1 -->
+                <div id="augmentation_1" class="augmentationGroup">
+                    <div class="form-inline my-2">
+                        <label class="form-label" for="augmentation_1_param1">Percentage: </label>
+                        <input class="form-control col-sm-3 mx-4" type="text" placeholder="0.05" readonly>
+                        <div class="range">
+                            <input type="range" class="form-range" min="0" max="1" step="0.01" value="0.05"
+                                id="augmentation_1_param1" />
+                        </div>
+                    </div>
+                    <div class="form-inline my-2">
+                        <div class="form-label">Per channel:</div>
+                        <div class="custom-control custom-switch mx-4">
+                            <input type="checkbox" class="custom-control-input" id="augmentation_1_param2" />
+                            <label class="custom-control-label" for="augmentation_1_param2"></label>
+                        </div>
+                    </div>
+                </div>
+                <!-- augmentation 2 -->
+                <div id="augmentation_2" class="augmentationGroup">
+                    <div class="form-inline my-2">
+                        <label class="form-label" for="augmentation_2_param1">Severity lower bound: </label>
+                        <input class="form-control col-sm-3 mx-4" type="text" placeholder="1" readonly>
+                        <div class="range">
+                            <input type="range" class="form-range" min="1" max="5" step="1" value="1"
+                                id="augmentation_2_param1" />
+                        </div>
+                    </div>
+                    <div class="form-inline my-2">
+                        <label class="form-label" for="augmentation_2_param2">Severity upper bound: </label>
+                        <input class="form-control col-sm-3 mx-4" type="text" placeholder="5" readonly>
+                        <div class="range">
+                            <input type="range" class="form-range" min="1" max="5" step="1" value="5"
+                                id="augmentation_2_param2" />
+                        </div>
+                    </div>
+                    <span class="text-muted">A random severity is sampled between the upper and lower bounds.</span>
+                </div>
+                <!-- augmentation 3 -->
+                <div id="augmentation_3" class="augmentationGroup">
+                    <div class="form-inline my-2">
+                        <label class="form-label" for="augmentation_3_param1">Speed lower bound: </label>
+                        <input class="form-control col-sm-3 mx-4" type="text" placeholder="0" readonly>
+                        <div class="range">
+                            <input type="range" class="form-range" min="0" max="1" step="0.01" value="0"
+                                id="augmentation_3_param1" />
+                        </div>
+                    </div>
+                    <div class="form-inline my-2">
+                        <label class="form-label" for="augmentation_3_param2">Speed upper bound: </label>
+                        <input class="form-control col-sm-3 mx-4" type="text" placeholder="1" readonly>
+                        <div class="range">
+                            <input type="range" class="form-range" min="0" max="1" step="0.01" value="1"
+                                id="augmentation_3_param2" />
+                        </div>
+                    </div>
+                    <div class="form-inline my-2">
+                        <label class="form-label" for="augmentation_3_param3">Drop size lower bound: </label>
+                        <input class="form-control col-sm-3 mx-4" type="text" placeholder="0.01" readonly>
+                        <div class="range">
+                            <input type="range" class="form-range" min="0.01" max="1" step="0.01" value="0.01"
+                                id="augmentation_3_param3" />
+                        </div>
+                    </div>
+                    <div class="form-inline my-2">
+                        <label class="form-label" for="augmentation_3_param4">Drop size upper bound: </label>
+                        <input class="form-control col-sm-3 mx-4" type="text" placeholder="1" readonly>
+                        <div class="range">
+                            <input type="range" class="form-range" min="0.01" max="1" step="0.01" value="1"
+                                id="augmentation_3_param4" />
+                        </div>
+                    </div>
+                    <span class="text-muted">A random severity is sampled between the upper and lower bounds for rain
+                        speed and drop size.</span>
+                </div>
+                <!-- augmentation 4 -->
+                <div id="augmentation_4" class="augmentationGroup">
+                    <div class="form-inline my-2">
+                        <label class="form-label" for="augmentation_4_param1">Severity lower bound: </label>
+                        <input class="form-control col-sm-3 mx-4" type="text" placeholder="1" readonly>
+                        <div class="range">
+                            <input type="range" class="form-range" min="1" max="5" step="1" value="1"
+                                id="augmentation_4_param1" />
+                        </div>
+                    </div>
+                    <div class="form-inline my-2">
+                        <label class="form-label" for="augmentation_4_param2">Severity upper bound: </label>
+                        <input class="form-control col-sm-3 mx-4" type="text" placeholder="5" readonly>
+                        <div class="range">
+                            <input type="range" class="form-range" min="1" max="5" step="1" value="5"
+                                id="augmentation_4_param2" />
+                        </div>
+                    </div>
+                    <span class="text-muted">A random severity is sampled between the upper and lower bounds.</span>
+                </div>
+                <!-- augmentation 5 -->
+                <div id="augmentation_5" class="augmentationGroup">
+                    <div class="form-inline my-2">
+                        <label class="form-label" for="augmentation_5_param1">Severity lower bound: </label>
+                        <input class="form-control col-sm-3 mx-4" type="text" placeholder="1" readonly>
+                        <div class="range">
+                            <input type="range" class="form-range" min="1" max="5" step="1" value="1"
+                                id="augmentation_5_param1" />
+                        </div>
+                    </div>
+                    <div class="form-inline my-2">
+                        <label class="form-label" for="augmentation_5_param2">Severity upper bound: </label>
+                        <input class="form-control col-sm-3 mx-4" type="text" placeholder="5" readonly>
+                        <div class="range">
+                            <input type="range" class="form-range" min="1" max="5" step="1" value="5"
+                                id="augmentation_5_param2" />
+                        </div>
+                    </div>
+                    <span class="text-muted">A random severity is sampled between the upper and lower bounds.</span>
+                </div>
+                <!-- augmentation 6 -->
+                <div id="augmentation_6" class="augmentationGroup">
+                    <div class="form-inline my-2">
+                        <label class="form-label" for="augmentation_6_param1">Severity lower bound: </label>
+                        <input class="form-control col-sm-3 mx-4" type="text" placeholder="1" readonly>
+                        <div class="range">
+                            <input type="range" class="form-range" min="1" max="5" step="1" value="1"
+                                id="augmentation_6_param1" />
+                        </div>
+                    </div>
+                    <div class="form-inline my-2">
+                        <label class="form-label" for="augmentation_6_param2">Severity upper bound: </label>
+                        <input class="form-control col-sm-3 mx-4" type="text" placeholder="5" readonly>
+                        <div class="range">
+                            <input type="range" class="form-range" min="1" max="5" step="1" value="5"
+                                id="augmentation_6_param2" />
+                        </div>
+                    </div>
+                    <span class="text-muted">A random severity is sampled between the upper and lower bounds.</span>
+                </div>
+                <!-- augmentation 7 -->
+                <div id="augmentation_7" class="augmentationGroup">
+                    <span>No parameters to set</span>
+                </div>
+                <!-- augmentation 8 -->
+                <div id="augmentation_8" class="augmentationGroup">
+                    <div class="form-inline my-2">
+                        <label class="form-label" for="augmentation_8_param1">Angle lower bound: </label>
+                        <input class="form-control col-sm-3 mx-4" type="text" placeholder="-30" readonly>
+                        <div class="range">
+                            <input type="range" class="form-range" min="-180" max="180" step="1" value="-30"
+                                id="augmentation_8_param1" />
+                        </div>
+                    </div>
+                    <div class="form-inline my-2">
+                        <label class="form-label" for="augmentation_8_param2">Angle upper bound: </label>
+                        <input class="form-control col-sm-3 mx-4" type="text" placeholder="30" readonly>
+                        <div class="range">
+                            <input type="range" class="form-range" min="-180" max="180" step="1" value="30"
+                                id="augmentation_8_param2" />
+                        </div>
+                    </div>
+                    <span class="text-muted">A random angle is sampled between the upper and lower bounds.</span>
+                </div>
+                <!-- augmentation 9 -->
+                <div id="augmentation_9" class="augmentationGroup">
+                    <span>No parameters to set</span>
+                </div>
+                <!-- augmentation 10 -->
+                <div id="augmentation_10" class="augmentationGroup">
+                    <div class="form-inline my-2">
+                        <label class="form-label" for="augmentation_10_param1">Kernel size: </label>
+                        <input class="form-control col-sm-3 mx-4" type="text" placeholder="5" readonly>
+                        <div class="range">
+                            <input type="range" class="form-range" min="3" max="10" step="1" value="5"
+                                id="augmentation_10_param1" />
+                        </div>
+                    </div>
+                    <div class="form-inline my-2">
+                        <label class="form-label" for="augmentation_10_param2">Angle lower bound: </label>
+                        <input class="form-control col-sm-3 mx-4" type="text" placeholder="-30" readonly>
+                        <div class="range">
+                            <input type="range" class="form-range" min="-180" max="180" step="1" value="-30"
+                                id="augmentation_10_param2" />
+                        </div>
+                    </div>
+                    <div class="form-inline my-2">
+                        <label class="form-label" for="augmentation_10_param3">Angle upper bound: </label>
+                        <input class="form-control col-sm-3 mx-4" type="text" placeholder="30" readonly>
+                        <div class="range">
+                            <input type="range" class="form-range" min="-180" max="180" step="1" value="30"
+                                id="augmentation_10_param3" />
+                        </div>
+                    </div>
+                    <span class="text-muted">A random angle is sampled between the upper and lower bounds.</span>
+                </div>
+                <!-- augmentation 11 -->
+                <div id="augmentation_11" class="augmentationGroup">
+                    <div class="form-inline my-2">
+                        <label class="form-label" for="augmentation_11_param1">Severity lower bound: </label>
+                        <input class="form-control col-sm-3 mx-4" type="text" placeholder="1" readonly>
+                        <div class="range">
+                            <input type="range" class="form-range" min="1" max="5" step="1" value="1"
+                                id="augmentation_11_param1" />
+                        </div>
+                    </div>
+                    <div class="form-inline my-2">
+                        <label class="form-label" for="augmentation_11_param2">Severity upper bound: </label>
+                        <input class="form-control col-sm-3 mx-4" type="text" placeholder="5" readonly>
+                        <div class="range">
+                            <input type="range" class="form-range" min="1" max="5" step="1" value="5"
+                                id="augmentation_11_param2" />
+                        </div>
+                    </div>
+                    <span class="text-muted">A random severity is sampled between the upper and lower bounds.</span>
+                </div>
+                <!-- augmentation 12 -->
+                <div id="augmentation_12" class="augmentationGroup">
+                    <div class="form-inline my-2">
+                        <label class="form-label" for="augmentation_12_param1">Lower bound: </label>
+                        <input class="form-control col-sm-3 mx-4" type="text" placeholder="-30" readonly>
+                        <div class="range">
+                            <input type="range" class="form-range" min="-30" max="30" step="1" value="-30"
+                                id="augmentation_12_param1" />
+                        </div>
+                    </div>
+                    <div class="form-inline my-2">
+                        <label class="form-label" for="augmentation_12_param2">Upper bound: </label>
+                        <input class="form-control col-sm-3 mx-4" type="text" placeholder="30" readonly>
+                        <div class="range">
+                            <input type="range" class="form-range" min="-30" max="30" step="1" value="30"
+                                id="augmentation_12_param2" />
+                        </div>
+                    </div>
+                    <span class="text-muted">A random value is sampled between the upper and lower bounds.</span>
+                </div>
+                <!-- augmentation 13 -->
+                <div id="augmentation_13" class="augmentationGroup">
+                    <div class="form-inline my-2">
+                        <label class="form-label" for="augmentation_13_param1">Temperature lower bound: </label>
+                        <input class="form-control col-sm-3 mx-4" type="text" placeholder="1000" readonly>
+                        <div class="range">
+                            <input type="range" class="form-range" min="1000" max="40000" step="100" value="1000"
+                                id="augmentation_13_param1" />
+                        </div>
+                    </div>
+                    <div class="form-inline my-2">
+                        <label class="form-label" for="augmentation_13_param2">Temperature upper bound: </label>
+                        <input class="form-control col-sm-3 mx-4" type="text" placeholder="40000" readonly>
+                        <div class="range">
+                            <input type="range" class="form-range" min="1000" max="40000" step="100" value="40000"
+                                id="augmentation_13_param2" />
+                        </div>
+                    </div>
+                    <span class="text-muted">A random temperature is sampled between the upper and lower bounds.</span>
+                </div>
+                <!-- augmentation 14 -->
+                <div id="augmentation_14" class="augmentationGroup">
+                    <div class="form-inline my-2">
+                        <label class="form-label" for="augmentation_14_param1">Gain lower bound: </label>
+                        <input class="form-control col-sm-3 mx-4" type="text" placeholder="5" readonly>
+                        <div class="range">
+                            <input type="range" class="form-range" min="5" max="20" step="1" value="5"
+                                id="augmentation_14_param1" />
+                        </div>
+                    </div>
+                    <div class="form-inline my-2">
+                        <label class="form-label" for="augmentation_14_param2">Gain upper bound: </label>
+                        <input class="form-control col-sm-3 mx-4" type="text" placeholder="20" readonly>
+                        <div class="range">
+                            <input type="range" class="form-range" min="5" max="20" step="1" value="20"
+                                id="augmentation_14_param2" />
+                        </div>
+                    </div>
+                    <div class="form-inline my-2">
+                        <label class="form-label" for="augmentation_14_param3">Cutoff lower bound: </label>
+                        <input class="form-control col-sm-3 mx-4" type="text" placeholder="0.25" readonly>
+                        <div class="range">
+                            <input type="range" class="form-range" min="0.25" max="0.75" step="0.01" value="0.25"
+                                id="augmentation_14_param3" />
+                        </div>
+                    </div>
+                    <div class="form-inline my-2">
+                        <label class="form-label" for="augmentation_14_param4">Cutoff upper bound: </label>
+                        <input class="form-control col-sm-3 mx-4" type="text" placeholder="0.75" readonly>
+                        <div class="range">
+                            <input type="range" class="form-range" min="0.25" max="0.75" step="0.01" value="0.75"
+                                id="augmentation_14_param4" />
+                        </div>
+                    </div>
+                    <div class="form-inline my-2">
+                        <div class="form-label">Per channel:</div>
+                        <div class="custom-control custom-switch mx-4">
+                            <input type="checkbox" class="custom-control-input" id="augmentation_14_param5" />
+                            <label class="custom-control-label" for="augmentation_14_param5"></label>
+                        </div>
+                    </div>
+                    <span class="text-muted">Gain and cutoff values are sampled between the upper and lower
+                        bounds.</span>
+                </div>
+                <!-- augmentation 15 -->
+                <div id="augmentation_15" class="augmentationGroup">
+                    <div class="form-inline my-2">
+                        <label class="form-label" for="augmentation_15_param1">Iteration lower bound: </label>
+                        <input class="form-control col-sm-3 mx-4" type="text" placeholder="1" readonly>
+                        <div class="range">
+                            <input type="range" class="form-range" min="1" max="100" step="1" value="1"
+                                id="augmentation_15_param1" />
+                        </div>
+                    </div>
+                    <div class="form-inline my-2">
+                        <label class="form-label" for="augmentation_15_param2">Iteration upper bound: </label>
+                        <input class="form-control col-sm-3 mx-4" type="text" placeholder="10" readonly>
+                        <div class="range">
+                            <input type="range" class="form-range" min="1" max="100" step="1" value="10"
+                                id="augmentation_15_param2" />
+                        </div>
+                    </div>
+                    <div class="form-inline my-2">
+                        <label class="form-label" for="augmentation_15_param3">Size: </label>
+                        <input class="form-control col-sm-3 mx-4" type="text" placeholder="0.2" readonly>
+                        <div class="range">
+                            <input type="range" class="form-range" min="0" max="1" step="0.01" value="0.2"
+                                id="augmentation_15_param3" />
+                        </div>
+                    </div>
+                    <div class="form-inline my-2">
+                        <div class="form-label">Squared:</div>
+                        <div class="custom-control custom-switch mx-4">
+                            <input type="checkbox" class="custom-control-input" id="augmentation_15_param4" />
+                            <label class="custom-control-label" for="augmentation_15_param4"></label>
+                        </div>
+                    </div>
+                    <span class="text-muted">Number of cutouts are sampled between the upper and lower bounds.</span>
+                </div>
+            </div>
+            <div class="p-4 text-center">
+                <button class="btn btn-primary" id="addAugmentation">Add augmentation</button>
+            </div>
+        </div>
+    </div>
+    <!-- Add augmentations end -->
+
+    <!-- Augmentations list start -->
+    <div class="col-2">
+        <div class="card" style="height: 470px;">
+            <div class="card-header py-1 bg-dark text-white">
+                <h5 class="card-title mb-0 text-center py-0">Applied Augmentations</h5>
+            </div>
+            <div class="card-body overflow-auto pl-0">
+                <ul id="augmentationsList">
+                </ul>
+            </div>
+        </div>
+    </div>
+    <!-- Augmentations list end -->
+
+    <!-- Image preview start -->
+    <div class="col-5">
+        <div class="card" style="height: 470px;">
+            <div class="card-header bg-dark text-white">
+                <h4 class="card-title mb-0 text-center">Image Preview</h4>
+            </div>
+            <div class="card-body d-flex flex-wrap justify-content-around px-0 mt-5 overflow-auto">
+                <!-- <button class="btn btn-primary float-right">Save</button> -->
+                <figure class="figure">
+                    <img class="figure-img img-fluid border rounded" src="static/images/select_image.png"
+                        id="originalImage" alt="Card image cap" style="width: 200px; max-height: 200px">
+                    <figcaption class="figure-caption text-center">Original Image</figcaption>
+                </figure>
+                <figure class="figure">
+                    <img class="figure-img img-fluid border rounded" src="static/images/preview_image.png"
+                        id="augmentedImage" alt="Card image cap" style="width: 200px; max-height: 200px">
+                    <figcaption class="figure-caption text-center">Augmented Image</figcaption>
+                </figure>
+            </div>
+            <div class="p-4 text-center">
+                <button class="btn btn-primary" id="imagePreview" onclick="get_preview()">Preview</button>
+            </div>
+        </div>
+    </div>
+    <!-- Image preview end -->
+
+
+</div>
+
+<!-- Select images start -->
+<div class="row">
+    <div class="col">
+        <div class="card shadow mb-4">
+            <!-- Card Header - Accordion -->
+            <a class="d-block card-header py-3">
+                <span class="m-0 font-weight-bold text-primary" style="position: relative; top: 7px;" data-toggle="collapse" role="button" aria-expanded="true"
+                data-target="#collapseCardSelectImages">Select from existing samples</span>
+                <div style="display: inline-block;" class="float-right">
+                    &nbsp; or &nbsp;
+                    <label for="uploadAugmentationImage" class="btn btn-primary form-label font-weight-bold m-0" style="cursor: pointer;">Upload Image</label>
+                    <input type="file" accept="image/*" id="uploadAugmentationImage" style="display: none;">
+                </div>
+            </a>
+            <!-- Card Content - Collapse -->
+            <div class="collapse overflow-auto p-4" style="max-height: 400px;" id="collapseCardSelectImages">
+                {% macro get_path(i) -%}
+                images/samples/{{i}}.png
+                {%- endmacro %}
+                <div class="d-flex flex-wrap justify-content-center" id="previewImagesList">
+                    {% for i in range(43) %}
+                    <a href="javascript:">
+                        <img alt="sample image" class="mx-1 my-1 previewImage"
+                            src="{{ url_for('static', filename=get_path(i)) }}" style="width:120px; max-height: 120px;">
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for applying augmentations to classes -->
+<div class="row justify-content-center">
+    <button type="button" class="btn btn-primary mb-5" data-toggle="modal" data-target="#augmentationModal">Apply
+        Augmentations</button>
+</div>
+
+
+<div class="modal fade bg-dark" id="augmentationModal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Apply Augmentations</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col">
+                            <button class="btn btn-primary" id="selectAll">Select all</button>
+                            <button class="btn btn-primary" id="clearAll">Clear selection</button>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <!-- List start -->
+                            <ul class="list-group list-group-flush my-2" style="height: 400px; overflow-y: scroll;">
+                                {% for i in range(43)%}
+                                <li class="list-group-item">
+                                    <div class="form-inline">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" value=""
+                                                id="imageClass{{i}}">
+                                            <label class="form-check-label" for="imageClass{{i}}"
+                                                style="font-size: medium;">
+                                                GTSRB Class {{i}}</label>
+                                        </div>
+                                        <!-- <button type="button" class="btn btn-primary ml-auto" data-toggle="modal"
+                                            data-target="#previewModal" id="previewClass{{i}}">Preview</button> -->
+                                    </div>
+                                </li>
+                                {% endfor %}
+                                {% for name in self_classes%}
+                                <li class="list-group-item">
+                                    <div class="form-inline">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" value=""
+                                                id="imageClass{{loop.index+42}}">
+                                            <label class="form-check-label" for="imageClass{{loop.index+42}}"
+                                                style="font-size: medium;">
+                                                {{name}}</label>
+                                        </div>
+                                        <!-- <button type="button" class="btn btn-primary ml-auto" data-toggle="modal"
+                                            data-target="#previewModal" id="previewClass{{i}}">Preview</button> -->
+                                    </div>
+                                </li>
+                                {% endfor %}
+                                <!-- <li class="list-group-item">
+                                    <div class="form-inline">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" value="" id="imageClass2">
+                                            <label class="form-check-label" for="imageClass2"
+                                                style="font-size: medium;">
+                                                Image Class 2</label>
+                                        </div>
+                                        <button type="button" class="btn btn-primary ml-auto" data-toggle="modal"
+                                            data-target="#previewModal" id="previewClass2">Preview</button>
+                                    </div>
+                                </li>
+                                <li class="list-group-item">
+                                    <div class="form-inline">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" value="" id="imageClass3">
+                                            <label class="form-check-label" for="imageClass3"
+                                                style="font-size: medium;">
+                                                Image Class 3</label>
+                                        </div>
+                                        <button type="button" class="btn btn-primary ml-auto" data-toggle="modal"
+                                            data-target="#previewModal" id="previewClass3">Preview</button>
+                                    </div>
+                                </li> -->
+                            </ul>
+                            <!-- List end -->
+                        </div>
+                    </div>
+                </div>
+                <div class="form-inline my-2  justify-content-center">
+                    <label class="form-label" for="augmentationProbability">Stochastic Parameter (%): </label>
+                    <input class="form-control col-sm-2 mx-4" type="text" placeholder="50" readonly>
+                    <div class="range">
+                        <input type="range" class="form-range" min="0" max="100" step="1" value="50"
+                            id="augmentationProbability" />
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="saveChanges()">Save changes</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="previewModal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="container-fluid">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Select images end -->
+
+<!-- <div class="row mx-4 overflow-auto border p-4 bg-light" style="max-height: 400px;">
+    <div class="d-flex flex-wrap justify-content-center">
+        {% for n in range(40) %}
+        <img alt="sample image" class="preview-image mx-1 my-1" style="width:150px; max-height: 100px;">
+        {% endfor %}
+    </div>
+</div> -->
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const classCount = 43 + {{self_classes|length}};
+    $("#augmentations-sidebar").addClass('active');
+
+    // change controls depending on which augmentation is selected
+    $(".augmentationGroup").hide();
+    $("#augmentation_0").show();
+    $("#selectAugmentation").change(function () {
+        $(".augmentationGroup").hide();
+        $("#augmentation_" + $(this).val()).show();
+    });
+    $("#selectAugmentationClass").change(function () {
+        $("#selectAugmentation").val('0');
+        $("#selectAugmentation").prop('disabled', true);
+        if ($(this).val() != 0) {
+            $("#selectAugmentation").prop('disabled', false);
+            $(".augmentationClassGroup").hide();
+            $(".augmentationClass_" + $(this).val()).show();
+        }
+        $(".augmentationGroup").hide();
+        $("#augmentation_0").show();
+    });
+
+    // add augmentation to stack
+    var no_param_augs = [7, 9]; //ids of those augmentations which take no parameters, can directly add them to augmentationList without any checks
+    var severity_param_augs = [2, 4, 5, 6, 8, 11, 12, 13]
+    var augmentationCount = 0;
+    var augmentationList = [];
+    $("#addAugmentation").click(function () {
+        augmentationCount++;
+
+        var newaug = $("<li></li>");
+        newaug.attr('id', 'augmentationsList_' + augmentationCount);
+        newaug_id = $("#selectAugmentation").val();
+        var text = $("#selectAugmentation > option[value=" + newaug_id + "]").text();
+
+        var newaug_remove = $("<a></a>");
+        newaug_remove.attr('id', 'removeAugmentation_' + augmentationCount);
+        newaug_remove.attr('class', 'removeAugmentation float-right');
+        newaug_remove.attr('href', 'javascript:');
+        newaug_remove.append('<i class="fa fa-times" aria-hidden="true" style="color: gray;"></i>');
+
+        newaug.append(text);
+        newaug.append(newaug_remove);
+
+        if (newaug_id == 0) {
+            alert("Select an augmentation first.");
+        }
+        else if (newaug_id == 1) {
+            var paramlist = [];
+            paramlist.push(parseFloat($("#augmentation_1_param1").val()));
+            paramlist.push($("#augmentation_1_param2").is(':checked'));
+            augmentationList.push({
+                serial: augmentationCount,
+                id: parseInt(newaug_id),
+                params: paramlist
+            });
+            $("#augmentationsList").append(newaug);
+        }
+        else if (newaug_id == 3) {
+            var speed_lb = parseFloat($("#augmentation_" + newaug_id + "_param1").val());
+            var speed_ub = parseFloat($("#augmentation_" + newaug_id + "_param2").val());
+            var size_lb = parseFloat($("#augmentation_" + newaug_id + "_param3").val());
+            var size_ub = parseFloat($("#augmentation_" + newaug_id + "_param4").val());
+            if (speed_lb > speed_ub || size_lb > size_ub) {
+                alert("Lower bound should be less than upper bound.");
+            }
+            else {
+                var paramlist = [speed_lb, speed_ub, size_lb, size_ub];
+                augmentationList.push({
+                    serial: augmentationCount,
+                    id: parseInt(newaug_id),
+                    params: paramlist
+                });
+                $("#augmentationsList").append(newaug);
+            }
+        }
+        else if (newaug_id == 10) {
+            var kernel = parseInt($("#augmentation_" + newaug_id + "_param1").val());
+            var angle_lb = parseInt($("#augmentation_" + newaug_id + "_param2").val());
+            var angle_ub = parseInt($("#augmentation_" + newaug_id + "_param3").val());
+            if (angle_lb > angle_ub) {
+                alert("Lower bound should be less than upper bound.");
+            }
+            else {
+                var paramlist = [kernel, angle_lb, angle_ub];
+                augmentationList.push({
+                    serial: augmentationCount,
+                    id: parseInt(newaug_id),
+                    params: paramlist
+                });
+                $("#augmentationsList").append(newaug);
+            }
+        }
+        else if (newaug_id == 14) {
+            var gain_lb = parseInt($("#augmentation_" + newaug_id + "_param1").val());
+            var gain_ub = parseInt($("#augmentation_" + newaug_id + "_param2").val());
+            var cutoff_lb = parseFloat($("#augmentation_" + newaug_id + "_param3").val());
+            var cutoff_ub = parseFloat($("#augmentation_" + newaug_id + "_param4").val());
+            var per_channel = $("#augmentation_14_param5").is(':checked');
+            if (gain_lb > gain_ub || cutoff_lb > cutoff_ub) {
+                alert("Lower bound should be less than upper bound.");
+            }
+            else {
+                var paramlist = [gain_lb, gain_ub, cutoff_lb, cutoff_ub, per_channel];
+                augmentationList.push({
+                    serial: augmentationCount,
+                    id: parseInt(newaug_id),
+                    params: paramlist
+                });
+                $("#augmentationsList").append(newaug);
+            }
+        }
+        else if (newaug_id == 15) {
+            var it_lb = parseInt($("#augmentation_" + newaug_id + "_param1").val());
+            var it_ub = parseInt($("#augmentation_" + newaug_id + "_param2").val());
+            var size = parseFloat($("#augmentation_" + newaug_id + "_param3").val());
+            var squared = $("#augmentation_15_param4").is(':checked');
+            if (it_lb > it_ub) {
+                alert("Lower bound should be less than upper bound.");
+            }
+            else {
+                var paramlist = [it_lb, it_ub, size, squared];
+                augmentationList.push({
+                    serial: augmentationCount,
+                    id: parseInt(newaug_id),
+                    params: paramlist
+                });
+                $("#augmentationsList").append(newaug);
+            }
+        }
+        else if (jQuery.inArray(parseInt(newaug_id), severity_param_augs) != -1) {
+            var lb = parseInt($("#augmentation_" + newaug_id + "_param1").val());
+            var ub = parseInt($("#augmentation_" + newaug_id + "_param2").val());
+            if (lb > ub) {
+                alert("Lower bound should be less than upper bound.");
+            }
+            else {
+                var paramlist = [lb, ub];
+                augmentationList.push({
+                    serial: augmentationCount,
+                    id: parseInt(newaug_id),
+                    params: paramlist
+                });
+                $("#augmentationsList").append(newaug);
+            }
+        }
+        else if (jQuery.inArray(parseInt(newaug_id), no_param_augs) != -1) {
+            augmentationList.push({
+                serial: augmentationCount,
+                id: parseInt(newaug_id),
+                params: []
+            });
+            $("#augmentationsList").append(newaug);
+        }
+        else {
+            alert("Not yet implemented.");
+        }
+
+        console.log(augmentationList);
+    });
+
+    // remove augmentations from stack
+    $("#augmentationsList").on('click', '.removeAugmentation', function () {
+        var num = $(this).attr('id').split('_')[1];
+        augmentationList = augmentationList.filter(function (elem) {
+            return elem.serial != num;
+        });
+        // console.log(augmentationList);
+        $("#augmentationsList_" + num).remove();
+    });
+
+    $("#previewImagesList").on('click', '.previewImage', function () {
+        $("#originalImage").attr('src', $(this).attr('src'));
+        $("#augmentedImage").attr('src', 'static/images/preview_image.png?' + new Date().getTime());
+    });
+
+    $("#uploadAugmentationImage").on('change', function () {
+        filelist = $(this)[0].files;
+        if (filelist.length > 0) {
+            data = new FormData();
+            data.append('file', filelist[0]);
+            fetch('/augmentations/uploadimage', {
+                method: 'POST',
+                credentials: "include",
+                body: data,
+                cache: "no-cache",
+            })
+                .then(response => response.json().then(data => ({ status: response.status, body: data })))
+                .then(result => {
+                    $("#originalImage").attr('src', result.body['path']);
+                    console.log(result);
+                    let msg = document.querySelector('#msg');
+                    if (result.status != 200) {
+                        msg.innerHTML = `*${result.body.error}`;
+                        msg.style.color = "red";
+                    }
+                });
+            $(this).val(null);
+            $("#augmentedImage").attr('src', 'static/images/preview_image.png?' + new Date().getTime());
+        }
+    });
+
+    function get_preview() {
+        var data = {
+            image: $("#originalImage").attr('src'),
+            augmentationList: augmentationList
+        }
+        if (data.image == 'static/images/select_image.png') {
+            alert("No image selected. Select an image first.");
+            return;
+        }
+        fetch('/augmentations/preview', {
+            method: 'POST',
+            credentials: "include",
+            body: JSON.stringify(data),
+            cache: "no-cache",
+            headers: new Headers(
+                {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                })
+        })
+            .then(response => response.json().then(data => ({ status: response.status, body: data })))
+            .then(result => {
+                $("#augmentedImage").attr('src', 'static/images/temps/preview_aug.png?' + new Date().getTime());
+                console.log(result);
+                let msg = document.querySelector('#msg');
+                if (result.status != 200) {
+                    msg.innerHTML = `*${result.body.error}`;
+                    msg.style.color = "red";
+                }
+            });
+    }
+
+    function saveChanges() {
+        classList = []
+        for (var i = 0; i < classCount; i++){
+            if($("#imageClass" + i).is(':checked')){
+                classList.push(i);
+            }
+        }
+        var data = {
+            percentage: parseFloat($("#augmentationProbability").val()),
+            augmentationList: augmentationList,
+            classList: classList
+        }
+        fetch('/augmentations/savechanges', {
+            method: 'POST',
+            credentials: "include",
+            body: JSON.stringify(data),
+            cache: "no-cache",
+            headers: new Headers(
+                {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                })
+        });
+        location.reload();
+    }
+
+    $('#previewModal').on('show.bs.modal', function () {
+        $('#augmentationModal').css('filter', 'brightness(50%)');
+    });
+    $('#previewModal').on('hide.bs.modal', function () {
+        $('#augmentationModal').css('filter', 'brightness(100%)');
+    });
+
+    $("#selectAll").on('click', function () {
+        for (var i = 0; i < classCount; i++)
+            $("#imageClass" + i).prop('checked', true);
+    });
+    $("#clearAll").on('click', function () {
+        for (var i = 0; i < classCount; i++)
+            $("#imageClass" + i).prop('checked', false);
+    });
+
+    $('.form-range').each(function () {
+        $(this).on('input', function () {
+            $(this).parent().prev().attr('placeholder', $(this).val());
+        });
+    });
+
+</script>
+{% endblock %}
+
+<!-- Coarse Salt and Pepper -->
+<!-- <div id="augmentation_1" class="augmentationGroup">
+    <div class="form-inline my-2">
+        <label class="form-label" for="augmentation_1_param1">Parameter 1: </label>
+        <input class="form-control col-sm-3 mx-4" type="text" placeholder="0.05" readonly>
+        <div class="range">
+            <input type="range" class="form-range" min="0" max="1" step="0.05" value="0.05"
+                id="augmentation_1_param1" />
+        </div>
+    </div>
+    <div class="form-inline my-2">
+        <label class="form-label" for="augmentation_1_param2">Parameter 2: </label>
+        <input class="form-control col-sm-3 mx-4" type="text" placeholder="0.01" readonly>
+        <div class="range">
+            <input type="range" class="form-range" min="0" max="1" step="0.01" value="0.01"
+                id="augmentation_1_param2" />
+        </div>
+    </div>
+    <div class="form-inline my-2">
+        <label class="form-label" for="augmentation_1_param3">Parameter 3: </label>
+        <input class="form-control col-sm-3 mx-4" type="text" placeholder="0.1" readonly>
+        <div class="range">
+            <input type="range" class="form-range" min="0" max="1" step="0.01" value="0.1"
+                id="augmentation_1_param3" />
+        </div>
+    </div>
+    <div class="form-inline my-2">
+        <div class="form-label">Parameter 4:</div>
+        <div class="custom-control custom-switch mx-4">
+            <input type="checkbox" class="custom-control-input" id="augmentation_1_param4" />
+            <label class="custom-control-label" for="augmentation_1_param4"></label>
+        </div>
+    </div>
+</div> -->

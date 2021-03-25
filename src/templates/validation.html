@@ -1,0 +1,117 @@
+{% extends "basetemplate.html" %}
+
+{% block title %}Create Validation Set{% endblock %}
+
+{% block ptitle %}Create Validation Set{% endblock %}
+
+{% block main %}
+
+<div class="row">
+    <div class="col text-center">
+        <h3>Add new validation images</h3>
+    </div>
+</div>
+<div class="row mt-2">
+    <div class="col justify-content-center d-flex">
+        <div class="form-inline">
+            <label for="selectValidationClass" class="form-label">Select class to add validation images for:</label>
+            <select class="custom-select custom-select my-0 border-1 mt-1 mx-2" aria-label="Select validation class"
+                id="selectValidationClass">
+                {% for i in range(43) %}
+                <option value="{{i}}">GTSRB Class {{i}}</option>
+                {% endfor %}
+                {% for name in self_classes %}
+                <option value="{{loop.index+42}}">{{name}}</option>
+                {% endfor %}
+            </select>
+            <label for="uploadValidationImage" class="btn btn-primary form-label">Upload Validation Images</label>
+            <input type="file" accept="image/*" id="uploadValidationImage" style="display: none;" multiple>
+        </div>
+    </div>
+</div>
+<hr>
+<div class="row">
+    <div class="col text-center">
+        <h3>Smart segregation</h3>
+    </div>
+</div>
+<div class="row mt-2">
+    <div class="col justify-content-center d-flex">
+        <div class="form-inline">
+            <label class="form-label ml-4" for="splitRatio">Split ratio: </label>
+            <input class="form-control col-sm-3 mx-4" type="text" placeholder="0.2" readonly>
+            <div class="range">
+                <input type="range" class="form-range" min="0" max="1" step="0.01" value="0.2" id="splitRatio" />
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row mt-2">
+    <div class="col justify-content-center d-flex">
+        <button class="btn btn-primary" id="segregate">
+            Segregate
+        </button>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    $("#validation-sidebar").addClass('active');
+
+    $("#uploadValidationImage").on('change', function () {
+        classId = $("#selectValidationClass").val();
+        filelist = $(this)[0].files;
+        if (filelist.length > 0) {
+            data = new FormData();
+            for (var i = 0; i < filelist.length; i++) {
+                data.append('file' + i, filelist[i]);
+            }
+            data.append('cnt', parseInt(filelist.length));
+            data.append('class', classId);
+            fetch('/validation/uploadimages', {
+                method: 'POST',
+                credentials: "include",
+                body: data,
+                cache: "no-cache",
+            });
+            //.then(response => response.json().then(data => ({ status: response.status, body: data })))
+            //.then(result => {
+            //    console.log(result);
+            //    let msg = document.querySelector('#msg');
+            //    if (result.status != 200) {
+            //        msg.innerHTML = `*${result.body.error}`;
+            //        msg.style.color = "red";
+            //    }
+            //});
+            $(this).val(null);
+            alert("Validation images added successfully.")
+        }
+    });
+
+    $("#segregate").on('click', function () {
+        var data = {
+            splitRatio: parseFloat($("#splitRatio").val())
+        }
+        fetch('/validation/segregation', {
+            method: 'POST',
+            credentials: "include",
+            body: JSON.stringify(data),
+            cache: "no-cache",
+            headers: new Headers(
+                {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                })
+        });
+        alert("Segregation complete.")
+    });
+
+    $('.form-range').each(function () {
+        $(this).on('input', function () {
+            $(this).parent().prev().attr('placeholder', $(this).val());
+        });
+    });
+</script>
+{% endblock %}

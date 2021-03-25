@@ -1,0 +1,272 @@
+{% extends "basetemplate.html" %}
+
+{% block title %}Add Images{% endblock %}
+
+{% block ptitle %}Add Images{% endblock %}
+
+{% block main %}
+    <div class="row">
+        <div class="col-xl-6 col-md-6 mb-4">
+            <h3 class="text-dark">
+                Upload Images
+            </h3>
+            <form action="/addimages" method="POST" enctype="multipart/form-data">
+                <div class="form-group">
+                    <h5 class="mt-3 mr-3">Add to</h5>
+                    <div class="form-check form-check-inline mt-1">
+                        <input class="form-check-input" type="radio" name="dataset" id="Train" value="Train" checked>
+                        <label class="form-check-label" for="Train">
+                            Train Set
+                        </label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="dataset" id="Test" value="Test">
+                        <label class="form-check-label" for="Test">
+                            Test Set
+                        </label>
+                    </div>
+                    <br>
+                  <h5 class="mt-3">Select Class</h5>
+                  <select name = "class-dropdown" class="form-control" id="exampleFormControlSelect1">
+                    {% for class in all_classes %}
+                        <option class="all-classes">{{ class }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+                <input type="file" id="file-upload" accept="image/*" class="btn btn-primary btn-sm" name="file_name" multiple>
+                <input type="submit" name = "submit_button"  value="Upload" class="btn btn-primary ml-2 bg-success border-0">
+                <h3>{{ msg }}</h3>
+                <div id="file-upload-filename"></div>
+            </form>
+        </div>
+
+        <div class="col-xl-6 col-md-6 mb-4">
+            <h3 class="text-dark">
+                Add/Delete Custom Classes
+            </h3>
+            <h5 class="mt-3">Type New Class Name</h5>
+            <form>
+                <div class="form-row">
+                    <div class="form-group col-md-9">
+                        <input type="text" id="candidate" placeholder="Class Name" class="form-control mr-3" /> 
+                    </div>
+                    <div class="form-group col-md-3 text-center">
+                        <input type="button" onclick="addItem()" class="btn btn-primary mr-2" value="Add Class">
+                    </div>
+                </div>
+            </form>
+            <h5 class="mt-3">Newly Added Classes</h5>
+            <div class="row">
+                <div class="col-md-9">
+                    <div class="mt-2">
+                        <ul id = "self-classes-area" style="padding: 0;list-style-type:none;width: 450px; height: 140px; overflow: auto">
+                            {% for class in self_classes %}
+                            <li>
+                                <div id = "{{class}}" style="display: inline-block;" class="mr-2"> 
+                                    <label id = "{{class}}">
+                                        <input type="checkbox" id= "{{class}}" name="self-classes" value="{{class}}"> {{ class }} 
+                                    </label>
+                                </div>
+                            </li>
+                        {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <form>
+                        <input type="button" onclick="removeItem()" class="btn btn-secondary mr-2" value="Delete Class">
+                    </form>
+                </div>
+            </div>
+            <div id="msg"></div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xl-6 col-md-6 mb-4">
+            <div class="card shadow mt-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Original Classes</h6>
+                </div>
+                <img class="shadow figure-img img-fluid border rounded my-0 p-1" src="static/images/data.png" id="dataset_img">
+            </div>
+        </div>
+        <div class="col-xl-6 col-md-6 mb-4">
+            <!-- New Added Classes -->
+            <div class="card shadow mt-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Newly Added Classes</h6>
+                </div>
+                <div class="flex-row">
+                    {% macro get_folder(img_path) -%}
+                        {{img_path[0]}}
+                    {%- endmacro %}
+                    {% macro get_path(img_path) -%}
+                        {{img_path[1]}}
+                    {%- endmacro %}
+                    {{img_paths}}
+                    {% for img_path in img_paths %}
+                    <img class="shadow figure-img img-fluid border rounded ml-3 my-2" src="{{ url_for('download_file', folder=get_folder(img_path), filename=get_path(img_path)) }}" alt="{{img_path}}" style="width: 100px; max-height: 250px">
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    $("#addimages-sidebar").addClass('active');
+
+    function remove_item_from_dropdown(class_list)
+    {
+        var select_list = document.getElementById('exampleFormControlSelect1');
+        var curr_options = select_list.children;
+        for(var i = 0; i<class_list.length; i++)
+        {
+            for(var j=0; j<curr_options.length; j++)
+            {
+                if(curr_options[j].innerHTML == class_list[i])
+                {
+                    curr_options[j].remove();
+                }
+            }
+            
+        }
+    }
+
+    var input = document.getElementById('file-upload');
+    var infoArea = document.getElementById( 'file-upload-filename' );
+
+    function addItem() 
+    { 
+        var elems = document.getElementsByClassName('all-classes');
+        var dataset = document.querySelector('input[name="dataset"]:checked').value;
+        console.log(dataset)
+        var i;
+        var candidate = document.getElementById("candidate");
+        candidate.value = candidate.value.trim();
+        if(candidate.value == "")
+            return false;
+        
+        var flag = 0;
+        for(i=0; i<elems.length; i++)
+        {
+            if(elems[i].value==candidate.value)
+            {
+                flag=1;
+            }
+        }
+
+        if(flag==0)
+        {
+            document.getElementById('msg').innerHTML = "";
+
+            var self_classes_label = document.getElementById( 'self-classes-area' );
+            // self_classes_label.innerHTML +="<li><div style=\"display: inline-block;\" class=\"mr-2\" id = \""+candidate.value+"\"> <label id = \""+candidate.value+"\"> <input type=\"checkbox\" id= \""+candidate.value+"\" name=\"self-classes\" value=\""+candidate.value+"\"> "+ candidate.value +"  </label></div></li>";
+            self_classes_label.innerHTML = "<li><div style=\"display: inline-block;\" class=\"mr-2\" id = \""+candidate.value+"\"> <label id = \""+candidate.value+"\"> <input type=\"checkbox\" id= \""+candidate.value+"\" name=\"self-classes\" value=\""+candidate.value+"\"> "+ candidate.value +"  </label></div></li>" + self_classes_label.innerHTML;
+            
+            var drop_down_list = document.getElementById( 'exampleFormControlSelect1' );
+            drop_down_list.innerHTML += "<option class=\"all-classes\">" + candidate.value + "</option>";
+
+            fetch('/addimages/receive_self_class', {
+                method: 'POST',
+                credentials: "include",
+                body: JSON.stringify({
+                    new_class: candidate.value
+                }),
+                cache: "no-cache",
+                headers: new Headers(
+                {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                })
+            })
+            .then(response => response.json().then(data => ({status: response.status, body: data})))
+            .then(result => {
+                console.log(result);
+                let msg = document.querySelector('#msg');
+                if(result.status != 200)
+                {
+                    msg.innerHTML = `*${result.body.error}`;
+                    msg.style.color = "red";
+                }
+            });
+            candidate.value = "";
+        } 
+        else
+        {
+            alert("Class Alredy exists!");
+            return;
+        }
+    } 
+
+    function removeItem()
+    {
+        if (confirm("Deleting the classes will deleted all the saved images associated with as well!")) 
+        {
+            document.getElementById('msg').innerHTML = "";
+
+            var elems = document.querySelectorAll('[name="self-classes"]');
+            var i;
+            var checked_classes = [];
+            for(i=0; i<elems.length; i++)
+            {
+                if(elems[i].checked)
+                {
+                    checked_classes.push(elems[i].id);
+                    document.getElementById(elems[i].id).remove();
+                }
+            }
+            if(checked_classes.length == 0 )
+                return;
+            
+            var elems = document.getElementsByClassName('all-classes');
+            var j;
+            for(i=0;i<checked_classes.length;i++)
+            {
+                for(j=0;j<elems.length;j++)
+                {
+                    try
+                    {
+                        if(elems[j].value==checked_classes[i])
+                        {
+                            elems[j].remove();
+                        }
+                    }
+                    catch
+                    {
+                        continue;
+                    }
+                    
+                }
+            }
+
+            fetch('/addimages/remove_self_class', {
+                method: 'POST',
+                credentials: "include",
+                body: JSON.stringify({
+                    delete_class: checked_classes
+                }),
+                cache: "no-cache",
+                headers: new Headers(
+                {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                })
+            })
+            .then(response => response.json().then(data => ({status: response.status, body: data})))
+            .then(result => {
+                console.log(result);
+                let msg = document.querySelector('#msg');
+                if(result.status != 200)
+                {
+                    msg.innerHTML = `*${result.body.error}`;
+                    msg.style.color = "red";
+                }
+            });
+        } 
+    }
+        
+</script>
+{% endblock %}

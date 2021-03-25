@@ -1,0 +1,216 @@
+{% extends "basetemplate.html" %}
+
+{% block title %}Results{% endblock %}
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='vendor/datatables/dataTables.bootstrap4.min.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='vendor/datatables/jquery.dataTables.css') }}">
+<style>
+div.dataTables_wrapper div.dataTables_length select {
+    width: 100%;
+}
+#container {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    font-size: 6;
+}
+.anychart-credits
+{
+    display: none ;
+}
+@media (min-width: 576px)
+ {  
+    .modal-dialog {
+        max-width: 5000px;
+    }
+ }
+</style>
+{% endblock %}
+
+{% block ptitle %}Results{% endblock %}
+
+{% block main %}
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h5 class="m-0 font-weight-bold text-primary">Choose Model</h5>
+    </div>
+    <div class="card-body">
+        <select name="model" class="form-control">
+            <option value="Micro_Net">Micron_Net</option>
+        </select>
+    </div>
+</div>
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h5 class="m-0 font-weight-bold text-primary">Metrics</h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered display" data-page-length='10' id="dataTable" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <td class="bg-success"><strong>Accuracy</strong></td>
+                        <td >{{'%0.3f'| format(data["accuracy"]|float)}}</td>
+                        <td style="display: none;"></td>
+                        <td style="display: none;"></td>
+                        <td style="display: none;"></td>
+                    </tr>
+                </thead>
+                <thead>
+                    <tr>
+                        <th class="bg-primary">Class</th>
+                        <th class="bg-primary">Precision</th>
+                        <th class="bg-primary">Recall</th>
+                        <th class="bg-primary">F1-score</th>
+                        <th class="bg-primary">Support</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Macro Average</strong></td>
+                        {% for key, value in data["macro avg"].items() %}
+                            {% if key == "support" %}
+                            <td>{{value}}</td>
+                            {% else %}
+                            <td>{{'%0.3f'| format(value|float)}}</td>
+                            {% endif %}
+                        {% endfor %}
+                    </tr>
+                    <tr>
+                        <td><strong> Weighted Average</strong></td>
+                        {% for key, value in data["weighted avg"].items() %}
+                            {% if key == "support" %}
+                            <td>{{value}}</td>
+                            {% else %}
+                            <td>{{'%0.3f'| format(value|float)}}</td>
+                            {% endif %}
+                        {% endfor %}
+                    </tr>
+
+                    {% for row in data %}
+                        
+                        {% if row == "accuracy" or row == "macro avg" or row == "weighted avg"%}
+                        {% else %}
+                        <tr>
+                            <td>{{row}}</td>
+                            {% for key, value in data[row].items() %}
+                                {% if key == "support" %}
+                                <td>{{value}}</td>
+                                {% else %}
+                                <td>{{'%0.3f'| format(value|float)}}</td>
+                                {% endif %}
+                            {% endfor %}
+                        </tr>
+                        {% endif %}
+
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h5 class="m-0 font-weight-bold text-primary">Confusion Matrix</h5>
+    </div>
+    <div class="card-body">
+        <!-- Button trigger modal -->
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalCenter">
+            See confusion matrix
+        </button>
+        <!-- Modal -->
+        <div class="modal fade pr-0" id="exampleModalCenter"  tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered mx-0 my-0"  role="document">
+                <div class="modal-content" style="width: 100vw; height: 100vh;">
+                    <button type="button" class="close text-right pr-3" style="outline: none;" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                
+                    <div class="modal-body px-0 py-0">
+                        <div id="container"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>  
+
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h5 class="m-0 font-weight-bold text-primary">Rise Maps</h5>
+    </div>
+    <div class="card-body">
+        <h5>Correct</h5>
+        <img class="shadow figure-img img-fluid border rounded" src="static\images\Correct\Copy of rise_04709_40.jpg" style="width: 150px; max-height: 250px">
+        <img class="shadow figure-img img-fluid border rounded" src="static\images\Correct\Copy of rise_05664_16.jpg" style="width: 150px; max-height: 250px">
+        <img class="shadow figure-img img-fluid border rounded" src="static\images\Correct\Copy of rise_06119_36.jpg" style="width: 150px; max-height: 250px">
+        <img class="shadow figure-img img-fluid border rounded" src="static\images\Correct\Copy of rise_07877_37.jpg" style="width: 150px; max-height: 250px">
+        <img class="shadow figure-img img-fluid border rounded" src="static\images\Correct\Copy of rise_11813_39.jpg" style="width: 150px; max-height: 250px">
+        <img class="shadow figure-img img-fluid border rounded" src="static\images\Correct\Copy of rise_12217_25.jpg" style="width: 150px; max-height: 250px">
+        <img class="shadow figure-img img-fluid border rounded" src="static\images\Correct\Copy of rise_53944_47.jpg" style="width: 150px; max-height: 250px">
+
+        <h5 class="mt-4">Incorrect</h5>
+        <img class="shadow figure-img img-fluid border rounded" src="static\images\Incorrect\Copy of rise_05476_11.jpg" style="width: 150px; max-height: 250px">
+        <img class="shadow figure-img img-fluid border rounded" src="static\images\Incorrect\Copy of rise_10251_35.jpg" style="width: 150px; max-height: 250px">
+        <img class="shadow figure-img img-fluid border rounded" src="static\images\Incorrect\Copy of rise_10292_41.jpg" style="width: 150px; max-height: 250px">
+        <img class="shadow figure-img img-fluid border rounded" src="static\images\Incorrect\Copy of rise_10667_7.jpg" style="width: 150px; max-height: 250px">
+        <img class="shadow figure-img img-fluid border rounded" src="static\images\Incorrect\Copy of rise_11415_27.jpg" style="width: 150px; max-height: 250px">
+        <img class="shadow figure-img img-fluid border rounded" src="static\images\Incorrect\Copy of rise_11515_35.jpg" style="width: 150px; max-height: 250px">
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='vendor/datatables/jquery.dataTables.min.js') }}"></script>
+<script src="https://cdn.anychart.com/releases/8.7.1/js/anychart-core.min.js"></script>
+<script src="https://cdn.anychart.com/releases/8.7.1/js/anychart-heatmap.min.js"></script>
+
+<script>
+    $("#results-sidebar").addClass('active');
+
+    $.extend( $.fn.dataTable.defaults, {
+        searching: false,
+        ordering:  false
+    } );
+ 
+    $(document).ready(function() {
+        $('#dataTable').DataTable();
+    });
+
+    anychart.onDocumentReady(function () {
+
+        var data = [
+            {% for i in range(class_count) %}
+                {% for j in range(class_count) %}
+                    {x: "{{j}}", y: "{{i}}", heat: {{'%0.3f'| format(matrix[i][j]|float)}}},
+                {% endfor %}
+            {% endfor %}
+        ];
+
+        // create the data
+        chart = anychart.heatMap(data);
+        chart.xAxis().labels().fontSize(9);
+        chart.yAxis().labels().fontSize(9);
+        chart.yAxis().labels().height(10);
+
+        // create and configure the color scale.
+        var customColorScale = anychart.scales.linearColor();
+        customColorScale.colors(["#ACE8D4", "#00726A"]);
+
+        // set the color scale as the color scale of the chart
+        chart.colorScale(customColorScale);
+
+        // set the container id
+        chart.container("container");
+
+        // initiate drawing the chart
+        chart.draw();
+
+
+    });
+    
+</script>
+{% endblock %}

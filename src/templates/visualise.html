@@ -1,0 +1,15 @@
+{% extends "basetemplate.html" %}
+
+{% block title %}Visualise Model{% endblock %}
+
+{% block ptitle %}Visualise Model{% endblock %}
+
+{% block main %}
+<iframe src="/netron" class="p-2" title="netron" width="100%" height="650px" style="border: 0;"></iframe>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    $("#visualise-sidebar").addClass('active');
+</script>
+{% endblock %}
