@@ -96,17 +96,22 @@
                 <div class="card-header py-3">
                     <h6 class="m-0 font-weight-bold text-primary">Newly Added Classes</h6>
                 </div>
-                <div class="flex-row">
+                <div class="flex-row py-4 px-4">
                     {% macro get_folder(img_path) -%}
                         {{img_path[0]}}
                     {%- endmacro %}
                     {% macro get_path(img_path) -%}
                         {{img_path[1]}}
                     {%- endmacro %}
-                    {{img_paths}}
-                    {% for img_path in img_paths %}
-                    <img class="shadow figure-img img-fluid border rounded ml-3 my-2" src="{{ url_for('download_file', folder=get_folder(img_path), filename=get_path(img_path)) }}" alt="{{img_path}}" style="width: 100px; max-height: 250px">
-                    {% endfor %}
+                    
+                        {% for img_path in img_paths %}                            
+                        <figure class="figure">
+                            <img class="shadow figure-img img-fluid border rounded ml-3 my-2" src="{{ url_for('download_file', folder=get_folder(img_path), filename=get_path(img_path)) }}" alt="{{img_path}}" style="width: 100px; max-height: 250px">
+                            <figcaption class="figure-caption text-center ">{{img_path[2]}}</figcaption>
+                        </figure>
+                        
+                        {% endfor %}
+                    
                 </div>
             </div>
         </div>

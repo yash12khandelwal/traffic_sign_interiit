@@ -16,7 +16,7 @@ from data.traffic_sign_interiit.dataset import prepare_new_classes
 
 app.config["JSON_PATH"] = "data/"
 app.config["DATA_PATH"] = "data/traffic_sign_interiit/"
-app.config["MEDIA_FOLDER"] = "data/traffic_sign_interiit/dataset/New/"
+app.config["MEDIA_FOLDER"] = "data/traffic_sign_interiit/dataset/New/Train/"
 orig_classes = []
 self_classes = []
 
@@ -47,14 +47,15 @@ def addImages():
     Uploads the newly added images to the dataset 
     """
     #assesing the paths of newly added classes to show on UI
-    base_path = app.config["DATA_PATH"] + "dataset/New/"
+    base_path = app.config["DATA_PATH"] + "dataset/New/Train/"
     img_paths = []
     for i in range(len(orig_classes), len(orig_classes) + len(self_classes)):
         path = base_path + f'{i}'
         if os.path.exists(path):
             #randomly choosing a img from a particular class folder
             random_file = random.choice(os.listdir(path))
-            temp = [f'{i}', random_file]
+            class_name = self_classes[i-43]
+            temp = [f'{i}', random_file, class_name]
             img_paths.append(temp)
 
     if request.method == 'POST':
@@ -176,7 +177,7 @@ def datasetStatistics():
     train_path_Extra = os.path.join(base_path_Extra, "Train/")
     train_class_dist_extra = []
     for i in range(0, len(orig_classes) + len(self_classes)):
-        folder = "{:04d}".format(i)
+        folder = f'{i}'
         path = train_path_Extra + folder
         if os.path.exists(path):
             train_class_dist_extra.insert(i, len(next(os.walk(path))[2]))
@@ -186,7 +187,7 @@ def datasetStatistics():
     val_path_Extra = os.path.join(base_path_Extra, "Valid/")
     val_class_dist_extra = []
     for i in range(0, len(orig_classes) + len(self_classes)):
-        folder = "{:04d}".format(i)
+        folder = f'{i}'
         path = val_path_Extra + folder
         if os.path.exists(path):
             val_class_dist_extra.insert(i, len(next(os.walk(path))[2]))
@@ -197,7 +198,7 @@ def datasetStatistics():
     test_path_Extra = os.path.join(base_path_Extra, "Test/")
     test_class_dist_extra = []
     for i in range(0, len(orig_classes) + len(self_classes)):
-        folder = "{:04d}".format(i)
+        folder = f'{i}'
         path = test_path_Extra + folder
         if os.path.exists(path):
             test_class_dist_extra.insert(i, len(next(os.walk(path))[2]))
