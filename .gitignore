@@ -8,9 +8,11 @@ data/traffic_sign_interiit/dataset/GTSRB/all/*
 data/traffic_sign_interiit/dataset/New/Train/*
 data/traffic_sign_interiit/dataset/New/Test/*
 data/traffic_sign_interiit/dataset/New/Valid/*
+data/traffic_sign_interiit/dataset/EXTRA/*
 
 # exception to the rule
 !data/traffic_sign_interiit/dataset/zips/.gitkeep
 !data/traffic_sign_interiit/dataset/New/Train/.gitkeep
 !data/traffic_sign_interiit/dataset/New/Test/.gitkeep
 !data/traffic_sign_interiit/dataset/New/Valid/.gitkeep
+!data/traffic_sign_interiit/dataset/EXTRA/.gitkeep
