@@ -111,7 +111,5 @@ def prepare_train_val_n_test(source_path, save_classpath, validation_fraction=0.
 if __name__ == '__main__':
     extra_classpath = sys.argv[1]
     save_classpath = sys.argv[2]
-    val_split = float(sys.argv[3])
-    test_split = float(sys.argv[4])
 
-    prepare_train_val_n_test(extra_classpath, save_classpath, validation_fraction=val_split, test_fraction=test_split)
+    prepare_train_val_n_test(extra_classpath, save_classpath, validation_fraction=0.2, test_fraction=0.2)
