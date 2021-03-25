@@ -3,8 +3,7 @@ import os.path as osp
 import pandas as pd
 import sys
 from collections import defaultdict, namedtuple
-import csv, json
-import requests
+import csv, json, requests
 
 source_dir = "data/traffic_sign_interiit/"
 
@@ -30,7 +29,6 @@ def get_classes(path):
         except:
             continue
     return int_dirs
-    # return list(map(int, os.listdir(path)))
 
 Annotation = namedtuple('Annotation', ['filename', 'label'])
 def make_annotations(datapath, new_classes):
@@ -42,7 +40,7 @@ def make_annotations(datapath, new_classes):
     Returns:
         list: List of Annotations
     """
-    
+
     classes = get_classes(datapath)
     if len(new_classes)!=0:
         print(os.path.join(source_dir, "config/temp_config.json"))
@@ -84,9 +82,9 @@ def split_train_val_test_sets(path, annotations, validation_fraction, test_fract
         test_fraction (float): Fraction for test
     """
 
-    all_path = osp.join(path, 'all')
     train_path = osp.join(path, 'train')
     validation_path = osp.join(path, 'valid')
+    all_path = osp.join(path, 'all')
     test_path = osp.join(path, 'test')
 
     if validation_fraction + test_fraction < 1.0:
@@ -138,3 +136,4 @@ if __name__ == '__main__':
     test_fraction = float(sys.argv[4])
 
     prepare_train_val_n_test(extra_classpath, save_classpath, validation_fraction=validation_fraction, test_fraction=test_fraction)
+

@@ -1,4 +1,4 @@
-# import data.traffic_sign_interiit.model
+import torch
 import model
 from options.train_options import *
 from data.gtsrb_loader import GTSRB, get_loader
@@ -26,6 +26,14 @@ def train(config_file=""):
 
     net, optimizer, schedular = model.CreateModel(args=args)
 
+    if args['experiment'].restore_from:
+        device = torch.device(args['experiment'].device)
+        PATH = args['experiment'].restore_from
+        checkpoints = torch.load(PATH, map_location=device)
+
+        net.load_state_dict(checkpoints['model_state_dict'])
+        optimizer.load_state_dict(checkpoints['optimizer_state_dict'])
+
     if args['experiment'].wandb:
         init_wandb(net, args)
 
@@ -33,10 +41,13 @@ def train(config_file=""):
                 valloader=valloader, model=net, optimizer=optimizer, scheduler=schedular)
 
     log_confusion = True if args['experiment'].wandb else False
-    test_acc, test_loss = calc_acc_n_loss(args['experiment'], net, testloader, log_confusion)
+    test_acc, test_loss,test_f1,cm,test_precision,test_recall = calc_acc_n_loss(args['experiment'], net, testloader, log_confusion)
 
     print(f'Test Accuracy = {test_acc}')
     print(f'Test Loss = {test_loss}')
+    print(f'F1 Score = {test_f1}')
+    print(f'Test Precision = {test_precision}')
+    print(f'Test Recall = {test_recall}')
 
     if args['experiment'].wandb:
-        wandb_save_summary(test_acc=test_acc)
+        wandb_save_summary(test_acc=test_acc,test_f1=test_f1,test_precision=test_precision,test_recall=test_recall)
