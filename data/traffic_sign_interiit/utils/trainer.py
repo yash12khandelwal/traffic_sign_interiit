@@ -87,7 +87,6 @@ def train_engine(args, trainloader, valloader, model, optimizer, scheduler=None)
         print('\nValidating ...')
         val_acc, val_loss, val_f1, val_cm, val_precision, val_recall = calc_acc_n_loss(
             args, model, valloader, False)
-\
         print(f'Valid Accuracy = {val_acc} %')
         print(f'Valid loss = {val_loss} %')
         print(f'Valid f1 = {val_f1} %')
