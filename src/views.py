@@ -16,7 +16,7 @@ from data.traffic_sign_interiit.dataset import prepare_new_classes
 
 app.config["JSON_PATH"] = "data/"
 app.config["DATA_PATH"] = "data/traffic_sign_interiit/"
-app.config["MEDIA_FOLDER"] = "data/traffic_sign_interiit/dataset/New/"
+app.config["MEDIA_FOLDER"] = "data/traffic_sign_interiit/dataset/New/Train/"
 orig_classes = []
 self_classes = []
 
@@ -47,7 +47,7 @@ def addImages():
     Uploads the newly added images to the dataset 
     """
     #assesing the paths of newly added classes to show on UI
-    base_path = app.config["DATA_PATH"] + "dataset/New/"
+    base_path = app.config["DATA_PATH"] + "dataset/New/Train/"
     img_paths = []
     for i in range(len(orig_classes), len(orig_classes) + len(self_classes)):
         path = base_path + f'{i}'
