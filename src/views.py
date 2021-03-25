@@ -204,17 +204,6 @@ def datasetStatistics():
         else:
             test_class_dist_extra.insert(i, 0)
 
-    #temporary random data generation
-    #to be removed############################
-    # for i in range(0, len(orig_classes) + len(self_classes)):
-    #     val_class_dist_extra.insert(i, random.randint(0,200))
-    #     test_class_dist_extra.insert(i, random.randint(0,200))
-    #     if i < len(orig_classes):
-    #         train_class_dist_extra.insert(i, 1800-train_class_dist_gtsrb[i] + random.randint(0,150) )
-    #     else:
-    #         train_class_dist_extra.insert(i, 1500 + random.randint(0,300))
-    ############################
-
     return render_template("dataset.html", orig_classes_count=len(orig_classes), self_classes_count=len(self_classes), train_class_dist_gtsrb=train_class_dist_gtsrb, train_class_dist_extra=train_class_dist_extra, count_org=sum(train_class_dist_gtsrb), count_new=sum(train_class_dist_extra), val_class_dist_gtsrb=val_class_dist_gtsrb, val_class_dist_extra=val_class_dist_extra, test_class_dist_gtsrb=test_class_dist_gtsrb, test_class_dist_extra=test_class_dist_extra,)
 
 

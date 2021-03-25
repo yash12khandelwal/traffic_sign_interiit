@@ -77,10 +77,6 @@
     <div id="msg" class="mt-4"></div>
 </div>
 
-<!-- <div class="row">
-    <h1><center>TRAINING....</center></h1>
-</div> -->
-
 <div class="row">
     <h2>Test Model</h2>
     <div class="input-group mb-3">
@@ -90,19 +86,12 @@
         <select class="custom-select" required id="test">
             {% for model in pretrained_models %}
                 <option value="{{model}}">{{model}}</option>
-                <!-- <option value="50">50</option>
-                <option value="100">100</option>
-                <option value="200">200</option> -->
             {% endfor %}
         </select>
         <div class="input-group-append">
             <button class="btn btn-success" type="button">Test Model</button>
         </div>
     </div>
-    <!-- <div class="text-center">
-        <input type="submit" value="Train Model" onclick="submitform()" class="btn btn-success">
-        <div id="msg" class="mt-4"></div>
-    </div> -->
 </div>
  
 <div class="toast" data-delay="5000" style="position: absolute; bottom: 15px; right: 15px;">
@@ -156,13 +145,6 @@
                 return false;
             } 
         }
-        // if(checked_classes.length == 0 )
-        // {
-        //     document.querySelector("#classes").classList.add("border-danger");
-        //     $('.toast').toast('show'); 
-        //     document.querySelector(".toast-body").innerHTML = "Select atleast one custom added class!"; 
-        //     return false;
-        // }
 
         for(var j=0; j<4; j++)
         {
