@@ -239,22 +239,26 @@ def ModelTraindata():
     with open(app.config["DATA_PATH"] + "config/temp_config.json", "w") as outfile:
         json.dump(default_configs, outfile)
 
-    shutil.move(os.path.join(app.config["DATA_PATH"], "dataset/EXTRA"),
-                os.path.join(app.config["DATA_PATH"], "dataset/EXTRA_copy"))
-    remake_EXTRA_folder(
-        0, 0, new_classes=default_configs["experiment"]["class_ids"])
-    remake_EXTRA_folder(
-        0, 1, new_classes=default_configs["experiment"]["class_ids"])
-    remake_EXTRA_folder(
-        1, 0, new_classes=default_configs["experiment"]["class_ids"])
-    train.train("temp_config")
-    shutil.rmtree(app.config["DATA_PATH"] + "dataset/EXTRA")
-    shutil.move(os.path.join(app.config["DATA_PATH"], "dataset/EXTRA_copy"),
+    try:
+        shutil.move(os.path.join(app.config["DATA_PATH"], "dataset/EXTRA"),
+                    os.path.join(app.config["DATA_PATH"], "dataset/EXTRA_copy"))
+        remake_EXTRA_folder(
+            0, 0, new_classes=default_configs["experiment"]["class_ids"])
+        remake_EXTRA_folder(
+            0, 1, new_classes=default_configs["experiment"]["class_ids"])
+        remake_EXTRA_folder(
+            1, 0, new_classes=default_configs["experiment"]["class_ids"])
+        train.train("temp_config")
+    except KeyboardInterrupt:
+        "Stopped Abruptly"
+    finally:
+        shutil.rmtree(app.config["DATA_PATH"] + "dataset/EXTRA")
+        shutil.move(os.path.join(app.config["DATA_PATH"], "dataset/EXTRA_copy"),
                 os.path.join(app.config["DATA_PATH"], "dataset/EXTRA"))
 
     check = True
     if check:
-        return make_response(jsonify({"message": "Model Trained Successfuly! Check Visualise tab and results tab for more info."}), 200)
+        return make_response(jsonify({"message": "Model Trained Successfuly!"}), 200)
     else:
         return make_response(jsonify({"error": "Something is Wrong. Try Again!"}), 400)
 
