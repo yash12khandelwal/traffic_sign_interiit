@@ -37,7 +37,7 @@ div.dataTables_wrapper div.dataTables_length select {
     </div>
     <div class="card-body">
         <select name="model" class="form-control">
-            <option value="Micro_Net">Micron_Net</option>
+            <option value="Micro_Net">MicronNet</option>
         </select>
     </div>
 </div>
@@ -50,7 +50,7 @@ div.dataTables_wrapper div.dataTables_length select {
             <table class="table table-bordered display" data-page-length='10' id="dataTable" width="100%" cellspacing="0">
                 <thead>
                     <tr>
-                        <td class="bg-success"><strong>Accuracy</strong></td>
+                        <td class="bg-success"><strong>Overall Accuracy</strong></td>
                         <td >{{'%0.3f'| format(data["accuracy"]|float)}}</td>
                         <td style="display: none;"></td>
                         <td style="display: none;"></td>
@@ -67,27 +67,6 @@ div.dataTables_wrapper div.dataTables_length select {
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td><strong>Macro Average</strong></td>
-                        {% for key, value in data["macro avg"].items() %}
-                            {% if key == "support" %}
-                            <td>{{value}}</td>
-                            {% else %}
-                            <td>{{'%0.3f'| format(value|float)}}</td>
-                            {% endif %}
-                        {% endfor %}
-                    </tr>
-                    <tr>
-                        <td><strong> Weighted Average</strong></td>
-                        {% for key, value in data["weighted avg"].items() %}
-                            {% if key == "support" %}
-                            <td>{{value}}</td>
-                            {% else %}
-                            <td>{{'%0.3f'| format(value|float)}}</td>
-                            {% endif %}
-                        {% endfor %}
-                    </tr>
-
                     {% for row in data %}
                         
                         {% if row == "accuracy" or row == "macro avg" or row == "weighted avg"%}

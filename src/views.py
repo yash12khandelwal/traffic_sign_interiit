@@ -1,18 +1,17 @@
 from src import app
 from src.preview_augmentations import get_preview
-from flask import render_template, send_from_directory, request, jsonify, make_response, send_from_directory, redirect
+from flask import render_template, send_from_directory, request, jsonify, make_response, redirect
 import cv2
 import os
 import json
 import csv
 import random
-import numpy
+import numpy as np
 import shutil
 import sys
 sys.path.append("data/traffic_sign_interiit")
-from data.traffic_sign_interiit.dataset import prepare_new_classes
-import numpy as np
 from data.traffic_sign_interiit import train
+from data.traffic_sign_interiit.dataset import prepare_new_classes
 
 
 app.config["JSON_PATH"] = "data/"
@@ -35,18 +34,26 @@ with open(app.config["JSON_PATH"] + "SELF_CLASSES.json") as json_file:
 def root():
     return render_template("index.html")
 
+
+#this route return the file from the new folder
 @app.route('/new/<folder>/<path:filename>')
-def download_file(folder,filename):
-    return send_from_directory(app.config["MEDIA_FOLDER"]+ folder + "/", filename, as_attachment=True)
+def download_file(folder, filename):
+    return send_from_directory("../" + app.config["MEDIA_FOLDER"] + folder + "/", filename, as_attachment=True)
+
 
 @app.route("/addimages", methods=["GET", "POST"])
 def addImages():
+    """
+    Uploads the newly added images to the dataset 
+    """
+    #assesing the paths of newly added classes to show on UI
     base_path = app.config["DATA_PATH"] + "dataset/New/"
     img_paths = []
-    for i in range(len(orig_classes), len(orig_classes) + len(self_classes)) :
+    for i in range(len(orig_classes), len(orig_classes) + len(self_classes)):
         path = base_path + f'{i}'
-        if os.path.exists(path) :
-            random_file=random.choice(os.listdir(path))
+        if os.path.exists(path):
+            #randomly choosing a img from a particular class folder
+            random_file = random.choice(os.listdir(path))
             temp = [f'{i}', random_file]
             img_paths.append(temp)
 
@@ -57,14 +64,17 @@ def addImages():
             class_name = request.form.get('class-dropdown')
             success = upload_images(dataset, file_list, class_name)
             if success:
-                return render_template("addimages.html", msg="Images uploaded successfully", self_classes=self_classes, all_classes=orig_classes + self_classes, img_paths = img_paths)
+                return render_template("addimages.html", msg="Images uploaded successfully", self_classes=self_classes, all_classes=orig_classes + self_classes, img_paths=img_paths)
             else:
-                return render_template("addimages.html", msg="Please select images to upload", self_classes=self_classes, all_classes=orig_classes + self_classes, img_paths = img_paths)
-    return render_template("addimages.html", self_classes=self_classes, all_classes=orig_classes + self_classes, img_paths = img_paths)
+                return render_template("addimages.html", msg="Please select images to upload", self_classes=self_classes, all_classes=orig_classes + self_classes, img_paths=img_paths)
+    return render_template("addimages.html", self_classes=self_classes, all_classes=orig_classes + self_classes, img_paths=img_paths)
 
 
 @app.route("/addimages/receive_self_class", methods=["POST"])
 def save_new_class():
+    """
+    Saves the newly added class in SELF_CLASSES.json
+    """
     new_class = request.get_json()['new_class']
     self_classes.append(new_class)
     save_self_classes_json()
@@ -77,12 +87,12 @@ def remove_new_class():
     delete_classes(class_list)
     return make_response(jsonify({"message": "Class(es) removed!"}), 200)
 
-
+# route for Add Augmentations page
 @app.route("/augmentations", methods=["GET", "POST"])
 def addAugmentations():
     return render_template("augmentations.html", self_classes=self_classes)
 
-
+# route to send preview image while trying out different augmentations
 @app.route("/augmentations/preview", methods=["POST"])
 def previewAugmentations():
     req = request.get_json()
@@ -91,7 +101,7 @@ def previewAugmentations():
     cv2.imwrite('src/static/images/temps/preview_aug.png', augmented[0])
     return make_response(jsonify({'message': 'Preview saved to static/images/temps/preview_aug.png'}), 200)
 
-
+# route to upload an image for testing augmentations on
 @app.route("/augmentations/uploadimage", methods=["POST"])
 def uploadAugmentationImage():
     if request.method == 'POST':
@@ -100,7 +110,7 @@ def uploadAugmentationImage():
         image.save("src/"+path)
         return make_response(jsonify({'message': 'Uploaded image successfully', 'path': path}), 200)
 
-
+# route to apply the selected augmentations on the dataset
 @app.route("/augmentations/savechanges", methods=["POST"])
 def applyAugmentations():
     if request.method == 'POST':
@@ -111,11 +121,13 @@ def applyAugmentations():
         path_gtsrb = app.config["DATA_PATH"] + "dataset/GTSRB/train/"
         path_self = app.config["DATA_PATH"] + "dataset/New/Train/"
         for i in classes:
-            saveAugmentedImages(i, path_gtsrb + str(i).rjust(4, '0'), auglist, percentage)
+            saveAugmentedImages(
+                i, path_gtsrb + str(i).rjust(4, '0'), auglist, percentage)
             saveAugmentedImages(i, path_self + str(i), auglist, percentage)
         return redirect("/augmentations")
 
 
+# getting data from the dataset folder to show on the bar graph UI
 @app.route("/dataset", methods=["GET", "POST"])
 def datasetStatistics():
     base_path = app.config["DATA_PATH"] + "dataset/"
@@ -138,46 +150,72 @@ def datasetStatistics():
     #val_set (GTSRB)
     val_path_GTSRB = os.path.join(base_path_GTSRB, "valid/")
     val_class_dist_gtsrb = []
-    for i in range(len(orig_classes)) :
-        folder = "{:04d}".format(i) 
-        path = val_path_GTSRB + folder + "/GT-" + folder + ".csv"
-        if os.path.exists(path) :
-            with open(path, 'r') as csv_file:
-                csvreader = csv.reader(csv_file, delimiter=';')
-                row_count = sum(1 for row in csvreader)
-                val_class_dist_gtsrb.insert(i,(row_count-1))
-        else :
-            val_class_dist_gtsrb.insert(i, 0)
-    #test_set (GTSRB)
-    test_path_GTSRB = os.path.join(base_path_GTSRB, "test/")
-    test_class_dist_gtsrb = [0] * len(orig_classes) 
-    path = test_path_GTSRB + "GT-Test.csv"
-    with open(path, 'r') as csv_file:
-        csvreader = csv.reader(csv_file, delimiter=';')
-        next(csvreader)
-        for row in csvreader: 
-            test_class_dist_gtsrb[int(row[1])] += 1
-
-    #Extra
-    base_path_Extra = os.path.join(base_path, "EXTRA/")
-    # train_set (EXTRA)
-    train_path_Extra = os.path.join(base_path_Extra, "train/")
-    train_class_dist_extra = []
-    for i in range(0, len(orig_classes) + len(self_classes)):
+    for i in range(len(orig_classes)):
         folder = "{:04d}".format(i)
-        path = train_path_Extra + folder + "/GT-" + folder + ".csv"
+        path = val_path_GTSRB + folder + "/GT-" + folder + ".csv"
         if os.path.exists(path):
             with open(path, 'r') as csv_file:
                 csvreader = csv.reader(csv_file, delimiter=';')
                 row_count = sum(1 for row in csvreader)
-                train_class_dist_extra.insert(i, (row_count-1))
+                val_class_dist_gtsrb.insert(i, (row_count-1))
+        else:
+            val_class_dist_gtsrb.insert(i, 0)
+    #test_set (GTSRB)
+    test_path_GTSRB = os.path.join(base_path_GTSRB, "test/")
+    test_class_dist_gtsrb = [0] * len(orig_classes)
+    path = test_path_GTSRB + "GT-Test.csv"
+    with open(path, 'r') as csv_file:
+        csvreader = csv.reader(csv_file, delimiter=';')
+        next(csvreader)
+        for row in csvreader:
+            test_class_dist_gtsrb[int(row[1])] += 1
+
+    # Extra
+    base_path_Extra = os.path.join(base_path, "New/")
+    # train_set (EXTRA)
+    train_path_Extra = os.path.join(base_path_Extra, "Train/")
+    train_class_dist_extra = []
+    for i in range(0, len(orig_classes) + len(self_classes)):
+        folder = "{:04d}".format(i)
+        path = train_path_Extra + folder
+        if os.path.exists(path):
+            train_class_dist_extra.insert(i, len(next(os.walk(path))[2]))
         else:
             train_class_dist_extra.insert(i, 0)
-
+    # val_set (EXTRA)
+    val_path_Extra = os.path.join(base_path_Extra, "Valid/")
     val_class_dist_extra = []
-    test_class_dist_extra = []
+    for i in range(0, len(orig_classes) + len(self_classes)):
+        folder = "{:04d}".format(i)
+        path = val_path_Extra + folder
+        if os.path.exists(path):
+            val_class_dist_extra.insert(i, len(next(os.walk(path))[2]))
+        else:
+            val_class_dist_extra.insert(i, 0)
 
-    return render_template("dataset.html", orig_classes_count=len(orig_classes), self_classes_count=len(self_classes), train_class_dist_gtsrb = train_class_dist_gtsrb, train_class_dist_extra = train_class_dist_extra, count_org = sum(train_class_dist_gtsrb), count_new = sum(train_class_dist_extra), val_class_dist_gtsrb = val_class_dist_gtsrb, val_class_dist_extra = val_class_dist_extra, test_class_dist_gtsrb = test_class_dist_gtsrb, test_class_dist_extra = test_class_dist_extra,)
+    # test_set (EXTRA)
+    test_path_Extra = os.path.join(base_path_Extra, "Test/")
+    test_class_dist_extra = []
+    for i in range(0, len(orig_classes) + len(self_classes)):
+        folder = "{:04d}".format(i)
+        path = test_path_Extra + folder
+        if os.path.exists(path):
+            test_class_dist_extra.insert(i, len(next(os.walk(path))[2]))
+        else:
+            test_class_dist_extra.insert(i, 0)
+
+    #temporary random data generation
+    #to be removed############################
+    # for i in range(0, len(orig_classes) + len(self_classes)):
+    #     val_class_dist_extra.insert(i, random.randint(0,200))
+    #     test_class_dist_extra.insert(i, random.randint(0,200))
+    #     if i < len(orig_classes):
+    #         train_class_dist_extra.insert(i, 1800-train_class_dist_gtsrb[i] + random.randint(0,150) )
+    #     else:
+    #         train_class_dist_extra.insert(i, 1500 + random.randint(0,300))
+    ############################
+
+    return render_template("dataset.html", orig_classes_count=len(orig_classes), self_classes_count=len(self_classes), train_class_dist_gtsrb=train_class_dist_gtsrb, train_class_dist_extra=train_class_dist_extra, count_org=sum(train_class_dist_gtsrb), count_new=sum(train_class_dist_extra), val_class_dist_gtsrb=val_class_dist_gtsrb, val_class_dist_extra=val_class_dist_extra, test_class_dist_gtsrb=test_class_dist_gtsrb, test_class_dist_extra=test_class_dist_extra,)
 
 
 @app.route("/training", methods=["GET", "POST"])
@@ -193,6 +231,10 @@ def trainModel():
 
 @app.route("/training/train", methods=["POST"])
 def ModelTraindata():
+    """
+    Trains the model according to the parameters set by the user in Train and Test page. 
+    Saves the new configuration file
+    """
     data = request.get_json()
     with open(app.config["DATA_PATH"] + "/config/params.json") as json_file:
         default_configs = json.load(json_file)
@@ -209,7 +251,7 @@ def ModelTraindata():
         json.dump(default_configs, outfile)
 
     shutil.move(os.path.join(app.config["DATA_PATH"], "dataset/EXTRA"),
-              os.path.join(app.config["DATA_PATH"], "dataset/EXTRA_copy"))
+                os.path.join(app.config["DATA_PATH"], "dataset/EXTRA_copy"))
     remake_EXTRA_folder(
         0, 0, new_classes=default_configs["experiment"]["class_ids"])
     remake_EXTRA_folder(
@@ -219,21 +261,21 @@ def ModelTraindata():
     train.train("temp_config")
     shutil.rmtree(app.config["DATA_PATH"] + "dataset/EXTRA")
     shutil.move(os.path.join(app.config["DATA_PATH"], "dataset/EXTRA_copy"),
-              os.path.join(app.config["DATA_PATH"], "dataset/EXTRA"))
+                os.path.join(app.config["DATA_PATH"], "dataset/EXTRA"))
 
     check = True
-    ###############
     if check:
         return make_response(jsonify({"message": "Model Trained Successfuly! Check Visualise tab and results tab for more info."}), 200)
     else:
         return make_response(jsonify({"error": "Something is Wrong. Try Again!"}), 400)
 
 
+# visualise tab
 @app.route("/visualise", methods=["GET", "POST"])
 def visualiseModel():
     return render_template("visualise.html")
 
-
+# netron page to be loaded as an iframe in visuale tab
 @app.route("/netron", methods=["GET", "POST"])
 def Model():
     return render_template("netron.html")
@@ -252,15 +294,15 @@ def uploadValidationImages():
         images = []
         for i in range(cnt):
             images.append(request.files[f'file{i}'])
+        
+        msg = ""
+        code = 200
         if upload_images("Valid", images, "", classId):
-            print("uploaded successfully")
+            msg = 'Uploaded images successfully'
         else:
-            print("failed to upload")
-        # images = request.files['files']
-        # print(images)
-        # path = "/static/images/temps/upload_aug.png"
-        # image.save("src/"+path)
-        return make_response(jsonify({'message': 'Uploaded images successfully'}), 200)
+            msg = 'Failed to upload images'
+            code = 400
+        return make_response(jsonify({'message': msg}), code)
 
 
 @app.route("/validation/segregation", methods=["POST"])
@@ -272,19 +314,36 @@ def smartSegregation():
         return make_response(jsonify({'message': 'Uploaded images successfully'}), 200)
 
 
+# getting the  metrics and confusion matrix file from the data directory
 @app.route("/results", methods=["GET", "POST"])
 def viewResults():
     with open(app.config["JSON_PATH"] + "metrics.json") as json_file:
+        # metrics file
         data = json.load(json_file)
-    conf_arr = numpy.load(app.config["JSON_PATH"] + "confusion_matrix.npy")
-    num_class = numpy.shape(conf_arr)[0]
+    #confusion matrix
+    conf_arr = np.load(app.config["JSON_PATH"] + "confusion_matrix.npy")
+    num_class = np.shape(conf_arr)[0]
 
     return render_template("results.html", data=data, matrix=conf_arr, class_count=num_class)
 
-# helpers
 
+#HELPER FUNCTIONS
 
 def upload_images(dataset, file_list, class_name, classID=None):
+    """
+        Uploads the images of a particular class in of of the dataset (Train, Test, Valid) folder
+        Inputs:
+            dataset (string):
+                Name of the folder to add the images to
+            file_list (list):
+                list of image names
+            class_name (string):
+                Class to which the images belongs
+            class_ID (int):
+                ID of the class
+        Output (bool):
+            Returns a True if successfully saved the images. Else, returns False 
+    """
     try:
         class_id = classID
         if class_id is None:
@@ -313,6 +372,17 @@ def upload_images(dataset, file_list, class_name, classID=None):
 
 
 def delete_classes(class_list, folders=["Train", "Test", "Valid"]):
+    """
+    Deletes the class(es) in the SELF_CLASSES.json file and dataset, according to 
+    the folders in the folders list, and then prepares the EXTRA folder 
+    Inputs:
+        class_list (list):
+            List of class names to be deleted
+        folders:
+            List of folders from which the class(es) will be removed 
+    Output:
+        None
+    """
     for klass in class_list:
         class_id = get_index(self_classes, klass) + 43
         for folder in folders:
@@ -330,13 +400,15 @@ def delete_classes(class_list, folders=["Train", "Test", "Valid"]):
                         dataset_dir, str(int(dir)-1)))
         self_classes.remove(klass)
     save_self_classes_json()
-    # make the EXTRA folder again
     remake_EXTRA_folder(0, 0)
     remake_EXTRA_folder(0, 1)
     remake_EXTRA_folder(1, 0)
 
 
 def save_self_classes_json():
+    """
+    Saves the SELF_CLASSES.json file to /data/SELF_CLASSES.json
+    """
     temp_dict = {}
     temp_dict["SELF_CLASSES"] = self_classes
     with open(app.config["JSON_PATH"] + "SELF_CLASSES.json", "w") as outfile:
@@ -344,6 +416,16 @@ def save_self_classes_json():
 
 
 def get_index(class_list, class_name):
+    """
+    Given a list and an element, returns the index of the first match of the element in the list
+    Inputs:
+        class_list (list): 
+            List to search element in
+        class_name: 
+            Element to be searched
+    Output:
+        Index of first matched element. if not found, returns -1
+    """
     for i in range(0, len(class_list)):
         if class_list[i] == class_name:
             return i
@@ -351,6 +433,21 @@ def get_index(class_list, class_name):
 
 
 def remake_EXTRA_folder(val_fraction, test_fraction, new_classes=[]):
+    """
+    Prepares the the .csv files in EXTRA/train, EXTRA/test and(or) EXTRA/valid
+    folders according to the input validation fraction, test fraction, 
+    train fraction (1 - val_fraction - test_fraction) and classes to include
+    Inputs:
+        val_fraction (float)[0,1]: 
+            percentage of Train set to be used as Validation set.
+            Setting  it to 1 prepares Valid folder
+        test_fraction (int){0,1}: 
+            Setting  it to 1 prepares Test folder
+        new_classes (list)[string]:
+            Contains the classes which need to be prepared.
+    Outputs:
+       None
+    """
     extra_path = os.path.join(app.config["DATA_PATH"], "dataset/EXTRA/")
     new_path = os.path.join(app.config["DATA_PATH"], "dataset/New/")
     if val_fraction == 1:
@@ -359,8 +456,6 @@ def remake_EXTRA_folder(val_fraction, test_fraction, new_classes=[]):
         new_path += "Test/"
     else:
         new_path += "Train/"
-    # shutil.rmtree(extra_path)
-    # os.mkdir(extra_path)
     prepare_new_classes.prepare_train_val_n_test(
         new_path, extra_path, validation_fraction=val_fraction, test_fraction=test_fraction, new_classes=new_classes)
     return
