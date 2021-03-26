@@ -41,6 +41,21 @@ def root():
 def download_file(folder, filename):
     return send_from_directory("../" + app.config["MEDIA_FOLDER"] + folder + "/", filename, as_attachment=True)
 
+# route for asynchronous loading of newly added classes
+@app.route("/get_new_class", methods=["GET"])
+def get_new_class():
+    base_path = app.config["DATA_PATH"] + "dataset/New/Train/"
+    img_paths = []
+    for i in range(len(orig_classes), len(orig_classes) + len(self_classes)):
+        path = base_path + f'{i}'
+        if os.path.exists(path) == True:
+            if len(os.listdir(path)) != 0 :
+                random_file = random.choice(os.listdir(path))
+                class_name = self_classes[i-43]
+                temp = [f'{i}', random_file, class_name]
+                img_paths.append(temp)
+                
+    return make_response(jsonify({"img_paths": img_paths}),200)
 
 @app.route("/addimages", methods=["GET", "POST"])
 def addImages():
