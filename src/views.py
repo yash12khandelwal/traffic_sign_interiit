@@ -8,6 +8,7 @@ import csv
 import random
 import numpy as np
 import shutil
+import threading
 import sys
 sys.path.append("data/traffic_sign_interiit")
 from data.traffic_sign_interiit import train
@@ -214,11 +215,29 @@ def trainModel():
     models = os.listdir(app.config["DATA_PATH"] + "checkpoints/logs/")
     for model in models:
         for file in os.listdir(app.config["DATA_PATH"] + "checkpoints/logs/" + model):
-            if model in file:
+            if model in file and file!="params.pt" and file.endswith(".pt"):
                 pretrained_models.append(file)
     print(pretrained_models)
     return render_template("training.html", self_classes=self_classes, pretrained_models=pretrained_models)
 
+@app.route("/training/test", methods=["POST"])
+def ModelTestdata():
+    pt_model = request.get_json()["pre_trained_model"]
+    lst = pt_model.split('_')
+    name = lst[1]+"_"+lst[2]+"_"+lst[3][:-3]
+    print(name)
+    f = open(os.path.join("data/traffic_sign_interiit/", "checkpoints/logs/"+name+ "/" +name+"_test.txt"), "r+")
+    data = f.read()
+    data = data.split(' ')
+    return make_response(jsonify({"data": data}), 200)
+
+
+@app.route("/training/send_file", methods=["GET"])
+def SendTextFile():
+    f = open(os.path.join(app.config["DATA_PATH"], "dataset/TrainInfo.txt"), "r+")
+    data = f.read()
+    data = data.split(' ')
+    return make_response(jsonify({"perc": data}), 200)
 
 @app.route("/training/train", methods=["POST"])
 def ModelTraindata():
@@ -259,17 +278,33 @@ def ModelTraindata():
             0, 1, new_classes=default_configs["experiment"]["class_ids"], next_config = max_train)
         remake_EXTRA_folder(
             1, 0, new_classes=default_configs["experiment"]["class_ids"], next_config = max_train)
-        train.train(next_config, next_config=next_config)
+        
+        
+        t1 = threading.Thread(target=train.train, args=[next_config])
+        t1.start()
+        while t1.is_alive():
+            continue
+            # f = open(os.path.join(app.config["DATA_PATH"], "dataset/TrainInfo.txt"), "r+")
+            # if len(f.read()) != 0:
+                # print(len(f.read()))
+                # print("File: " + f.readline()[0:3])
+
+            # print(t1.is_alive())
+            # print("Main thread still executing")
+        # train.train(next_config)
     except KeyboardInterrupt:
         "Stopped Abruptly"
     finally:
+        print("finally")
+        f = open(os.path.join("data/traffic_sign_interiit/dataset/", "TrainInfo.txt"), "w+")
+        f.close()
         shutil.rmtree(app.config["DATA_PATH"] + "dataset/EXTRA")
         shutil.move(os.path.join(app.config["DATA_PATH"], "dataset/EXTRA_copy"),
                 os.path.join(app.config["DATA_PATH"], "dataset/EXTRA"))
 
     check = True
     if check:
-        return make_response(jsonify({"message": "Model Trained Successfuly!"}), 200)
+        return make_response(jsonify({"message": "Model Trained Successfuly! Saved as: "+ next_config +".pt. Reload to see it in test"}), 200)
     else:
         return make_response(jsonify({"error": "Something is Wrong. Try Again!"}), 400)
 

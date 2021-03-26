@@ -10,6 +10,7 @@ import numpy as np
 import os
 import datetime
 
+file_location = "data/traffic_sign_interiit/dataset/"
 
 def train_engine(args, trainloader, valloader, model, optimizer, scheduler=None, next_config=""):
     """
@@ -55,9 +56,14 @@ def train_engine(args, trainloader, valloader, model, optimizer, scheduler=None,
 
         print('-'*50)
         print('\nEpoch =', i)
-
+        j=1.00
         for (img, gt) in tqdm(trainloader):
-
+            
+            percentage = j/len(tqdm(trainloader))*100
+            f = open(os.path.join(file_location, "TrainInfo.txt"), "w+")
+            f.write(str(i+1) + " " + str(round(percentage, 3)) + " " + str(args.epochs))
+            f.close()
+            
             optimizer.zero_grad()
 
             img, gt = img.to(device), gt.to(device)
@@ -72,6 +78,7 @@ def train_engine(args, trainloader, valloader, model, optimizer, scheduler=None,
 
             loss.backward()
             optimizer.step()
+            j+=1
 
         if scheduler is not None:
             scheduler.step()
@@ -83,6 +90,9 @@ def train_engine(args, trainloader, valloader, model, optimizer, scheduler=None,
 
         print(f'Train Accuracy = {train_acc} %')
         print(f'Train loss = {train_loss}')
+        f = open(os.path.join(file_location, "TrainInfo.txt"), "w+")
+        f.write("TrainAccuracy " + str(round(train_acc, 3)) + " " + str(round(train_loss, 3)) + " " + str(args.epochs))
+        f.close()
 
         print('\nValidating ...')
         val_acc, val_loss, val_f1, val_cm, val_precision, val_recall = calc_acc_n_loss(
@@ -94,6 +104,10 @@ def train_engine(args, trainloader, valloader, model, optimizer, scheduler=None,
         print(f'Valid precision = {val_precision} %')
         print(f'Valid recall = {val_recall}')
         print('-'*50)
+
+        f = open(os.path.join(file_location, "TrainInfo.txt"), "w+")
+        f.write("Validating " + str(round(val_acc, 3)) + " " + str(round(val_loss, 3)) + " " + str(args.epochs))
+        f.close()
 
         if (i+1) % args.save_pred_every == 0:
 

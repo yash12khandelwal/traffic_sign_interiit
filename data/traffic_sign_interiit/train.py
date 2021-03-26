@@ -7,7 +7,9 @@ from utils.evaluate import calc_acc_n_loss
 from utils.utils import set_seed
 from utils.wandb_utils import init_wandb, wandb_save_summary
 
-def train(config_file="", next_config=""):
+root_dir = "data/traffic_sign_interiit/checkpoints/logs/"
+
+def train(config_file=""):
 
     opt = TrainOptions()
     args = opt.initialize(config_file=config_file)
@@ -38,7 +40,7 @@ def train(config_file="", next_config=""):
         init_wandb(net, args)
 
     train_engine(args=args, trainloader=trainloader,
-                valloader=valloader, model=net, optimizer=optimizer, scheduler=schedular, next_config=next_config)
+                valloader=valloader, model=net, optimizer=optimizer, scheduler=schedular, next_config=config_file)
 
     log_confusion = True if args['experiment'].wandb else False
     test_acc, test_loss,test_f1,cm,test_precision,test_recall = calc_acc_n_loss(args['experiment'], net, testloader, log_confusion)
@@ -48,6 +50,10 @@ def train(config_file="", next_config=""):
     print(f'F1 Score = {test_f1}')
     print(f'Test Precision = {test_precision}')
     print(f'Test Recall = {test_recall}')
+
+    f = open(root_dir + config_file + "/" + config_file+"_train.txt","w+")
+    f.write(str(round(test_acc, 3)) + " " + str(round(test_loss, 3)) + " " + str(round(test_f1, 3)) + " " + str(round(test_precision, 3)) + " " + str(round(test_recall, 3)))    
+    f.close()
 
     if args['experiment'].wandb:
         wandb_save_summary(test_acc=test_acc,test_f1=test_f1,test_precision=test_precision,test_recall=test_recall)

@@ -57,6 +57,7 @@
                 <select class="custom-select" required id="epochs">
                     <option value="" selected>Choose...</option>
                     <option value="1">1</option>
+                    <option value="2">2</option>
                     <option value="50">50</option>
                     <option value="100">100</option>
                     <option value="200">200</option>
@@ -68,12 +69,13 @@
                 </div>
                 <input type="number" name="lr" id="lr" placeholder=">0" class="form-control" min="0" value="0.01" step="0.01" required>
             </div>
+            
         </form>
     </div>
 </div>
 
 <div class="text-center">
-    <input type="submit" value="Train Model" onclick="submitform()" class="btn btn-success">
+    <input type="submit" value="Train Model" onclick="submitform()" onsubmit="" onclick="" class="btn btn-success">
     <div id="msg" class="mt-4"></div>
 </div>
 
@@ -89,7 +91,8 @@
             {% endfor %}
         </select>
         <div class="input-group-append">
-            <button class="btn btn-success" type="button">Test Model</button>
+            <button class="btn btn-success" type="button" onclick="test()">Test Model</button>
+            <div id="test_msg" class="mt-4"></div>
         </div>
     </div>
 </div>
@@ -109,12 +112,41 @@
 
 {% block scripts %}
 <script>
+    // document.onload(fetch_text_file())
     $("#training-sidebar").addClass('active');
 
+    window.onload = function fetch_text_file()
+    {
+        fetch('/training/send_file', {
+            method: 'GET',
+            credentials: "include",
+            cache: "no-cache",
+        })
+        .then(response => response.json().then(data => ({status: response.status, body: data})))
+        .then(result => {
+            console.log(result);
+            let msg = document.querySelector('#msg');
+            if(result.status != 200)
+            {
+                msg.innerHTML = result.body.error;
+                msg.style.color = "red";
+            }
+            else
+            {
+                if(result.body.perc.length==3)
+                {
+                    msg.innerHTML = "Epochs: "+ result.body.perc[0] + "/" + result.body.perc[2] + "<br>Percentage = " + result.body.perc[1] + "%";
+                    msg.style.color = "green";
+                }
+                
+            }
+        });
+        setTimeout(fetch_text_file, 3000)
+    }
 
     function submitform()
     {
-        msg.innerHTML = "Your model is training. Please wait."
+        msg.innerHTML = "Training is about to start. Please wait."
         var Obj = [];
         Obj[0] = document.querySelector('#Model');
         Obj[1] = document.querySelector('#batch_size');
@@ -186,6 +218,42 @@
                 msg.style.color = "green";
             }
         });
+    }
+
+    function test()
+    {
+        var drop_down = document.getElementById("test");
+        var model = drop_down.value;
+        fetch('training/test', {
+            method: 'POST',
+            credentials: "include",
+            body: JSON.stringify({
+                pre_trained_model: model,
+            }),
+            cache: "no-cache",
+            headers: new Headers(
+            {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            })
+        })
+        .then(response => response.json().then(data => ({status: response.status, body: data})))
+        .then(result => {
+            console.log(result);
+            let msg = document.querySelector('#msg');
+            if(result.status != 200)
+            {
+                msg.innerHTML = result.body.error;
+                msg.style.color = "red";
+            }
+            // else
+            // {
+            //     msg.innerHTML = result.body.message;
+            //     msg.style.color = "green";
+            // }
+        });
+
+
     }
 </script>
 {% endblock %}
