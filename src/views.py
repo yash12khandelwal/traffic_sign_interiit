@@ -68,11 +68,12 @@ def addImages():
     for i in range(len(orig_classes), len(orig_classes) + len(self_classes)):
         path = base_path + f'{i}'
         if os.path.exists(path):
-            #randomly choosing a img from a particular class folder
-            random_file = random.choice(os.listdir(path))
-            class_name = self_classes[i-43]
-            temp = [f'{i}', random_file, class_name]
-            img_paths.append(temp)
+            if len(os.listdir(path)) != 0 :
+                #randomly choosing a img from a particular class folder
+                random_file = random.choice(os.listdir(path))
+                class_name = self_classes[i-43]
+                temp = [f'{i}', random_file, class_name]
+                img_paths.append(temp)
 
     if request.method == 'POST':
         if request.form['submit_button'] == "Upload":
