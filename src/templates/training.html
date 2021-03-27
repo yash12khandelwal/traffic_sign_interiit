@@ -181,6 +181,12 @@
         </div>
     </div>    
 </div>
+<div style="display: none;" class="row" id="loader">
+    <div class="col-xl-12 col-md-12 mb-4">
+        <h5 class="text-center">Testing..</h5>
+    </div>
+</div>
+
 <div class="row">
     <div class="col-xl-6 col-md-6 mb-4">
         <div class="text-center hide mt-4" id="resultmsg">
@@ -372,7 +378,18 @@
 
     function test()
     {
+        $("#testImage").attr('src', "");
+        document.getElementById("riseImage").innerHTML = "";
+        var chart_div = document.getElementById("chart_div");
+        $("canvas#myBarChart").remove();
+        chart_div.innerHTML = `<canvas id="myBarChart" style="height: 300px;"></canvas>`;
+
+        document.getElementById("test_table").style.display = "none";
+        document.getElementById("loader").style.display = "block";
+        document.getElementById("chart").style.display = "none";
         document.getElementById("close_modal").click();
+        document.querySelector('#result').innerHTML = "";
+
         var drop_down = document.getElementById("test");
         var model = drop_down.value;
         fetch('training/test', {
@@ -399,6 +416,7 @@
             }
             else
             {
+                document.getElementById("loader").style.display = "none";
                 document.getElementById("test_table").style.display = "block";
                 var stuff = [
                     [
@@ -431,10 +449,11 @@
         var chart_div = document.getElementById("chart_div");
         $("canvas#myBarChart").remove();
         chart_div.innerHTML = `<canvas id="myBarChart" style="height: 300px;"></canvas>`;
-
+        document.getElementById("test_table").style.display = "none";
         document.getElementById("chart").style.display = "none";
         document.getElementById("close_modal").click();
-        document.getElementById("result").innerHTML = "Loading.."
+        document.getElementById("loader").style.display = "block";
+        document.querySelector('#result').innerHTML = "";
 
         var drop_down = document.getElementById("test");
         var model = drop_down.value;
@@ -454,6 +473,7 @@
                 console.log(result);
                 let msg = document.querySelector('#resultmsg');
                 resultp = document.querySelector('#result');
+                document.getElementById("loader").style.display = "none";
                 $("#testImage").attr('src', "static/images/temps/upload_test.png?" + new Date().getTime());
                 document.getElementById("riseImage").innerHTML = `<figure class="figure">
                     <img src="static/images/temps/rise.jpg?${new Date().getTime()}" class="figure-img img-fluid border rounded" id="risemap" style="width: 200px; max-height: 200px">
