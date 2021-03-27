@@ -85,6 +85,15 @@
             </div>
             
         </form>
+        <div class="toast" data-delay="5000" style="top: 5px; right: 15px;">
+            <div class="toast-header">
+                <strong class="mr-auto text-danger">Form Submission Error</strong>
+                <button type="button" class="ml-2 mb-1 close" data-dismiss="toast">&times;</button>
+            </div>
+            <div class="toast-body">
+        
+            </div>
+        </div>
     </div>
 </div>
 
@@ -127,7 +136,9 @@
     <div class="col-xl-6 col-lg-6">
         <div id="msg" class="mt-4"></div>
     </div>
+    <br>
 </div>
+<br>
 <div class="row">
     <div class="col-xl-12">
         <h2>Test Model</h2>
@@ -173,18 +184,6 @@
             <img class="figure-img img-fluid border rounded" id="testImage" alt="Card image cap" style="width: 200px; max-height: 200px">
             <figcaption id="result" class="figure-caption text-center "></figcaption>
         </figure>
-    </div>
-</div>
-
-
- 
-<div class="toast" data-delay="5000" style="position: absolute; bottom: 15px; right: 15px;">
-    <div class="toast-header">
-        <strong class="mr-auto text-danger">Form Submission Error</strong>
-        <button type="button" class="ml-2 mb-1 close" data-dismiss="toast">&times;</button>
-    </div>
-    <div class="toast-body">
-
     </div>
 </div>
 
@@ -271,7 +270,6 @@
 
     function submitform()
     {
-        msg.innerHTML = "Training is about to start. Please wait."
         var Obj = [];
         Obj[0] = document.querySelector('#Model');
         Obj[1] = document.querySelector('#batch_size');
@@ -310,6 +308,7 @@
         }
         document.querySelector("#classes").classList.remove("border-danger");
 
+        msg.innerHTML = "Training is about to start. Please wait."
         fetch('/training/train', {
             method: 'POST',
             credentials: "include",
