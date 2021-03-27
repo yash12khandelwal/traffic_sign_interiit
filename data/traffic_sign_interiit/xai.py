@@ -45,7 +45,7 @@ def rise(model1, dataloader, num_classes, cl, save_path, image_size=(48, 48), de
     explainer = RISEBatch(model1, image_size, gpu_batch=20)
 
     #Create the masks once, and save them. For later use, simply load the masks.
-    explainer.generate_masks(N = 4000, s= 8, p1 = 0.1, savepath = 'masks.npy')
+    # explainer.generate_masks(N = 4000, s= 8, p1 = 0.1, savepath = 'masks.npy')
     explainer.load_masks('masks.npy')
     
     for data in tqdm(dataloader):
