@@ -379,10 +379,13 @@
     }
 
     $("#uploadTestImage").on('change', function () {
+        var drop_down = document.getElementById("test");
+        var model = drop_down.value;
         filelist = $(this)[0].files;
         if (filelist.length > 0) {
             data = new FormData();
             data.append('file', filelist[0]);
+            data.append('model_name', model);
             fetch('/testmodel/uploadimage', {
                 method: 'POST',
                 credentials: "include",
@@ -394,6 +397,7 @@
                     console.log(result);
                     let msg = document.querySelector('#resultmsg');
                     resultp = document.querySelector('#result');
+                    $("#testImage").attr('src', "static/images/temps/upload_test.png");
                     resultp.innerHTML = `*${result.body.message}`;
                     if (result.status != 200) {
                         msg.innerHTML = `*${result.body.error}`;
@@ -401,7 +405,6 @@
                     }
                 });
             $(this).val(null);
-            $("#testImage").attr('src', 'static/images/temps/upload_test.png');
             $("#resultmsg").removeClass("hide");
             $("#resultmsg").addClass("disp");
         }

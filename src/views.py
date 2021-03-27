@@ -546,7 +546,13 @@ def saveAugmentedImages(classID, path, auglist, percentage):
 @app.route("/testmodel/uploadimage", methods=["POST"])
 def uploadTestImage():
     if request.method == 'POST':
-        image = request.files['file']
-        path = "/static/images/temps/upload_test.png"
-        image.save("src/"+path)
-        return make_response(jsonify({'message': 'Uploaded image successfully', 'path': path}), 200)
+        data  = request.form.get('model_name')
+        print(data)
+        image1 = request.files['file']
+        image2 = request.files['file']
+        path1 = os.path.join(app.config["DATA_PATH"] + "dataset/New_Test/upload_test.png")
+        path2 = "src/static/images/temps/upload_test.png"
+        image1.save(path1)
+        shutil.copy(path1, path2)
+        
+        return make_response(jsonify({'message': 'Uploaded image successfully', 'path': path2}), 200)

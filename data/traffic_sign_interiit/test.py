@@ -7,7 +7,7 @@ from utils.evaluate import calc_acc_n_loss
 from utils.wandb_utils import init_wandb, wandb_save_summary
 import wandb
 
-if __name__ == "__main__":
+def test():
 
     opts = TrainOptions()
     args = opts.initialize()
