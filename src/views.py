@@ -547,9 +547,12 @@ def uploadTestImage():
         data  = request.form.get('model_name')
         image1 = request.files['file']
         path1 = os.path.join(app.config["DATA_PATH"] + "dataset/New_Test/upload_test.png")
-        path2 = "src/static/images/temps/upload_test.png"
+        path2 = "src/static/images/temps/upload_test.jpg"
+        path3 = os.path.join(app.config["DATA_PATH"] + "dataset/New_Test/rise.png")
+        path4 = "src/static/images/temps/rise.jpg"
         image1.save(path1)
         shutil.copy(path1, path2)
+        shutil.copy(path3, path4)
         lst = data.split("_")
         config_name = lst[1]+ "_" + lst[2]+ "_" + lst[3][:-3]
         
