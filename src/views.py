@@ -573,7 +573,6 @@ def uploadTestImage():
         shutil.copy(path3, path4)
         bar_graph = histo.cpu().detach().numpy()
         bar_graph = bar_graph.tolist()
-        print(bar_graph)
         index = class_ids[out]
         all_classes = orig_classes + self_classes
         classname = all_classes[index]
