@@ -573,4 +573,9 @@ def uploadTestImage():
         index = class_ids[out]
         all_classes = orig_classes + self_classes
         classname = all_classes[index]
-        return make_response(jsonify({'message': classname, 'path': path2, 'data': bar_graph}), 200)
+
+        display_class=[]
+        for index in class_ids:
+            display_class.append(all_classes[index])
+
+        return make_response(jsonify({'message': classname, 'path': path2, 'data': bar_graph, 'classes': display_class}), 200)

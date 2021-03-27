@@ -466,11 +466,10 @@
                 resultp.innerHTML = `The predicted class is ${result.body.message}`;
                 console.log(result.body.data[0].length);
                 document.getElementById("chart").style.display = "block";
-                var class_ids = [];
+                var class_ids = result.body.classes;
                 var sum= 0;
                 for(var i=0; i<result.body.data[0].length; i++)
                 {
-                    class_ids.push(i);
                     result.body.data[0][i] = Math.exp(result.body.data[0][i]);
                     sum += result.body.data[0][i];
                 }
