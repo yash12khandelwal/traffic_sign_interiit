@@ -540,3 +540,13 @@ def saveAugmentedImages(classID, path, auglist, percentage):
 
         image_list.clear()
         image_names.clear()
+
+
+# route to upload an image for testing augmentations on
+@app.route("/testmodel/uploadimage", methods=["POST"])
+def uploadTestImage():
+    if request.method == 'POST':
+        image = request.files['file']
+        path = "/static/images/temps/upload_test.png"
+        image.save("src/"+path)
+        return make_response(jsonify({'message': 'Uploaded image successfully', 'path': path}), 200)
