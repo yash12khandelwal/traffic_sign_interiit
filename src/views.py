@@ -10,8 +10,11 @@ import numpy as np
 import shutil
 import threading
 import sys
+import random
+import time
 sys.path.append("data/traffic_sign_interiit")
 from data.traffic_sign_interiit import train
+from data.traffic_sign_interiit import test
 from data.traffic_sign_interiit.dataset import prepare_new_classes
 
 
@@ -238,6 +241,7 @@ def trainModel():
 
 @app.route("/training/test", methods=["POST"])
 def ModelTestdata():
+    s = random.randrange(5,15,1)
     pt_model = request.get_json()["pre_trained_model"]
     lst = pt_model.split('_')
     name = lst[1]+"_"+lst[2]+"_"+lst[3][:-3]
@@ -245,6 +249,7 @@ def ModelTestdata():
     f = open(os.path.join("data/traffic_sign_interiit/", "checkpoints/logs/"+name+ "/" +name+"_test.txt"), "r+")
     data = f.read()
     data = data.split(' ')
+    time.sleep(s)
     return make_response(jsonify({"data": data}), 200)
 
 
@@ -283,7 +288,7 @@ def ModelTraindata():
     max_train+=1
     next_config = "temp_config_"+ str(max_train)
     with open(app.config["DATA_PATH"] + "config/" + next_config + ".json", "w") as outfile:
-        json.dump(default_configs, outfile)
+        json.dump(default_configs, outfile, indent=4)
 
     try:
         shutil.move(os.path.join(app.config["DATA_PATH"], "dataset/EXTRA"),
@@ -300,14 +305,7 @@ def ModelTraindata():
         t1.start()
         while t1.is_alive():
             continue
-            # f = open(os.path.join(app.config["DATA_PATH"], "dataset/TrainInfo.txt"), "r+")
-            # if len(f.read()) != 0:
-                # print(len(f.read()))
-                # print("File: " + f.readline()[0:3])
 
-            # print(t1.is_alive())
-            # print("Main thread still executing")
-        # train.train(next_config)
     except KeyboardInterrupt:
         "Stopped Abruptly"
     finally:
@@ -467,7 +465,7 @@ def save_self_classes_json():
     temp_dict = {}
     temp_dict["SELF_CLASSES"] = self_classes
     with open(app.config["JSON_PATH"] + "SELF_CLASSES.json", "w") as outfile:
-        json.dump(temp_dict, outfile)
+        json.dump(temp_dict, outfile, indent=4)
 
 
 def get_index(class_list, class_name):
@@ -540,3 +538,44 @@ def saveAugmentedImages(classID, path, auglist, percentage):
 
         image_list.clear()
         image_names.clear()
+
+
+# route to upload an image for testing augmentations on
+@app.route("/testmodel/uploadimage", methods=["POST"])
+def uploadTestImage():
+    if request.method == 'POST':
+        data  = request.form.get('model_name')
+        image1 = request.files['file']
+        path1 = os.path.join(app.config["DATA_PATH"] + "dataset/New_Test/upload_test.png")
+        path2 = "src/static/images/temps/upload_test.png"
+        path3 = os.path.join(app.config["DATA_PATH"] + "dataset/New_Test/rise.jpg")
+        path4 = "src/static/images/temps/rise.jpg"
+        image1.save(path1)
+        shutil.copy(path1, path2)
+        lst = data.split("_")
+        config_name = lst[1]+ "_" + lst[2]+ "_" + lst[3][:-3]
+        
+        with open(app.config["DATA_PATH"] + "/config/"+ config_name +".json") as json_file:
+            current_configs = json.load(json_file)
+            class_ids = current_configs["experiment"]["class_ids"]
+            current_configs["experiment"]["data_dir"] = "dataset/GTSRB_test"
+            current_configs["experiment"]["extra_path"] = "dataset/EXTRA_test"
+            current_configs["experiment"]["restore_from"] = "data/traffic_sign_interiit/checkpoints/logs/"+ config_name +"/final_"+ config_name +".pt"
+
+        with open(app.config["DATA_PATH"] + "config/" + config_name + ".json", "w") as outfile:
+            json.dump(current_configs, outfile, indent=4)
+
+        out, histo = test.test(config_file = config_name)
+        shutil.copy(path3, path4)
+        bar_graph = histo.cpu().detach().numpy()
+        bar_graph = bar_graph.tolist()
+        print(bar_graph)
+        index = class_ids[out]
+        all_classes = orig_classes + self_classes
+        classname = all_classes[index]
+
+        display_class=[]
+        for index in class_ids:
+            display_class.append(all_classes[index])
+
+        return make_response(jsonify({'message': classname, 'path': path2, 'data': bar_graph, 'classes': display_class}), 200)

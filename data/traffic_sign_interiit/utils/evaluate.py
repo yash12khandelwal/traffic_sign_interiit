@@ -59,3 +59,44 @@ def calc_acc_n_loss(args, model, loader, log_matrix=False):
     acc = sum(1 for x, y in zip(y_true, y_pred) if x == y) * 100 / len(y_true)
 
     return acc, (loss/len(loader)), f1, cm, precision, recall
+
+def calc_acc_n_loss_2(args, model, loader, log_matrix=False):
+    """ 
+    Function to calculate the Accuracy and Loss given a loader
+
+    Args:
+        args (TrainOptions): TrainOptions class (refer options/train_options.py)
+        model (Torch Model): Current model object to evaluate
+        loader (DataLoader): DataLoader for dataset
+        log_matrix   (bool): Whether to log confusion matrix
+
+    Returns:
+        tuple: (Model Accuracy, Model Loss, F1 Score, Confusion Matrix, Precision, Recall)
+    """
+
+    print("In func")
+    model.eval()
+
+    device = args.device
+
+    y_pred = []
+    y_true = []
+
+    criterion = nn.CrossEntropyLoss()
+    loss = 0
+
+    print("Before for")
+    print(loader)
+    for img, gt in tqdm(loader):
+        print("In for")
+        img = img.to(device)
+        gt = gt.to(device)
+
+        out = model(img)
+        loss += criterion(out, gt).item()
+        histo = out
+        out = torch.argmax(out, dim=-1).cpu().detach().numpy()[0]
+
+    print("out = "*5)
+    print(out)
+    return out, histo

@@ -1,16 +1,39 @@
 import torch
+import argparse
 from model.micronet import MicroNet
 from data.gtsrb_loader import GTSRB, get_loader
 from utils.utils import set_seed
 from options.train_options import *
-from utils.evaluate import calc_acc_n_loss
+from utils.evaluate import calc_acc_n_loss, calc_acc_n_loss_2
 from utils.wandb_utils import init_wandb, wandb_save_summary
 import wandb
+import argparse
+import sys, math
+import os
+import matplotlib.pyplot as plt 
+import torch 
+import numpy as np
+from skimage.transform import resize
+import model
+from options.train_options import *
+from data.gtsrb_loader import GTSRB, get_loader
+from utils.trainer import train_engine
+from utils.evaluate import calc_acc_n_loss
+from utils.utils import set_seed
+from utils.wandb_utils import init_wandb, wandb_save_summary
+from RISE.evaluation import CausalMetric, auc, gkern
+from RISE.explanations import RISEBatch
+from tqdm import tqdm
+import csv
+from PIL import Image 
+import matplotlib as mpl
+import csv
+import xai
 
-if __name__ == "__main__":
+def test(config_file=""):
 
     opts = TrainOptions()
-    args = opts.initialize()
+    args = opts.initialize(config_file)
 
     set_seed(int(args['experiment'].seed))
 
@@ -29,15 +52,9 @@ if __name__ == "__main__":
     testloader = get_loader(args, test_dataset)
 
     log_confusion = True if args['experiment'].wandb else False
-    acc, loss, f1, cm, precision, recall = calc_acc_n_loss(args['experiment'], model, testloader, log_matrix=log_confusion)
+    out, histo= calc_acc_n_loss_2(args['experiment'], model, testloader, log_matrix=log_confusion)
 
-    print(f'Test Accuracy: {acc}')
-    print(f'F1 Score: {f1}')
-    print(f'Precision Score: {precision}')
-    print(f'Recall Score: {recall}')
+    xai.rise(model, testloader, args["experiment"].num_classes, out, "data/traffic_sign_interiit/dataset/New_Test/")
 
-    if args['experiment'].wandb:
-        wandb.run.summary['test_accuracy'] = acc
-        wandb.run.summary["test_f1"] = f1*100
-        wandb.run.summary["test_precision"] = precision*100
-        wandb.run.summary["test_recall"] = recall*100
+    return out, histo
+

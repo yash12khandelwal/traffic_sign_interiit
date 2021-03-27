@@ -99,7 +99,7 @@ def get_test_tuple(test_path, extra_test_path=None):
             test_ids.append(int(row[1]))
 
     if extra_test_path is not None:
-        extra_test_csv = osp.join(extra_test_path, 'GT-Test.csv')
+        extra_test_csv = osp.join(root_dir, osp.join(extra_test_path, 'GT-Test.csv'))
 
         with open(extra_test_csv) as f:
             reader = csv.reader(f, delimiter=';')
@@ -162,7 +162,6 @@ class GTSRB(Dataset):
         Returns:
             TorchTensor: Transformed Tensor
         """
-
         image = cv2.resize(image, self.size)
         trans = transforms.Compose([
             transforms.ToTensor(),
@@ -188,7 +187,7 @@ class GTSRB(Dataset):
             tuple: (Image, Ground Truth) for a setname
         """
 
-        img = cv2.imread(root_dir + self.imgs[idx], 1)
+        img = cv2.imread(osp.join(root_dir, self.imgs[idx]), 1)
         gt = self.ids[idx]
 
         img = self.transform(img)
