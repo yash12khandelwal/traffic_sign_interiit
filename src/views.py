@@ -566,8 +566,9 @@ def uploadTestImage():
         out, histo = test.test(config_file = config_name)
         
         bar_graph = histo.cpu().detach().numpy()
+        bar_graph = bar_graph.tolist()
         print(bar_graph)
         index = class_ids[out]
         all_classes = orig_classes + self_classes
         classname = all_classes[index]
-        return make_response(jsonify({'message': 'The predicted class is ' + classname, 'path': path2}), 200)
+        return make_response(jsonify({'message': 'The predicted class is ' + classname, 'path': path2, 'data': bar_graph}), 200)

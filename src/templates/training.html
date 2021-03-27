@@ -139,6 +139,7 @@
     <br>
 </div>
 <br>
+<hr>
 <div class="row">
     <div class="col-xl-12">
         <h2>Test Model</h2>
@@ -187,6 +188,17 @@
     </div>
 </div>
 
+<div class="card shadow" style="display: none;" id="chart">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">Classification</h6>
+    </div>
+    <div class="card-body">
+        <div class="chart-bar">
+            <canvas id="myBarChart" style="height: 300px;"></canvas>
+        </div>
+    </div>
+</div>
+
 <div id="test_table" style="display: none;" class="card shadow mb-4">
     <div class="card-body">
         <div class="table-responsive">
@@ -206,9 +218,12 @@
     </div>
 </div>
 
+
 {% endblock %}
 
 {% block scripts %}
+<script src="{{ url_for('static', filename='js/coreui-chartjs.bundle.js') }}"></script>
+<script src="{{ url_for('static', filename='vendor/chart.js/Chart.min.js') }}"></script>
 <script src="{{ url_for('static', filename='vendor/datatables/jquery.dataTables.min.js') }}"></script>
 <script>
     // document.onload(fetch_text_file())
@@ -240,7 +255,8 @@
             {
                 if(result.body.perc.length==3)
                 {
-                    msg.innerHTML = "Epochs: "+ result.body.perc[0] + "/" + result.body.perc[2] + "<br>Percentage = " + result.body.perc[1] + "%";
+                    msg.innerHTML = `<span class="text-primary font-weight-bold">Epochs: </span>`+ result.body.perc[0] + "/" + result.body.perc[2] + `<br><br> <div class="progress bg-dark">
+                    <div class="progress-bar bg-success" role="progressbar" style="width: 25%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">${result.body.perc[1]}%</div></div>`;
                     msg.style.color = "green";
                 }
                 else if(result.body.perc.length==4)
@@ -401,6 +417,7 @@
     $("#uploadTestImage").on('change', function () {
 
         $("#testImage").attr('src', "");
+        document.getElementById("chart").style.display = "none";
         document.getElementById("close_modal").click();
         document.getElementById("result").innerHTML = "Loading.."
         var drop_down = document.getElementById("test");
@@ -416,18 +433,94 @@
                 body: data,
                 cache: "no-cache",
             })
-                .then(response => response.json().then(data => ({ status: response.status, body: data })))
-                .then(result => {
-                    console.log(result);
-                    let msg = document.querySelector('#resultmsg');
-                    resultp = document.querySelector('#result');
-                    $("#testImage").attr('src', "static/images/temps/upload_test.png?" + new Date().getTime());
-                    resultp.innerHTML = `*${result.body.message}`;
-                    if (result.status != 200) {
-                        msg.innerHTML = `*${result.body.error}`;
-                        msg.style.color = "red";
+            .then(response => response.json().then(data => ({ status: response.status, body: data })))
+            .then(result => {
+                console.log(result);
+                let msg = document.querySelector('#resultmsg');
+                resultp = document.querySelector('#result');
+                $("#testImage").attr('src', "static/images/temps/upload_test.png?" + new Date().getTime());
+                if (result.status != 200) {
+                    msg.innerHTML = `*${result.body.error}`;
+                    msg.style.color = "red";
+                }
+                resultp.innerHTML = `*${result.body.message}`;
+                console.log(result.body.data[0].length);
+                document.getElementById("chart").style.display = "block";
+                var class_ids = [];
+                var sum= 0;
+                for(var i=0; i<result.body.data[0].length; i++)
+                {
+                    class_ids.push(i);
+                    result.body.data[0][i] = Math.exp(result.body.data[0][i]);
+                    sum += result.body.data[0][i];
+                }
+                console.log(sum);
+
+                var ctx = document.getElementById("myBarChart").getContext("2d");
+                var stackedBar = new Chart(ctx,{
+                    type: 'bar',
+                    data: {
+                        labels: class_ids,
+                        datasets: [{
+                            label: "Probability",
+                            backgroundColor: "#1d8cf8", // blue color
+                            hoverBackgroundColor: "#2e59d9",
+                            maxBarThickness: 10,
+                            data: result.body.data[0],
+                        }],
+                    },
+                    options: {
+                        maintainAspectRatio: false,
+                        layout: {
+                            padding: {
+                                left: 10,
+                                right: 25,
+                                top: 25,
+                                bottom: 0
+                            }
+                        },
+                        scales: {
+                            xAxes: [{
+                                stacked : false,
+                                gridLines: {
+                                    display: true,
+                                    drawBorder: true
+                                },
+                                ticks: {
+                                    maxTicksLimit: 55
+                                }
+                            }],
+                            yAxes: [{
+                                stacked : false,
+                                ticks: {
+                                    min: 0,
+                                    max: 1,
+                                    maxTicksLimit: 10,
+                                    padding: 10,
+                                },
+                                gridLines: {
+                                    color: "rgb(234, 236, 244)",
+                                    zeroLineColor: "rgb(234, 236, 244)",
+                                    drawBorder: true,
+                                    borderDash: [2],
+                                    zeroLineBorderDash: [2]
+                                }
+                            }],
+                        },
+                        legend: {
+                            display: true
+                        },
+                        tooltips: {
+                            titleFontSize: 14,
+                            xPadding: 15,
+                            yPadding: 15,
+                            displayColors: false,
+                            caretPadding: 10,
+                        },
                     }
                 });
+                
+            });
             $(this).val(null);
             $("#resultmsg").removeClass("hide");
             $("#resultmsg").addClass("disp");
