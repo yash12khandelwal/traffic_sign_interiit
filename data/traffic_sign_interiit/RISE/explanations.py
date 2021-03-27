@@ -31,13 +31,13 @@ class RISE(nn.Module):
         self.masks = self.masks.reshape(-1, 1, *self.input_size)
         np.save(savepath, self.masks)
         self.masks = torch.from_numpy(self.masks).float()
-        self.masks = self.masks.cuda()
+        self.masks = self.masks
         self.N = N
         self.p1 = p1
 
     def load_masks(self, filepath):
         self.masks = np.load(filepath)
-        self.masks = torch.from_numpy(self.masks).float().cuda()
+        self.masks = torch.from_numpy(self.masks).float()
         self.N = self.masks.shape[0]
         self.p1 = 0.1
 
@@ -94,14 +94,14 @@ class RISEBatch(RISE):
 #     # Get all predicted labels first
 #     target = np.empty(total, 'int64')
 #     for i, (imgs, _) in enumerate(tqdm(data_loader, total=n_batch, desc='Predicting labels')):
-#         p, c = torch.max(nn.Softmax(1)(explainer.model(imgs.cuda())), dim=1)
+#         p, c = torch.max(nn.Softmax(1)(explainer.model(imgs)), dim=1)
 #         target[i * b_size:(i + 1) * b_size] = c
 #     image_size = imgs.shape[-2:]
 #
 #     # Get saliency maps for all images in val loader
 #     explanations = np.empty((total, *image_size))
 #     for i, (imgs, _) in enumerate(tqdm(data_loader, total=n_batch, desc='Explaining images')):
-#         saliency_maps = explainer(imgs.cuda())
+#         saliency_maps = explainer(imgs)
 #         explanations[i * b_size:(i + 1) * b_size] = saliency_maps[
 #             range(b_size), target[i * b_size:(i + 1) * b_size]].data.cpu().numpy()
 #     return explanations

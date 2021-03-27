@@ -564,6 +564,7 @@ def uploadTestImage():
             json.dump(current_configs, outfile, indent=4)
 
         out, histo = test.test(config_file = config_name)
+        
         bar_graph = histo.cpu().detach().numpy()
         print(bar_graph)
         index = class_ids[out]
