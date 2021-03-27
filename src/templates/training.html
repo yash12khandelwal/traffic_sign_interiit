@@ -140,22 +140,39 @@
                     <option value="{{model}}">{{model}}</option>
                 {% endfor %}
             </select>
-        </div>
-    </div>
-    <div class="col-xl-12 text-center">
-        <button class="btn btn-success" type="button">Test Model</button>
-        <div style="display: inline-block;">
-            &nbsp; or &nbsp;
-            <label for="uploadTestImage" class="btn btn-primary form-label font-weight-bold m-0" style="cursor: pointer;">Test Image</label>
-            <input type="file" accept="image/*" id="uploadTestImage" style="display: none;">
+            <button style="display: inline-block;" type="button" class="btn btn-success" data-toggle="modal" data-target="#exampleModal">
+                Test Model
+            </button>
+
+            <!-- Modal -->
+            <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Test Model</h5>
+                        <button type="button" id="close_modal" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="flex"></div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-success mr-auto" onclick="test(); ">Test using dataset</button>
+                        <label for="uploadTestImage" class="btn btn-primary form-label m-0" style="cursor: pointer;">Test on a custom image</label>
+                        <input type="file" accept="image/*" id="uploadTestImage" style="display: none;">
+                    </div>
+                </div>
+                </div>
+            </div>
+            <div style="display: inline-block;">
+                
+            </div>
         </div>
     </div>
     <div class="col-xl-12 text-center hide mt-4" id="resultmsg">
         <figure class="figure">
             <img class="figure-img img-fluid border rounded" id="testImage" alt="Card image cap" style="width: 200px; max-height: 200px">
+            <figcaption id="result" class="figure-caption text-center "></figcaption>
         </figure>
-        <br>
-        <p id="result"></p>
     </div>
 </div>
 
@@ -330,6 +347,7 @@
 
     function test()
     {
+        document.getElementById("close_modal").click();
         var drop_down = document.getElementById("test");
         var model = drop_down.value;
         fetch('training/test', {
@@ -369,7 +387,10 @@
                 ]
 
                 $('#dataTable').DataTable({
-                        data: stuff
+                    destroy: true,
+                    "paging": false,
+                    "bInfo" : false,
+                    data: stuff
                 });
                 
             }
@@ -379,6 +400,10 @@
     }
 
     $("#uploadTestImage").on('change', function () {
+
+        $("#testImage").attr('src', "");
+        document.getElementById("close_modal").click();
+        document.getElementById("result").innerHTML = "Loading.."
         var drop_down = document.getElementById("test");
         var model = drop_down.value;
         filelist = $(this)[0].files;
