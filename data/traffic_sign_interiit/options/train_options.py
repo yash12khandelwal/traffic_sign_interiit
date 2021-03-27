@@ -30,7 +30,7 @@ class TrainOptions():
         cfg = cfg_parser(osp.join("config", version + '.json'))
         cfg['experiment'].wandb = wandb
         cfg['experiment'].version = version
-        cfg['experiment'].wandb_id = "kalimali3"
+        cfg['experiment'].wandb_id = "id"
         cfg['experiment'].wandb_name = "MicroNet-Tsinghwa-iter-exp3-without-dropout"
         cfg['experiment'].snapshot_dir = os.path.join(cfg['experiment'].snapshot_dir, version)
 

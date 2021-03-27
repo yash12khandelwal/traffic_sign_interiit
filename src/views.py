@@ -12,6 +12,7 @@ import threading
 import sys
 sys.path.append("data/traffic_sign_interiit")
 from data.traffic_sign_interiit import train
+from data.traffic_sign_interiit import test
 from data.traffic_sign_interiit.dataset import prepare_new_classes
 
 
@@ -554,5 +555,7 @@ def uploadTestImage():
         path2 = "src/static/images/temps/upload_test.png"
         image1.save(path1)
         shutil.copy(path1, path2)
-        
+        lst = data.split("_")
+        config_name = lst[1]+ "_" + lst[2]+ "_" + lst[3][:-3]
+        test.test(config_file = config_name)
         return make_response(jsonify({'message': 'Uploaded image successfully', 'path': path2}), 200)

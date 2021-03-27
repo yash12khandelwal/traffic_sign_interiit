@@ -397,7 +397,7 @@
                     console.log(result);
                     let msg = document.querySelector('#resultmsg');
                     resultp = document.querySelector('#result');
-                    $("#testImage").attr('src', "static/images/temps/upload_test.png");
+                    $("#testImage").attr('src', "static/images/temps/upload_test.png?" + new Date().getTime());
                     resultp.innerHTML = `*${result.body.message}`;
                     if (result.status != 200) {
                         msg.innerHTML = `*${result.body.error}`;

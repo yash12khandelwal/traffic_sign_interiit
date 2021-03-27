@@ -99,7 +99,7 @@ def get_test_tuple(test_path, extra_test_path=None):
             test_ids.append(int(row[1]))
 
     if extra_test_path is not None:
-        extra_test_csv = osp.join(extra_test_path, 'GT-Test.csv')
+        extra_test_csv = osp.join(root_dir, osp.join(extra_test_path, 'GT-Test.csv'))
 
         with open(extra_test_csv) as f:
             reader = csv.reader(f, delimiter=';')
@@ -130,6 +130,7 @@ class GTSRB(Dataset):
         self.setname = setname
         self.path = osp.join(self.args.data_dir, self.setname)
         self.size = tuple(self.args.size)
+        print("Setname = " + self.setname)
 
         extra_class_path = None if self.args.extra_path is None else \
             osp.join(self.args.extra_path, self.setname)
@@ -189,6 +190,7 @@ class GTSRB(Dataset):
         """
 
         img = cv2.imread(root_dir + self.imgs[idx], 1)
+        print(self.img)
         gt = self.ids[idx]
 
         img = self.transform(img)
