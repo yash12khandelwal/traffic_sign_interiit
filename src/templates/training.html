@@ -8,6 +8,12 @@
     div.dataTables_wrapper div.dataTables_length select {
         width: 100%;
     }
+    .hide {
+        display: none;
+    }
+    .disp {
+        display: block;
+    }
     </style>
 {% endblock %}
 {% block ptitle %}Train and Test Model{% endblock %}
@@ -123,20 +129,33 @@
     </div>
 </div>
 <div class="row">
-    <h2>Test Model</h2>
-    <div class="input-group mb-3">
-        <div class="input-group-prepend">
-            <label class="input-group-text bg-primary text-white" for="test">Pre-Trained Model :</label>
+    <div class="col-xl-12">
+        <h2>Test Model</h2>
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <label class="input-group-text bg-primary text-white" for="test">Select Pre-Trained Model :</label>
+            </div>
+            <select class="custom-select" required id="test">
+                {% for model in pretrained_models %}
+                    <option value="{{model}}">{{model}}</option>
+                {% endfor %}
+            </select>
         </div>
-        <select class="custom-select" required id="test">
-            {% for model in pretrained_models %}
-                <option value="{{model}}">{{model}}</option>
-            {% endfor %}
-        </select>
-        <div class="input-group-append">
-            <button class="btn btn-success" type="button" onclick="test()">Test Model</button>
-            <div id="test_msg" class="mt-4"></div>
+    </div>
+    <div class="col-xl-12 text-center">
+        <button class="btn btn-success" type="button">Test Model</button>
+        <div style="display: inline-block;">
+            &nbsp; or &nbsp;
+            <label for="uploadTestImage" class="btn btn-primary form-label font-weight-bold m-0" style="cursor: pointer;">Test Image</label>
+            <input type="file" accept="image/*" id="uploadTestImage" style="display: none;">
         </div>
+    </div>
+    <div class="col-xl-12 text-center hide mt-4" id="resultmsg">
+        <figure class="figure">
+            <img class="figure-img img-fluid border rounded" id="testImage" alt="Card image cap" style="width: 200px; max-height: 200px">
+        </figure>
+        <br>
+        <p id="result"></p>
     </div>
 </div>
 
@@ -358,5 +377,34 @@
 
 
     }
+
+    $("#uploadTestImage").on('change', function () {
+        filelist = $(this)[0].files;
+        if (filelist.length > 0) {
+            data = new FormData();
+            data.append('file', filelist[0]);
+            fetch('/testmodel/uploadimage', {
+                method: 'POST',
+                credentials: "include",
+                body: data,
+                cache: "no-cache",
+            })
+                .then(response => response.json().then(data => ({ status: response.status, body: data })))
+                .then(result => {
+                    console.log(result);
+                    let msg = document.querySelector('#resultmsg');
+                    resultp = document.querySelector('#result');
+                    resultp.innerHTML = `*${result.body.message}`;
+                    if (result.status != 200) {
+                        msg.innerHTML = `*${result.body.error}`;
+                        msg.style.color = "red";
+                    }
+                });
+            $(this).val(null);
+            $("#testImage").attr('src', 'static/images/temps/upload_test.png');
+            $("#resultmsg").removeClass("hide");
+            $("#resultmsg").addClass("disp");
+        }
+    });
 </script>
 {% endblock %}
