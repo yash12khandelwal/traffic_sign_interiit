@@ -1,0 +1,32 @@
+----------------- Options ----------------
+               batch_size: 128                           
+                 cfg_file: config\temp_config_3.json     
+                class_ids: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42]
+            class_weights: None                          
+                 data_dir: dataset/GTSRB                 
+                   device: cpu                           
+                   epochs: 1                             
+              epochs_stop: 100                           
+               extra_path: None                          
+             init_weights: None                          
+            learning_rate: 0.01                          
+            lr_decay_step: 5                             
+                    model: micronet                      
+                 momentum: 0.9                           
+              num_classes: 43                            
+              num_workers: 4                             
+                    power: 0.9                           
+               print_freq: 5                             
+             restore_from: None                          
+          save_pred_every: 1                             
+                     seed: 42                            
+                     size: [48, 48]                      
+             snapshot_dir: data/traffic_sign_interiit/checkpoints/logs\temp_config_3
+                  version: temp_config_3                 
+                    wandb: False                         
+            wandb_api_key: None                          
+                 wandb_id: kalimali3                     
+               wandb_name: MicroNet-Tsinghwa-iter-exp3-without-dropout
+             weight_decay: 0.0005                        
+----------------- End -------------------
+
