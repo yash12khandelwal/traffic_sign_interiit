@@ -557,5 +557,10 @@ def uploadTestImage():
         shutil.copy(path1, path2)
         lst = data.split("_")
         config_name = lst[1]+ "_" + lst[2]+ "_" + lst[3][:-3]
-        test.test(config_file = config_name)
-        return make_response(jsonify({'message': 'Uploaded image successfully', 'path': path2}), 200)
+        print('Config Name', config_name, '\n\n\n\n\n\n\n\n\n\n\n\n\n')
+        out = test.test(config_file = config_name)
+        if out < 43:
+            classname = orig_classes[out]
+        else:
+            classname = self_classes[out-43]
+        return make_response(jsonify({'message': 'The predicted class is ' + classname, 'path': path2}), 200)

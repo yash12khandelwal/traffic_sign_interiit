@@ -31,3 +31,5 @@ def test(config_file=""):
     log_confusion = True if args['experiment'].wandb else False
     out = calc_acc_n_loss_2(args['experiment'], model, testloader, log_matrix=log_confusion)
 
+    return out
+

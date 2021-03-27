@@ -94,7 +94,7 @@ def calc_acc_n_loss_2(args, model, loader, log_matrix=False):
 
         out = model(img)
         loss += criterion(out, gt).item()
-        out = torch.argmax(out, dim=-1)
+        out = torch.argmax(out, dim=-1).cpu().detach().numpy()[0]
 
     print("out = "*5)
     print(out)

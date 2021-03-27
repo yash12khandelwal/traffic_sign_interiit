@@ -139,6 +139,8 @@ class GTSRB(Dataset):
             self.imgs, self.ids = get_train_tuple(self.path, extra_class_path)
         elif self.setname == 'test':
             self.imgs, self.ids = get_test_tuple(self.path, extra_class_path)
+            print(self.path, extra_class_path)
+            print("self.imgs", self.imgs, "self.ids", self.ids)
 
     def __len__(self):
         """
@@ -163,7 +165,6 @@ class GTSRB(Dataset):
         Returns:
             TorchTensor: Transformed Tensor
         """
-
         image = cv2.resize(image, self.size)
         trans = transforms.Compose([
             transforms.ToTensor(),
@@ -189,8 +190,8 @@ class GTSRB(Dataset):
             tuple: (Image, Ground Truth) for a setname
         """
 
-        img = cv2.imread(root_dir + self.imgs[idx], 1)
-        print(self.img)
+        img = cv2.imread(osp.join(root_dir, self.imgs[idx]), 1)
+        print(self.imgs)
         gt = self.ids[idx]
 
         img = self.transform(img)
