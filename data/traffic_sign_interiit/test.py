@@ -29,7 +29,7 @@ def test(config_file=""):
     testloader = get_loader(args, test_dataset)
 
     log_confusion = True if args['experiment'].wandb else False
-    out = calc_acc_n_loss_2(args['experiment'], model, testloader, log_matrix=log_confusion)
+    out, histo = calc_acc_n_loss_2(args['experiment'], model, testloader, log_matrix=log_confusion)
 
-    return out
+    return out, histo
 

@@ -11,6 +11,7 @@ import shutil
 import threading
 import sys
 import random
+import time
 sys.path.append("data/traffic_sign_interiit")
 from data.traffic_sign_interiit import train
 from data.traffic_sign_interiit import test
@@ -240,7 +241,7 @@ def trainModel():
 
 @app.route("/training/test", methods=["POST"])
 def ModelTestdata():
-    s = random.randrange(5,15,0.5),
+    s = random.randrange(5,15,1)
     pt_model = request.get_json()["pre_trained_model"]
     lst = pt_model.split('_')
     name = lst[1]+"_"+lst[2]+"_"+lst[3][:-3]
@@ -562,12 +563,10 @@ def uploadTestImage():
         with open(app.config["DATA_PATH"] + "config/" + config_name + ".json", "w") as outfile:
             json.dump(current_configs, outfile, indent=4)
 
-        out = test.test(config_file = config_name)
+        out, histo = test.test(config_file = config_name)
+        bar_graph = histo.cpu().detach().numpy()
+        print(bar_graph)
         index = class_ids[out]
         all_classes = orig_classes + self_classes
         classname = all_classes[index]
-        # if out < 43:
-        #     classname = orig_classes[out]
-        # else:
-        #     classname = self_classes[out-43]
         return make_response(jsonify({'message': 'The predicted class is ' + classname, 'path': path2}), 200)

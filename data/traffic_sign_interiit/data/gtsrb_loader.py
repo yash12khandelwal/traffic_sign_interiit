@@ -130,7 +130,6 @@ class GTSRB(Dataset):
         self.setname = setname
         self.path = osp.join(self.args.data_dir, self.setname)
         self.size = tuple(self.args.size)
-        print("Setname = " + self.setname)
 
         extra_class_path = None if self.args.extra_path is None else \
             osp.join(self.args.extra_path, self.setname)
@@ -139,8 +138,6 @@ class GTSRB(Dataset):
             self.imgs, self.ids = get_train_tuple(self.path, extra_class_path)
         elif self.setname == 'test':
             self.imgs, self.ids = get_test_tuple(self.path, extra_class_path)
-            print(self.path, extra_class_path)
-            print("self.imgs", self.imgs, "self.ids", self.ids)
 
     def __len__(self):
         """
@@ -191,7 +188,6 @@ class GTSRB(Dataset):
         """
 
         img = cv2.imread(osp.join(root_dir, self.imgs[idx]), 1)
-        print(self.imgs)
         gt = self.ids[idx]
 
         img = self.transform(img)
