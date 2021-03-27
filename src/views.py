@@ -231,11 +231,15 @@ def datasetStatistics():
 @app.route("/training", methods=["GET", "POST"])
 def trainModel():
     pretrained_models = []
+    display = []
     models = os.listdir(app.config["DATA_PATH"] + "checkpoints/logs/")
+    i=1
     for model in models:
         for file in os.listdir(app.config["DATA_PATH"] + "checkpoints/logs/" + model):
             if model in file and file!="params.pt" and file.endswith(".pt"):
-                pretrained_models.append(file)
+                pretrained_models.append((file, "MicronNet_"+str(i)))
+                i+=1
+    
     print(pretrained_models)
     return render_template("training.html", self_classes=self_classes, pretrained_models=pretrained_models)
 
