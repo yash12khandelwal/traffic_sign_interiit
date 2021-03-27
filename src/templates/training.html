@@ -179,21 +179,31 @@
                 
             </div>
         </div>
+    </div>    
+</div>
+<div class="row">
+    <div class="col-xl-6 col-md-6 mb-4">
+        <div class="text-center hide mt-4" id="resultmsg">
+            <figure class="figure">
+                <img class="figure-img img-fluid border rounded" id="testImage" style="width: 200px; max-height: 200px">
+                <figcaption id="result" style="font-size: 20px;" class="figure-caption text-center font-weigth-bold "></figcaption>
+            </figure>
+        </div>
     </div>
-    <div class="col-xl-12 text-center hide mt-4" id="resultmsg">
-        <figure class="figure">
-            <img class="figure-img img-fluid border rounded" id="testImage" alt="Card image cap" style="width: 200px; max-height: 200px">
-            <figcaption id="result" class="figure-caption text-center "></figcaption>
-        </figure>
+    <div class="col-xl-6 col-md-6 mb-4">
+        <div class="text-center mt-4" id="riseImage">
+        
+        </div>
     </div>
 </div>
+
 
 <div class="card shadow" style="display: none;" id="chart">
     <div class="card-header py-3">
         <h6 class="m-0 font-weight-bold text-primary">Classification</h6>
     </div>
     <div class="card-body">
-        <div class="chart-bar">
+        <div class="chart-bar" id="chart_div">
             <canvas id="myBarChart" style="height: 300px;"></canvas>
         </div>
     </div>
@@ -417,9 +427,15 @@
     $("#uploadTestImage").on('change', function () {
 
         $("#testImage").attr('src', "");
+        document.getElementById("riseImage").innerHTML = "";
+        var chart_div = document.getElementById("chart_div");
+        $("canvas#myBarChart").remove();
+        chart_div.innerHTML = `<canvas id="myBarChart" style="height: 300px;"></canvas>`;
+
         document.getElementById("chart").style.display = "none";
         document.getElementById("close_modal").click();
         document.getElementById("result").innerHTML = "Loading.."
+
         var drop_down = document.getElementById("test");
         var model = drop_down.value;
         filelist = $(this)[0].files;
@@ -439,11 +455,15 @@
                 let msg = document.querySelector('#resultmsg');
                 resultp = document.querySelector('#result');
                 $("#testImage").attr('src', "static/images/temps/upload_test.png?" + new Date().getTime());
+                document.getElementById("riseImage").innerHTML = `<figure class="figure">
+                    <img src="static/images/temps/rise.jpg?${new Date().getTime()}" class="figure-img img-fluid border rounded" id="risemap" style="width: 200px; max-height: 200px">
+                <figcaption style="font-size: 20px;" class="figure-caption text-center font-weigth-bold ">Rise Map</figcaption>
+            </figure>`;
                 if (result.status != 200) {
                     msg.innerHTML = `*${result.body.error}`;
                     msg.style.color = "red";
                 }
-                resultp.innerHTML = `*${result.body.message}`;
+                resultp.innerHTML = `The predicted class is ${result.body.message}`;
                 console.log(result.body.data[0].length);
                 document.getElementById("chart").style.display = "block";
                 var class_ids = [];

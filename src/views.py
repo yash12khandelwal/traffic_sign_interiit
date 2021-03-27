@@ -547,12 +547,11 @@ def uploadTestImage():
         data  = request.form.get('model_name')
         image1 = request.files['file']
         path1 = os.path.join(app.config["DATA_PATH"] + "dataset/New_Test/upload_test.png")
-        path2 = "src/static/images/temps/upload_test.jpg"
-        path3 = os.path.join(app.config["DATA_PATH"] + "dataset/New_Test/rise.png")
+        path2 = "src/static/images/temps/upload_test.png"
+        path3 = os.path.join(app.config["DATA_PATH"] + "dataset/New_Test/rise.jpg")
         path4 = "src/static/images/temps/rise.jpg"
         image1.save(path1)
         shutil.copy(path1, path2)
-        shutil.copy(path3, path4)
         lst = data.split("_")
         config_name = lst[1]+ "_" + lst[2]+ "_" + lst[3][:-3]
         
@@ -567,11 +566,11 @@ def uploadTestImage():
             json.dump(current_configs, outfile, indent=4)
 
         out, histo = test.test(config_file = config_name)
-        
+        shutil.copy(path3, path4)
         bar_graph = histo.cpu().detach().numpy()
         bar_graph = bar_graph.tolist()
         print(bar_graph)
         index = class_ids[out]
         all_classes = orig_classes + self_classes
         classname = all_classes[index]
-        return make_response(jsonify({'message': 'The predicted class is ' + classname, 'path': path2, 'data': bar_graph}), 200)
+        return make_response(jsonify({'message': classname, 'path': path2, 'data': bar_graph}), 200)
