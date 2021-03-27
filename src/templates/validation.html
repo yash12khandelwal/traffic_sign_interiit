@@ -18,7 +18,7 @@
             <select class="custom-select custom-select my-0 border-1 mt-1 mx-2" aria-label="Select validation class"
                 id="selectValidationClass">
                 {% for i in range(43) %}
-                <option value="{{i}}">GTSRB Class {{i}}</option>
+                <option value="{{i}}">{{orig_classes[i]}}</option>
                 {% endfor %}
                 {% for name in self_classes %}
                 <option value="{{loop.index+42}}">{{name}}</option>

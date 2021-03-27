@@ -111,7 +111,7 @@ def remove_new_class():
 # route for Add Augmentations page
 @app.route("/augmentations", methods=["GET", "POST"])
 def addAugmentations():
-    return render_template("augmentations.html", self_classes=self_classes)
+    return render_template("augmentations.html", self_classes=self_classes, orig_classes=orig_classes)
 
 # route to send preview image while trying out different augmentations
 @app.route("/augmentations/preview", methods=["POST"])
@@ -336,7 +336,7 @@ def Model():
 
 @app.route("/validation", methods=["GET", "POST"])
 def createValidationSet():
-    return render_template("validation.html", self_classes=self_classes)
+    return render_template("validation.html", self_classes=self_classes, orig_classes=orig_classes)
 
 
 @app.route("/validation/uploadimages", methods=["GET", "POST"])
