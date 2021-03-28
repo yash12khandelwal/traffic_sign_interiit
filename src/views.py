@@ -139,11 +139,11 @@ def applyAugmentations():
         percentage = req['percentage']/100
         auglist = req['augmentationList']
         classes = req['classList']
-        path_gtsrb = app.config["DATA_PATH"] + "dataset/GTSRB/train/"
+        path_gtsrb = app.config["DATA_PATH"] + "dataset/GTSRB/Final_Training/Images/"
         path_self = app.config["DATA_PATH"] + "dataset/New/Train/"
         for i in classes:
             saveAugmentedImages(
-                i, path_gtsrb + str(i).rjust(4, '0'), auglist, percentage)
+                i, path_gtsrb + str(i).rjust(5, '0'), auglist, percentage)
             saveAugmentedImages(i, path_self + str(i), auglist, percentage)
         return redirect("/augmentations")
 
@@ -525,7 +525,10 @@ def saveAugmentedImages(classID, path, auglist, percentage):
         for image in images:
             name, ext = image.split('.')
             if ext not in ['csv', 'gitignore', 'gitkeep']:
-                image_list.append(cv2.imread(f'{path}/{image}'))
+                temp = cv2.imread(f'{path}/{image}')
+                if(temp.shape[0]<32 or temp.shape[1]<32):
+                    temp = cv2.resize(temp, (40,40))
+                image_list.append(temp)
                 image_names.append(name)
         augmented = get_preview(
             image_list, auglist, percentage)
