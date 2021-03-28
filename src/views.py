@@ -225,17 +225,29 @@ def datasetStatistics():
         else:
             test_class_dist_extra.insert(i, 0)
 
+    # for i in range(0, len(orig_classes) + len(self_classes)):
+    #     val_class_dist_extra.insert(i, random.randint(0,200))
+    #     test_class_dist_extra.insert(i, random.randint(0,200))
+    #     if i < len(orig_classes):
+    #         train_class_dist_extra.insert(i, 1800-train_class_dist_gtsrb[i] + random.randint(0,150) )
+    #     else:
+    #         train_class_dist_extra.insert(i, 1500 + random.randint(0,300))
+
     return render_template("dataset.html", orig_classes_count=len(orig_classes), self_classes_count=len(self_classes), train_class_dist_gtsrb=train_class_dist_gtsrb, train_class_dist_extra=train_class_dist_extra, count_org=sum(train_class_dist_gtsrb), count_new=sum(train_class_dist_extra), val_class_dist_gtsrb=val_class_dist_gtsrb, val_class_dist_extra=val_class_dist_extra, test_class_dist_gtsrb=test_class_dist_gtsrb, test_class_dist_extra=test_class_dist_extra,)
 
 
 @app.route("/training", methods=["GET", "POST"])
 def trainModel():
     pretrained_models = []
+    display = []
     models = os.listdir(app.config["DATA_PATH"] + "checkpoints/logs/")
+    i=1
     for model in models:
         for file in os.listdir(app.config["DATA_PATH"] + "checkpoints/logs/" + model):
             if model in file and file!="params.pt" and file.endswith(".pt"):
-                pretrained_models.append(file)
+                pretrained_models.append((file, "MicronNet_"+str(i)))
+                i+=1
+    
     print(pretrained_models)
     return render_template("training.html", self_classes=self_classes, pretrained_models=pretrained_models)
 
@@ -370,14 +382,28 @@ def smartSegregation():
 # getting the  metrics and confusion matrix file from the data directory
 @app.route("/results", methods=["GET", "POST"])
 def viewResults():
-    with open(app.config["JSON_PATH"] + "metrics.json") as json_file:
-        # metrics file
-        data = json.load(json_file)
-    #confusion matrix
-    conf_arr = np.load(app.config["JSON_PATH"] + "confusion_matrix.npy")
-    num_class = np.shape(conf_arr)[0]
+    base_path = "data/Results/"
+    img_path = "src/static/images/Cherrypicked-"
+    metrics = []
+    conf_arr = []
+    rise_filenames = []
+    num_class = 48
 
-    return render_template("results.html", data=data, matrix=conf_arr, class_count=num_class)
+    for i in range(1,4):
+        #metrics table
+        with open(base_path + f'{i}' + "/metrics_iter" + f'{i}' + ".json") as json_file:
+            metrics.insert(i-1, json.load(json_file))
+        #confusion matrix
+        with open(base_path + f'{i}' + "/save_mat_iter" + f'{i}' + ".json") as json_file1:
+            conf_arr.insert(i-1, json.load(json_file1))
+
+        path = img_path + f'{i}'
+        iter_i = []
+        iter_i.insert(0, os.listdir(path + "/Correct/")) 
+        iter_i.insert(1, os.listdir(path + "/Incorrect/"))
+        rise_filenames.insert(i-1, iter_i)
+
+    return render_template("results.html", data=metrics, matrix=conf_arr, risemaps = rise_filenames, class_count=num_class)
 
 
 #HELPER FUNCTIONS
@@ -572,7 +598,6 @@ def uploadTestImage():
         shutil.copy(path3, path4)
         bar_graph = histo.cpu().detach().numpy()
         bar_graph = bar_graph.tolist()
-        print(bar_graph)
         index = class_ids[out]
         all_classes = orig_classes + self_classes
         classname = all_classes[index]

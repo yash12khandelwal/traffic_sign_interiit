@@ -149,7 +149,7 @@
             </div>
             <select class="custom-select" required id="test">
                 {% for model in pretrained_models %}
-                    <option value="{{model}}">{{model}}</option>
+                    <option value="{{model[0]}}">{{model[1]}}</option>
                 {% endfor %}
             </select>
             <button style="display: inline-block;" type="button" class="btn btn-success" data-toggle="modal" data-target="#exampleModal">
@@ -210,7 +210,7 @@
     </div>
     <div class="card-body">
         <div class="chart-bar" id="chart_div">
-            <canvas id="myBarChart" style="height: 300px;"></canvas>
+            <canvas id="myBarChart" style="height: 450px;"></canvas>
         </div>
     </div>
 </div>

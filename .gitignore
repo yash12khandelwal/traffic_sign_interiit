@@ -5,16 +5,16 @@ data/traffic_sign_interiit/dataset/zips/*
 data/traffic_sign_interiit/dataset/GTSRB/Final_Training/*
 data/traffic_sign_interiit/dataset/GTSRB/Final_Test/*
 data/traffic_sign_interiit/dataset/GTSRB/all/*
-data/traffic_sign_interiit/dataset/New/Train/*
-data/traffic_sign_interiit/dataset/New/Test/*
-data/traffic_sign_interiit/dataset/New/Valid/*
-data/traffic_sign_interiit/dataset/New/Augmented/*
-data/traffic_sign_interiit/dataset/EXTRA/*
+# data/traffic_sign_interiit/dataset/New/Train/*
+# data/traffic_sign_interiit/dataset/New/Test/*
+# data/traffic_sign_interiit/dataset/New/Valid/*
+# data/traffic_sign_interiit/dataset/New/Augmented/*
+# data/traffic_sign_interiit/dataset/EXTRA/*
 
 # exception to the rule
 !data/traffic_sign_interiit/dataset/zips/.gitkeep
-!data/traffic_sign_interiit/dataset/New/Train/.gitkeep
-!data/traffic_sign_interiit/dataset/New/Test/.gitkeep
-!data/traffic_sign_interiit/dataset/New/Valid/.gitkeep
-!data/traffic_sign_interiit/dataset/EXTRA/.gitkeep
-!data/traffic_sign_interiit/dataset/New/Augmented/.gitkeep
+# !data/traffic_sign_interiit/dataset/New/Train/.gitkeep
+# !data/traffic_sign_interiit/dataset/New/Test/.gitkeep
+# !data/traffic_sign_interiit/dataset/New/Valid/.gitkeep
+# !data/traffic_sign_interiit/dataset/EXTRA/.gitkeep
+# !data/traffic_sign_interiit/dataset/New/Augmented/.gitkeep

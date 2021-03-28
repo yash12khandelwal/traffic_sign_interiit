@@ -108,6 +108,7 @@
     var test_IPC_extra_gtsrb = test_ImgsPerClass_extra.slice(0, orig_classes);
     var test_IPC_extra_new = [];
 
+
     var class_ids = [];
     for (var i = 0; i < orig_classes; i++) {
             class_ids.push(i);
@@ -130,6 +131,13 @@
     val_IPC_extra_new = val_IPC_extra_new.concat(val_ImgsPerClass_extra.slice(orig_classes, total_classes));
     test_IPC_extra_new = test_IPC_extra_new.concat(test_ImgsPerClass_extra.slice(orig_classes, total_classes));
 
+    for(var i=0; i<orig_classes; i++)
+    {
+        train_ImgsPerClass_gtsrb[i] = train_ImgsPerClass_gtsrb[i] + train_IPC_extra_gtsrb[i];
+        val_ImgsPerClass_gtsrb[i] = val_ImgsPerClass_gtsrb[i] + val_IPC_extra_gtsrb[i];
+        test_ImgsPerClass_gtsrb[i] = test_ImgsPerClass_gtsrb[i] + test_IPC_extra_gtsrb[i];
+    }
+
     // StackedBar Chart
     var ctx = document.getElementById("myBarChart").getContext("2d");
     var stackedBar = new Chart(ctx,{
@@ -137,18 +145,20 @@
         data: {
             labels: class_ids,
             datasets: [{
-                label: "GTSRB Data",
+                label: "Orig Classes Data",
                 backgroundColor: "#1d8cf8", // blue color
                 hoverBackgroundColor: "#2e59d9",
                 maxBarThickness: 10,
                 data: train_ImgsPerClass_gtsrb,
-            }, {
-                label: "Augmented Data",
-                backgroundColor: "#ffff00", // yellow color
-                hoverBackgroundColor: "#cccc00",
-                maxBarThickness: 10,
-                data: train_IPC_extra_gtsrb,
-            },{
+            }, 
+            // {
+            //     label: "Augmented Data",
+            //     backgroundColor: "#ffff00", // yellow color
+            //     hoverBackgroundColor: "#cccc00",
+            //     maxBarThickness: 10,
+            //     data: train_IPC_extra_gtsrb,
+            // },
+            {
                 label: 'New Classes Data',
                 backgroundColor: "#4edf61", //green color
                 hoverBackgroundColor: "#0acc24",
@@ -255,18 +265,20 @@
         data: {
             labels: class_ids,
             datasets: [{
-                label: "GTSRB Data",
+                label: "Orig Classes Data",
                 backgroundColor: "#1d8cf8", // blue color
                 hoverBackgroundColor: "#2e59d9",
                 maxBarThickness: 10,
                 data: val_ImgsPerClass_gtsrb,
-            }, {
-                label: "Augmented Data",
-                backgroundColor: "#ffff00", // yellow color
-                hoverBackgroundColor: "#cccc00",
-                maxBarThickness: 10,
-                data: val_IPC_extra_gtsrb,
-            },{
+            }, 
+            // {
+            //     label: "Augmented Data",
+            //     backgroundColor: "#ffff00", // yellow color
+            //     hoverBackgroundColor: "#cccc00",
+            //     maxBarThickness: 10,
+            //     data: val_IPC_extra_gtsrb,
+            // },
+            {
                 label: 'New Classes Data',
                 backgroundColor: "#4edf61", //green color
                 hoverBackgroundColor: "#0acc24",
@@ -332,18 +344,20 @@
         data: {
             labels: class_ids,
             datasets: [{
-                label: "GTSRB Data",
+                label: "Orig Classes Data",
                 backgroundColor: "#1d8cf8", // blue color
                 hoverBackgroundColor: "#2e59d9",
                 maxBarThickness: 10,
                 data: test_ImgsPerClass_gtsrb,
-            }, {
-                label: "Augmented Data",
-                backgroundColor: "#ffff00", // yellow color
-                hoverBackgroundColor: "#cccc00",
-                maxBarThickness: 10,
-                data: test_IPC_extra_gtsrb,
-            },{
+            }, 
+            // {
+            //     label: "Augmented Data",
+            //     backgroundColor: "#ffff00", // yellow color
+            //     hoverBackgroundColor: "#cccc00",
+            //     maxBarThickness: 10,
+            //     data: test_IPC_extra_gtsrb,
+            // },
+            {
                 label: 'New Classes Data',
                 backgroundColor: "#4edf61", //green color
                 hoverBackgroundColor: "#0acc24",

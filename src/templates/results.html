@@ -8,13 +8,28 @@
 div.dataTables_wrapper div.dataTables_length select {
     width: 100%;
 }
-#container {
+#container0{
     width: 100%;
     height: 100%;
     margin: 0;
     padding: 0;
     font-size: 6;
 }
+#container1{
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    font-size: 6;
+}
+#container2{
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    font-size: 6;
+}
+
 .anychart-credits
 {
     display: none ;
@@ -36,109 +51,119 @@ div.dataTables_wrapper div.dataTables_length select {
         <h5 class="m-0 font-weight-bold text-primary">Choose Model</h5>
     </div>
     <div class="card-body">
-        <select name="model" class="form-control">
-            <option value="Micro_Net">MicronNet</option>
+        <select name="model" class="form-control" id="selectmodel" onchange="looper()">
+            <option value="" selected>Choose...</option>
+            <option value="0">MicronNet_Iter1</option>
+            <option value="1">MicronNet_Iter2</option>
+            <option value="2">MicronNet_Iter3</option>
         </select>
     </div>
 </div>
-<div class="card shadow mb-4">
-    <div class="card-header py-3">
-        <h5 class="m-0 font-weight-bold text-primary">Metrics</h5>
-    </div>
-    <div class="card-body">
-        <div class="table-responsive">
-            <table class="table table-bordered display" data-page-length='10' id="dataTable" width="100%" cellspacing="0">
-                <thead>
-                    <tr>
-                        <td class="bg-success"><strong>Overall Accuracy</strong></td>
-                        <td >{{'%0.3f'| format(data["accuracy"]|float)}}</td>
-                        <td style="display: none;"></td>
-                        <td style="display: none;"></td>
-                        <td style="display: none;"></td>
-                    </tr>
-                </thead>
-                <thead>
-                    <tr>
-                        <th class="bg-primary">Class</th>
-                        <th class="bg-primary">Precision</th>
-                        <th class="bg-primary">Recall</th>
-                        <th class="bg-primary">F1-score</th>
-                        <th class="bg-primary">Support</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for row in data %}
-                        
-                        {% if row == "accuracy" or row == "macro avg" or row == "weighted avg"%}
-                        {% else %}
-                        <tr>
-                            <td>{{row}}</td>
-                            {% for key, value in data[row].items() %}
-                                {% if key == "support" %}
-                                <td>{{value}}</td>
-                                {% else %}
-                                <td>{{'%0.3f'| format(value|float)}}</td>
-                                {% endif %}
-                            {% endfor %}
-                        </tr>
-                        {% endif %}
 
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+<div class="card shadow mb-0 bg-warning" id="title" style="display: none;">
+    <div class="card-header py-3">
+        <h5 class="m-0 font-weight-bold text-center text-black" id="name_model"></h5>
     </div>
 </div>
 
-<div class="card shadow mb-4">
-    <div class="card-header py-3">
-        <h5 class="m-0 font-weight-bold text-primary">Confusion Matrix</h5>
+
+{% for i in range(3) %}
+
+<div id="Iter_{{i}}" style="display: none;">
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h5 class="m-0 font-weight-bold text-primary">Metrics</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered display" data-page-length='10' id="dataTable{{i}}" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <td class="bg-success"><strong>Overall Accuracy</strong></td>
+                            <td >{{'%0.3f'| format(data[i]["accuracy"]|float)}}</td>
+                            <td style="display: none;"></td>
+                            <td style="display: none;"></td>
+                            <td style="display: none;"></td>
+                        </tr>
+                    </thead>
+                    <thead>
+                        <tr>
+                            <th class="bg-primary">Class</th>
+                            <th class="bg-primary">Precision</th>
+                            <th class="bg-primary">Recall</th>
+                            <th class="bg-primary">F1-score</th>
+                            <th class="bg-primary">Support</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in data[i] %}
+                            
+                            {% if row == "accuracy" or row == "macro avg" or row == "weighted avg"%}
+                            {% else %}
+                            <tr>
+                                <td>{{row}}</td>
+                                {% for key, value in data[i][row].items() %}
+                                    {% if key == "support" %}
+                                    <td>{{value}}</td>
+                                    {% else %}
+                                    <td>{{'%0.3f'| format(value|float)}}</td>
+                                    {% endif %}
+                                {% endfor %}
+                            </tr>
+                            {% endif %}
+
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
-    <div class="card-body">
-        <!-- Button trigger modal -->
-        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalCenter">
-            Show confusion matrix
-        </button>
-        <!-- Modal -->
-        <div class="modal fade pr-0" id="exampleModalCenter"  tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered mx-0 my-0"  role="document">
-                <div class="modal-content" style="width: 100vw; height: 100vh;">
-                    <button type="button" class="close text-right pr-3" style="outline: none;" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                
-                    <div class="modal-body px-0 py-0">
-                        <div id="container"></div>
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h5 class="m-0 font-weight-bold text-primary">Confusion Matrix</h5>
+        </div>
+        <div class="card-body">
+            <!-- Button trigger modal -->
+            <button type="button" class="btn btn-primary" onclick="loadmatrix({{i}})" data-toggle="modal" data-target="#exampleModalCenter">
+                Show confusion matrix
+            </button>
+            <!-- Modal -->
+            <div class="modal fade pr-0" id="exampleModalCenter"  tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered mx-0 my-0"  role="document">
+                    <div class="modal-content" style="width: 100vw; height: 100vh;">
+                        <button type="button" class="close text-right pr-3" style="outline: none;" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    
+                        <div class="modal-body px-0 py-0">
+                            <div id="container{{i}}"></div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-</div>  
+    </div>  
 
-<div class="card shadow mb-4">
-    <div class="card-header py-3">
-        <h5 class="m-0 font-weight-bold text-primary">Rise Maps</h5>
-    </div>
-    <div class="card-body">
-        <h5>Correct</h5>
-        <img class="shadow figure-img img-fluid border rounded" src="static\images\Correct\Copy of rise_04709_40.jpg" style="width: 150px; max-height: 250px">
-        <img class="shadow figure-img img-fluid border rounded" src="static\images\Correct\Copy of rise_05664_16.jpg" style="width: 150px; max-height: 250px">
-        <img class="shadow figure-img img-fluid border rounded" src="static\images\Correct\Copy of rise_06119_36.jpg" style="width: 150px; max-height: 250px">
-        <img class="shadow figure-img img-fluid border rounded" src="static\images\Correct\Copy of rise_07877_37.jpg" style="width: 150px; max-height: 250px">
-        <img class="shadow figure-img img-fluid border rounded" src="static\images\Correct\Copy of rise_11813_39.jpg" style="width: 150px; max-height: 250px">
-        <img class="shadow figure-img img-fluid border rounded" src="static\images\Correct\Copy of rise_12217_25.jpg" style="width: 150px; max-height: 250px">
-        <img class="shadow figure-img img-fluid border rounded" src="static\images\Correct\Copy of rise_53944_47.jpg" style="width: 150px; max-height: 250px">
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h5 class="m-0 font-weight-bold text-primary">Rise Maps</h5>
+        </div>
+        <div class="card-body">
+            <h5>Correctly Classified:</h5>
+            {% for img in risemaps[i][0] %}
+            <img class="shadow figure-img img-fluid border rounded" src="static\images\Cherrypicked-{{i+1}}\Correct\{{img}}" style="width: 150px; max-height: 250px">
+            {% endfor %}
+           
+            <h5 class="mt-4">Incorrectly Classified:</h5>
+            {% for img in risemaps[i][1] %}
+            <img class="shadow figure-img img-fluid border rounded" src="static\images\Cherrypicked-{{i+1}}\Incorrect\{{img}}" style="width: 150px; max-height: 250px">
+            {% endfor %}
 
-        <h5 class="mt-4">Incorrect</h5>
-        <img class="shadow figure-img img-fluid border rounded" src="static\images\Incorrect\Copy of rise_05476_11.jpg" style="width: 150px; max-height: 250px">
-        <img class="shadow figure-img img-fluid border rounded" src="static\images\Incorrect\Copy of rise_10251_35.jpg" style="width: 150px; max-height: 250px">
-        <img class="shadow figure-img img-fluid border rounded" src="static\images\Incorrect\Copy of rise_10292_41.jpg" style="width: 150px; max-height: 250px">
-        <img class="shadow figure-img img-fluid border rounded" src="static\images\Incorrect\Copy of rise_10667_7.jpg" style="width: 150px; max-height: 250px">
-        <img class="shadow figure-img img-fluid border rounded" src="static\images\Incorrect\Copy of rise_11415_27.jpg" style="width: 150px; max-height: 250px">
-        <img class="shadow figure-img img-fluid border rounded" src="static\images\Incorrect\Copy of rise_11515_35.jpg" style="width: 150px; max-height: 250px">
+        </div>
     </div>
 </div>
+{% endfor %}
 
 {% endblock %}
 
@@ -150,46 +175,129 @@ div.dataTables_wrapper div.dataTables_length select {
 <script>
     $("#results-sidebar").addClass('active');
 
+
+    var model = document.getElementById('selectmodel');
+    var heading = document.getElementById('title');
+    var heading_name = document.getElementById("name_model");
+
+    function looper()
+    {
+        heading_name.innerHTML = `${model.options[model.selectedIndex].text}`;
+        
+        if(model.value == "0")
+        {
+            heading.style.display = "block";
+            document.getElementById("Iter_0").style.display = "block";
+            document.getElementById("Iter_1").style.display = "none";
+            document.getElementById("Iter_2").style.display = "none";
+        }
+        else if(model.value == "1")
+        {
+            heading.style.display = "block";
+            document.getElementById("Iter_0").style.display = "none";
+            document.getElementById("Iter_1").style.display = "block";
+            document.getElementById("Iter_2").style.display = "none";
+        }
+        else if(model.value == "2")
+        {
+            heading.style.display = "block";
+            document.getElementById("Iter_0").style.display = "none";
+            document.getElementById("Iter_1").style.display = "none";
+            document.getElementById("Iter_2").style.display = "block";
+        }
+        else
+        {
+            heading.style.display = "none";
+            document.getElementById("Iter_0").style.display = "none";
+            document.getElementById("Iter_1").style.display = "none";
+            document.getElementById("Iter_2").style.display = "none";
+        }
+    }
+    
+
     $.extend( $.fn.dataTable.defaults, {
         searching: false,
         ordering:  false
     } );
  
     $(document).ready(function() {
-        $('#dataTable').DataTable();
+        $('#dataTable0').DataTable();
+        $('#dataTable1').DataTable();
+        $('#dataTable2').DataTable();
     });
+    var data = [{{ matrix[0] | tojson }}, {{ matrix[1] | tojson }}, {{ matrix[2] | tojson }}]
 
-    anychart.onDocumentReady(function () {
+    // create and configure the color scale.
+    var customColorScale = anychart.scales.linearColor();
+    customColorScale.colors(["#ACE8D4", "#00726A"]);
 
-        var data = [
-            {% for i in range(class_count) %}
-                {% for j in range(class_count) %}
-                    {x: "{{j}}", y: "{{i}}", heat: {{'%0.3f'| format(matrix[i][j]|float)}}},
-                {% endfor %}
-            {% endfor %}
-        ];
-
+    function loadmatrix(index)
+    {       
         // create the data
-        chart = anychart.heatMap(data);
-        chart.xAxis().labels().fontSize(9);
-        chart.yAxis().labels().fontSize(9);
-        chart.yAxis().labels().height(10);
-
-        // create and configure the color scale.
-        var customColorScale = anychart.scales.linearColor();
-        customColorScale.colors(["#ACE8D4", "#00726A"]);
+        chart0 = anychart.heatMap(data[index]);
+        chart0.xAxis().labels().fontSize(9);
+        chart0.yAxis().labels().fontSize(9);
+        chart0.yAxis().labels().height(10);
 
         // set the color scale as the color scale of the chart
-        chart.colorScale(customColorScale);
-
+        chart0.colorScale(customColorScale);
         // set the container id
-        chart.container("container");
-
+        chart0.container(`container${index}`);
         // initiate drawing the chart
-        chart.draw();
+        chart0.draw();
+    }
+
+    // anychart.onDocumentReady(function () {
+
+        
+    
+
+    //     // create and configure the color scale.
+    //     var customColorScale = anychart.scales.linearColor();
+    //     customColorScale.colors(["#ACE8D4", "#00726A"]);
+
+    //     // create the data
+    //     chart0 = anychart.heatMap(data[0]);
+    //     chart0.xAxis().labels().fontSize(9);
+    //     chart0.yAxis().labels().fontSize(9);
+    //     chart0.yAxis().labels().height(10);
+
+    //     // set the color scale as the color scale of the chart
+    //     chart0.colorScale(customColorScale);
+    //     // set the container id
+    //     chart0.container("container0");
+    //     // initiate drawing the chart
+    //     chart0.draw();
 
 
-    });
+
+    //     // create the data
+    //     chart1 = anychart.heatMap(data[1]);
+    //     chart1.xAxis().labels().fontSize(9);
+    //     chart1.yAxis().labels().fontSize(9);
+    //     chart1.yAxis().labels().height(10);
+
+    //     // set the color scale as the color scale of the chart
+    //     chart1.colorScale(customColorScale);
+    //     // set the container id
+    //     chart1.container("container1");
+    //     // initiate drawing the chart
+    //     chart1.draw();
+
+        
+    //     // create the data
+    //     chart2 = anychart.heatMap(data[2]);
+    //     chart2.xAxis().labels().fontSize(9);
+    //     chart2.yAxis().labels().fontSize(9);
+    //     chart2.yAxis().labels().height(10);
+
+    //     // set the color scale as the color scale of the chart
+    //     chart2.colorScale(customColorScale);
+    //     // set the container id
+    //     chart2.container("container2");
+    //     // initiate drawing the chart
+    //     chart2.draw();
+    // });
     
 </script>
 {% endblock %}
