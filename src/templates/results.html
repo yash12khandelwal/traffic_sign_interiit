@@ -8,13 +8,28 @@
 div.dataTables_wrapper div.dataTables_length select {
     width: 100%;
 }
-#container0 , #container1 , #container2  {
+#container0{
     width: 100%;
     height: 100%;
     margin: 0;
     padding: 0;
     font-size: 6;
 }
+#container1{
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    font-size: 6;
+}
+#container2{
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    font-size: 6;
+}
+
 .anychart-credits
 {
     display: none ;
@@ -110,7 +125,7 @@ div.dataTables_wrapper div.dataTables_length select {
         </div>
         <div class="card-body">
             <!-- Button trigger modal -->
-            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalCenter">
+            <button type="button" class="btn btn-primary" onclick="loadmatrix({{i}})" data-toggle="modal" data-target="#exampleModalCenter">
                 Show confusion matrix
             </button>
             <!-- Modal -->
@@ -210,18 +225,16 @@ div.dataTables_wrapper div.dataTables_length select {
         $('#dataTable1').DataTable();
         $('#dataTable2').DataTable();
     });
+    var data = [{{ matrix[0] | tojson }}, {{ matrix[1] | tojson }}, {{ matrix[2] | tojson }}]
 
-    anychart.onDocumentReady(function () {
+    // create and configure the color scale.
+    var customColorScale = anychart.scales.linearColor();
+    customColorScale.colors(["#ACE8D4", "#00726A"]);
 
-        var data = [{{ matrix[0] | tojson }}, {{ matrix[1] | tojson }}, {{ matrix[2] | tojson }}]
-    
-
-        // create and configure the color scale.
-        var customColorScale = anychart.scales.linearColor();
-        customColorScale.colors(["#ACE8D4", "#00726A"]);
-
+    function loadmatrix(index)
+    {       
         // create the data
-        chart0 = anychart.heatMap(data[0]);
+        chart0 = anychart.heatMap(data[index]);
         chart0.xAxis().labels().fontSize(9);
         chart0.yAxis().labels().fontSize(9);
         chart0.yAxis().labels().height(10);
@@ -229,39 +242,62 @@ div.dataTables_wrapper div.dataTables_length select {
         // set the color scale as the color scale of the chart
         chart0.colorScale(customColorScale);
         // set the container id
-        chart0.container("container0");
+        chart0.container(`container${index}`);
         // initiate drawing the chart
         chart0.draw();
+    }
 
-
-
-        // create the data
-        chart1 = anychart.heatMap(data[1]);
-        chart1.xAxis().labels().fontSize(9);
-        chart1.yAxis().labels().fontSize(9);
-        chart1.yAxis().labels().height(10);
-
-        // set the color scale as the color scale of the chart
-        chart1.colorScale(customColorScale);
-        // set the container id
-        chart1.container("container1");
-        // initiate drawing the chart
-        chart1.draw();
+    // anychart.onDocumentReady(function () {
 
         
-        // create the data
-        chart2 = anychart.heatMap(data[2]);
-        chart2.xAxis().labels().fontSize(9);
-        chart2.yAxis().labels().fontSize(9);
-        chart2.yAxis().labels().height(10);
+    
 
-        // set the color scale as the color scale of the chart
-        chart2.colorScale(customColorScale);
-        // set the container id
-        chart2.container("container2");
-        // initiate drawing the chart
-        chart2.draw();
-    });
+    //     // create and configure the color scale.
+    //     var customColorScale = anychart.scales.linearColor();
+    //     customColorScale.colors(["#ACE8D4", "#00726A"]);
+
+    //     // create the data
+    //     chart0 = anychart.heatMap(data[0]);
+    //     chart0.xAxis().labels().fontSize(9);
+    //     chart0.yAxis().labels().fontSize(9);
+    //     chart0.yAxis().labels().height(10);
+
+    //     // set the color scale as the color scale of the chart
+    //     chart0.colorScale(customColorScale);
+    //     // set the container id
+    //     chart0.container("container0");
+    //     // initiate drawing the chart
+    //     chart0.draw();
+
+
+
+    //     // create the data
+    //     chart1 = anychart.heatMap(data[1]);
+    //     chart1.xAxis().labels().fontSize(9);
+    //     chart1.yAxis().labels().fontSize(9);
+    //     chart1.yAxis().labels().height(10);
+
+    //     // set the color scale as the color scale of the chart
+    //     chart1.colorScale(customColorScale);
+    //     // set the container id
+    //     chart1.container("container1");
+    //     // initiate drawing the chart
+    //     chart1.draw();
+
+        
+    //     // create the data
+    //     chart2 = anychart.heatMap(data[2]);
+    //     chart2.xAxis().labels().fontSize(9);
+    //     chart2.yAxis().labels().fontSize(9);
+    //     chart2.yAxis().labels().height(10);
+
+    //     // set the color scale as the color scale of the chart
+    //     chart2.colorScale(customColorScale);
+    //     // set the container id
+    //     chart2.container("container2");
+    //     // initiate drawing the chart
+    //     chart2.draw();
+    // });
     
 </script>
 {% endblock %}
